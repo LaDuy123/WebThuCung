@@ -1,0 +1,138 @@
+﻿@model WebThuCung.Dto.RegisterDto
+@{
+    ViewData["Title"] = "Login";
+    Layout = "~/Views/Shared/_LayoutUser.cshtml";
+}
+
+<script language="javascript" src="~/Scripts/dangkyform.js"></script>
+
+<div id="PageContainer" class="is-moved-by-drawer" style="border-color:dimgray">
+    <main class="main-content" role="main">
+        <section id="page-wrapper">
+            <div class="wrapper">
+                <div class="inner">
+                    <div class="grid">
+                        <div class="grid__item large--one-third push--large--one-third text-center">
+                            <h1 style="font-size:30px;" align="center">Đăng ký tài khoản mới</h1>
+                            <div class="form-vertical">
+                                @using (Html.BeginForm("Register", "User", FormMethod.Post))
+                                {
+                                    @Html.AntiForgeryToken()
+
+                                    <div class="form-horizontal">
+                                        <div class="form-group">
+                                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                                            @if (ViewBag.Success != null)
+                                            {
+                                                <div class="alert alert-success">@ViewBag.Success = "Đăng ký thành công";</div>
+                                            }
+                                        </div>
+
+                                        <!-- Tên đăng nhập -->
+                                        <div class="form-group" style="text-align:left;">
+                                            @Html.LabelFor(model => model.userCustomer, new { @class = "control-label col-md-2" })
+                                            <div class="col-md-10">
+                                                @Html.TextBoxFor(model => model.userCustomer, new { @class = "form-control", placeholder = "Nhập tên đăng nhập" })
+                                                @Html.ValidationMessageFor(model => model.userCustomer, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+
+                                        <!-- Mật khẩu -->
+                                        <div class="form-group" style="text-align:left;">
+                                            @Html.LabelFor(model => model.paswordCusstomer, new { @class = "control-label col-md-2" })
+                                            <div class="col-md-10">
+                                                @Html.PasswordFor(model => model.paswordCusstomer, new { @class = "form-control", placeholder = "Nhập mật khẩu" })
+                                                @Html.ValidationMessageFor(model => model.paswordCusstomer, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+
+                                        <!-- Xác nhận mật khẩu -->
+                                        <div class="form-group" style="text-align:left;">
+                                            @Html.LabelFor(model => model.confirmPassword, new { @class = "control-label col-md-2" })
+                                            <div class="col-md-10">
+                                                @Html.PasswordFor(model => model.confirmPassword, new { @class = "form-control", placeholder = "Nhập lại mật khẩu" })
+                                                @Html.ValidationMessageFor(model => model.confirmPassword, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+
+                                        <!-- Họ tên -->
+                                        <div class="form-group" style="text-align:left;">
+                                            @Html.LabelFor(model => model.Name, new { @class = "control-label col-md-2" })
+                                            <div class="col-md-10">
+                                                @Html.TextBoxFor(model => model.Name, new { @class = "form-control", placeholder = "Nhập họ tên" })
+                                                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+
+                                        <!-- Điện thoại -->
+                                        <div class="form-group" style="text-align:left;">
+                                            @Html.LabelFor(model => model.Phone, new { @class = "control-label col-md-2" })
+                                            <div class="col-md-10">
+                                                @Html.TextBoxFor(model => model.Phone, new { @class = "form-control", placeholder = "Nhập số điện thoại", onkeypress = "return isNumberKey(event)" })
+                                                @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+
+                                        <!-- Email -->
+                                        <div class="form-group" style="text-align:left;">
+                                            @Html.LabelFor(model => model.Email, new { @class = "control-label col-md-2" })
+                                            <div class="col-md-10">
+                                                @Html.TextBoxFor(model => model.Email, new { @class = "form-control", type = "email", placeholder = "Nhập email" })
+                                                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+
+                                        <!-- Hình ảnh -->
+                                        <div class="form-group" style="text-align:left;">
+                                            @Html.LabelFor(model => model.Image, new { @class = "control-label col-md-2" })
+                                            <div class="col-md-10">
+                                                <input type="file" name="Image" accept="image/*" class="form-control" /> <!-- Đổi từ "hinhanh" thành "Image" -->
+                                                @Html.ValidationMessageFor(model => model.Image, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+
+                                        <!-- Ngày sinh -->
+                                        <div class="form-group" style="text-align:left;">
+                                            @Html.LabelFor(model => model.DateBirth, new { @class = "control-label col-md-2" })
+                                            <div class="col-md-10">
+                                                @Html.TextBoxFor(model => model.DateBirth, new { @class = "form-control", type = "date" })
+                                                @Html.ValidationMessageFor(model => model.DateBirth, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+
+                                        <!-- Địa chỉ -->
+                                        <div class="form-group" style="text-align:left;">
+                                            @Html.LabelFor(model => model.Address, new { @class = "control-label col-md-2" })
+                                            <div class="col-md-10">
+                                                @Html.TextAreaFor(model => model.Address, new { @class = "form-control", placeholder = "Nhập địa chỉ", rows = 2 })
+                                                @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+
+                                        <!-- Nút Đăng ký -->
+                                        <div class="form-group">
+                                            <div class="col-md-offset-2 col-md-10">
+                                                <input type="submit" value="Đăng Ký" class="btn btn--full" />
+                                                <p><a href="@Url.Action("Login", "User")">Trở về trang đăng nhập</a></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            return false;
+        }
+        return true;
+    }
+</script>
