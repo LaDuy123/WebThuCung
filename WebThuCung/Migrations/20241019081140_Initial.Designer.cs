@@ -12,8 +12,8 @@ using WebThuCung.Data;
 namespace WebThuCung.Migrations
 {
     [DbContext(typeof(PetContext))]
-    [Migration("20241019030427_fix1")]
-    partial class fix1
+    [Migration("20241019081140_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -137,10 +137,20 @@ namespace WebThuCung.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Image")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("OtpCode")
+                        .HasMaxLength(6)
+                        .HasColumnType("nvarchar(6)");
+
+                    b.Property<DateTime?>("OtpExpiryTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Phone")
                         .IsRequired()

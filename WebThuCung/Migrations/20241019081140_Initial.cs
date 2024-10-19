@@ -74,12 +74,15 @@ namespace WebThuCung.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     nameCustomer = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Phone = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     userCustomer = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     passwordCustomer = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     dateBirth = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Image = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false)
+                    Image = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    OtpCode = table.Column<string>(type: "nvarchar(6)", maxLength: 6, nullable: true),
+                    OtpExpiryTime = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {

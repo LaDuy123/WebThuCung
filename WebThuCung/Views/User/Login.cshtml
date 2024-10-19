@@ -54,7 +54,7 @@
                     <!-- Log In Tab -->
                     <div class="tab-pane fade active show" id="nav-sign-in" role="tabpanel" aria-labelledby="nav-sign-in-tab">
                         <div class="col-lg-8 offset-lg-2 mt-5">
-                            <p class="mb-0">Log-In With Social</p>
+                            @* <p class="mb-0">Log-In With Social</p>
                             <hr class="my-1">
                             <div class="row mt-4 mb-5">
                                 <div class="d-grid col-md-6 my-2">
@@ -73,9 +73,9 @@
                                         </div>
                                     </a>
                                 </div>
-                            </div>
+                            </div> *@
 
-                            <p class="mb-0">Or Log-In With Email</p>
+                            <p class="mb-0">Log-In With Email or Username</p>
                             <hr class="my-1">
 
                             @using (Html.BeginForm("Login", "User", FormMethod.Post))
@@ -84,7 +84,7 @@
                                 @Html.ValidationSummary(true, "", new { @class = "text-danger" })
                                 <div class="form-group flex-wrap">
                                     <div class="form-input col-lg-12 my-4">
-                                        @Html.TextBoxFor(model => model.userName, new { @class = "form-control mb-3 p-4", placeholder = "Enter email address" })
+                                        @Html.TextBoxFor(model => model.userName, new { @class = "form-control mb-3 p-4", placeholder = "Enter username or email address" })
                                         @Html.ValidationMessageFor(model => model.userName, "", new { @class = "text-danger" })
 
                                         @Html.PasswordFor(model => model.password, new { @class = "form-control mb-3 p-4", placeholder = "Enter password" })

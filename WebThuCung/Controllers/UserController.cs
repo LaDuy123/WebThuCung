@@ -57,6 +57,10 @@ namespace WebThuCung.Controllers
         {
             return _context.Customers.Any(x => x.Email == email);
         }
+        public bool KiemTraEmailAdmin(string email)
+        {
+            return _context.Admins.Any(x => x.Email == email);
+        }
 
         // Hàm sử dụng BCrypt để băm mật khẩu
         private string HashPassword(string password)
@@ -88,6 +92,11 @@ namespace WebThuCung.Controllers
                 if (KiemTraEmail(model.Email))
                 {
                     ModelState.AddModelError("Email", "Email đã tồn tại");
+                    return View(model);
+                }
+                if (KiemTraEmailAdmin(model.Email))
+                {
+                    ModelState.AddModelError("Email", "Email này là của Admin");
                     return View(model);
                 }
 
@@ -136,54 +145,55 @@ namespace WebThuCung.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Tìm kiếm khách hàng theo tên đăng nhập
-                var customer = _context.Customers.SingleOrDefault(n => n.userCustomer == model.userName);
+                // Tìm kiếm khách hàng theo tên đăng nhập hoặc email
+                var customer = _context.Customers
+                                       .SingleOrDefault(c => c.userCustomer == model.userName || c.Email == model.userName);
 
-                // Kiểm tra nếu tài khoản tồn tại
-                if (customer != null)
+                // Nếu tài khoản không tồn tại
+                if (customer == null)
                 {
-                    if (!customer.EmailConfirmed)
-                    {
-                        ModelState.AddModelError(string.Empty, "Email của bạn chưa được xác nhận.");
-                        return View(model); // Trả về view cùng thông báo lỗi
-                    }
-                    // Kiểm tra mật khẩu
-                    if (BCrypt.Net.BCrypt.Verify(model.password, customer.passwordCustomer))
-                    {
-                        // Đăng nhập thành công
-                        ViewBag.Thongbao = "Đăng nhập thành công";
-
-                        // Serialize thông tin khách hàng thành JSON và lưu vào Session
-                        var customerJson = Newtonsoft.Json.JsonConvert.SerializeObject(customer);
-                        HttpContext.Session.SetString("Taikhoan", customerJson);
-
-                        // Chuyển hướng về trang chính sau khi đăng nhập thành công
-                        return RedirectToAction("Index", "User");
-                    }
+                    // Thêm thông báo lỗi vào ModelState
+                    ModelState.AddModelError(string.Empty, "Tài khoản không tồn tại. Vui lòng kiểm tra lại email hoặc tên đăng nhập.");
+                    return View(model); // Trả về view cùng thông báo lỗi
                 }
 
-                // Nếu tên đăng nhập hoặc mật khẩu không đúng
-                ViewBag.Thongbao = "Tên đăng nhập hoặc mật khẩu không đúng";
-            }
-            else
-            {
-                // Xử lý nếu model không hợp lệ
-                ViewBag.Thongbao = "Dữ liệu không hợp lệ.";
+                // Kiểm tra xem email đã được xác nhận chưa
+                if (!customer.EmailConfirmed)
+                {
+                    ModelState.AddModelError(string.Empty, "Email của bạn chưa được xác nhận.");
+                    return View(model); // Trả về view cùng thông báo lỗi
+                }
+
+                // Kiểm tra mật khẩu
+                if (!BCrypt.Net.BCrypt.Verify(model.password, customer.passwordCustomer))
+                {
+                    ModelState.AddModelError(string.Empty, "Mật khẩu không đúng. Vui lòng thử lại.");
+                    return View(model); // Trả về view cùng thông báo lỗi
+                }
+
+                // Nếu vượt qua tất cả các kiểm tra, đăng nhập thành công
+                ViewBag.Thongbao = "Đăng nhập thành công";
+
+                // Serialize thông tin khách hàng thành JSON và lưu vào Session
+                var customerJson = Newtonsoft.Json.JsonConvert.SerializeObject(customer);
+                HttpContext.Session.SetString("Taikhoan", customerJson);
+
+                // Chuyển hướng về trang chính sau khi đăng nhập thành công
+                return RedirectToAction("Index", "User");
             }
 
-            // Trả về view với model để hiển thị thông báo
+            // Nếu model không hợp lệ, trả về view với thông báo lỗi ModelState
             return View(model);
         }
 
+
+
         public IActionResult Logout()
         {
-            // Xóa thông tin tài khoản khỏi session
             HttpContext.Session.Remove("Taikhoan");
 
-            // Bạn có thể thêm thông báo cho người dùng ở đây
             ViewBag.Thongbao = "Bạn đã đăng xuất thành công.";
 
-            // Chuyển hướng về trang đăng nhập hoặc trang chính
             return RedirectToAction("Index", "User");
         }
 
