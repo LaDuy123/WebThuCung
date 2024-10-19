@@ -7,7 +7,7 @@ namespace WebThuCung.Models
     public class Customer
     {
         [Key]
-        public string idCustomer { get; set; }
+        public int idCustomer { get; set; }
 
         [Required]
         [MaxLength(100)]

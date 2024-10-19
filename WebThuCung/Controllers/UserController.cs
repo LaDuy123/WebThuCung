@@ -86,14 +86,8 @@ namespace WebThuCung.Controllers
                 {
                     // Tạo đối tượng KHACHHANG và gán thông tin từ form đăng ký
                     var khachHang = new Customer
-                    {
-                        nameCustomer = model.Name,
-                        userCustomer = model.userCustomer,
-                        Email = model.Email,
-                        Address = model.Address,
-                        Phone = model.Phone,
-                        Image = model.Image,
-                        dateBirth = model.DateBirth
+                    {                      
+                        userCustomer = model.userCustomer,                     
                     };
 
                     // Sử dụng BCrypt để băm mật khẩu
@@ -124,19 +118,20 @@ namespace WebThuCung.Controllers
             if (ModelState.IsValid)
             {
                 // Tìm kiếm khách hàng theo tên đăng nhập
-                var customer = _context.Customers.SingleOrDefault(n => n.userCustomer == model.userCustomer);
+                var customer = _context.Customers.SingleOrDefault(n => n.userCustomer == model.userName);
 
                 // Kiểm tra nếu tài khoản tồn tại
                 if (customer != null)
                 {
                     // Kiểm tra mật khẩu
-                    if (BCrypt.Net.BCrypt.Verify(model.passwordCustomer, customer.passwordCustomer))
+                    if (BCrypt.Net.BCrypt.Verify(model.password, customer.passwordCustomer))
                     {
                         // Đăng nhập thành công
                         ViewBag.Thongbao = "Đăng nhập thành công";
 
-                        // Lưu thông tin đăng nhập vào Session
-                        HttpContext.Session.SetString("Taikhoan", customer.nameCustomer);
+                        // Serialize thông tin khách hàng thành JSON và lưu vào Session
+                        var customerJson = Newtonsoft.Json.JsonConvert.SerializeObject(customer);
+                        HttpContext.Session.SetString("Taikhoan", customerJson);
 
                         // Chuyển hướng về trang chính sau khi đăng nhập thành công
                         return RedirectToAction("Index", "User");
@@ -154,6 +149,18 @@ namespace WebThuCung.Controllers
 
             // Trả về view với model để hiển thị thông báo
             return View(model);
+        }
+
+        public IActionResult Logout()
+        {
+            // Xóa thông tin tài khoản khỏi session
+            HttpContext.Session.Remove("Taikhoan");
+
+            // Bạn có thể thêm thông báo cho người dùng ở đây
+            ViewBag.Thongbao = "Bạn đã đăng xuất thành công.";
+
+            // Chuyển hướng về trang đăng nhập hoặc trang chính
+            return RedirectToAction("Index", "User");
         }
 
     }

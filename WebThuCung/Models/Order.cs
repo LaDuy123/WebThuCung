@@ -10,7 +10,7 @@ namespace WebThuCung.Models
         public string idOrder { get; set; }
 
         [ForeignKey("Customer")]
-        public string idCustomer { get; set; }
+        public int idCustomer { get; set; }
 
         [Required]
         public DateTime dateFrom { get; set; }
@@ -24,7 +24,7 @@ namespace WebThuCung.Models
         public decimal? totalOrder { get; set; }
 
         // Navigation Properties
-        public Customer Cusstomer { get; set; }
+        public Customer Customer { get; set; }
         public ICollection<DetailOrder> DetailOrders { get; set; }
     }
 }

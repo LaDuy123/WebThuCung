@@ -12,7 +12,7 @@ using WebThuCung.Data;
 namespace WebThuCung.Migrations
 {
     [DbContext(typeof(PetContext))]
-    [Migration("20241018120401_Initial")]
+    [Migration("20241018150001_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -122,8 +122,11 @@ namespace WebThuCung.Migrations
 
             modelBuilder.Entity("WebThuCung.Models.Customer", b =>
                 {
-                    b.Property<string>("idCustomer")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("idCustomer")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("idCustomer"));
 
                     b.Property<string>("Address")
                         .IsRequired()
@@ -260,18 +263,14 @@ namespace WebThuCung.Migrations
                     b.Property<string>("idOrder")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("CusstomeridCustomer")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<DateTime>("dateFrom")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("dateTo")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("idCustomer")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("idCustomer")
+                        .HasColumnType("int");
 
                     b.Property<bool?>("statusOrder")
                         .HasColumnType("bit");
@@ -284,7 +283,7 @@ namespace WebThuCung.Migrations
 
                     b.HasKey("idOrder");
 
-                    b.HasIndex("CusstomeridCustomer");
+                    b.HasIndex("idCustomer");
 
                     b.ToTable("Order");
                 });
@@ -516,11 +515,13 @@ namespace WebThuCung.Migrations
 
             modelBuilder.Entity("WebThuCung.Models.Order", b =>
                 {
-                    b.HasOne("WebThuCung.Models.Customer", "Cusstomer")
+                    b.HasOne("WebThuCung.Models.Customer", "Customer")
                         .WithMany("Orders")
-                        .HasForeignKey("CusstomeridCustomer");
+                        .HasForeignKey("idCustomer")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("Cusstomer");
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("WebThuCung.Models.Product", b =>

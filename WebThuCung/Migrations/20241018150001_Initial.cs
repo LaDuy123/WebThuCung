@@ -70,7 +70,8 @@ namespace WebThuCung.Migrations
                 name: "Customer",
                 columns: table => new
                 {
-                    idCustomer = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    idCustomer = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     nameCustomer = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Phone = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
                     Address = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
@@ -155,22 +156,22 @@ namespace WebThuCung.Migrations
                 columns: table => new
                 {
                     idOrder = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    idCustomer = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    idCustomer = table.Column<int>(type: "int", nullable: false),
                     dateFrom = table.Column<DateTime>(type: "datetime2", nullable: false),
                     dateTo = table.Column<DateTime>(type: "datetime2", nullable: true),
                     statusOrder = table.Column<bool>(type: "bit", nullable: true),
                     statusPay = table.Column<bool>(type: "bit", nullable: true),
-                    totalOrder = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    CusstomeridCustomer = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    totalOrder = table.Column<decimal>(type: "decimal(18,2)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Order", x => x.idOrder);
                     table.ForeignKey(
-                        name: "FK_Order_Customer_CusstomeridCustomer",
-                        column: x => x.CusstomeridCustomer,
+                        name: "FK_Order_Customer_idCustomer",
+                        column: x => x.idCustomer,
                         principalTable: "Customer",
-                        principalColumn: "idCustomer");
+                        principalColumn: "idCustomer",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -346,9 +347,9 @@ namespace WebThuCung.Migrations
                 column: "idProduct");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Order_CusstomeridCustomer",
+                name: "IX_Order_idCustomer",
                 table: "Order",
-                column: "CusstomeridCustomer");
+                column: "idCustomer");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Product_idBranch",

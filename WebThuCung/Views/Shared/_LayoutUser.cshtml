@@ -411,40 +411,46 @@
                             </div>
                         </div>
                         <div class="hd-account">
-                            @if (Context.Session.GetString("Taikhoan") != null)
-                            {
-                                // Lấy thông tin khách hàng từ session
+                            @{
                                 var khachHangJson = Context.Session.GetString("Taikhoan");
 
-                                // Kiểm tra nếu dữ liệu session không null hoặc rỗng
                                 if (!string.IsNullOrEmpty(khachHangJson))
                                 {
-                                    var kh = Newtonsoft.Json.JsonConvert.DeserializeObject<WebThuCung.Models.Customer>(khachHangJson);
-
-                                    if (kh != null)
+                                    try
                                     {
-                                        // Hiển thị lời chào và liên kết đến trang thông tin cá nhân
-                                        <div class="account-info">
-                                            <span>Xin chào,</span>
-                                            <a href="@Url.Action("thongtincanhan", "User")" class="account-name">
-                                                @kh.nameCustomer
-                                            </a>
-                                        </div>
+                                        var kh = Newtonsoft.Json.JsonConvert.DeserializeObject<WebThuCung.Models.Customer>(khachHangJson);
 
-                                        // Nút đăng xuất
-                                        <a href="@Url.Action("dangxuat", "User")" class="logout-link">
-                                            <i class="fa fa-sign-out" aria-hidden="true"></i> Đăng xuất
-                                        </a>
+                                        if (kh != null)
+                                        {
+                                            // Hiển thị lời chào và liên kết đến trang thông tin cá nhân
+                                            <div class="account-info">
+                                                <span>Xin chào,</span>
+                                                <a href="@Url.Action("thongtincanhan", "User")" class="account-name">
+                                                    @kh.nameCustomer
+                                                </a>
+                                            </div>
+
+                                            // Nút đăng xuất
+                                            <a href="@Url.Action("Logout", "User")" class="logout-link">
+                                                <i class="fa fa-sign-out" aria-hidden="true"></i> Đăng xuất
+                                            </a>
+                                        }
+                                    }
+                                    catch (Newtonsoft.Json.JsonReaderException ex)
+                                    {
+                                    // Xử lý lỗi nếu JSON không hợp lệ
+                                        <div>Có lỗi xảy ra khi đọc thông tin tài khoản.</div>
                                     }
                                 }
-                            }
-                            else
-                            {
+                                else
+                                {
                                 // Hiển thị nút đăng nhập khi chưa đăng nhập
-                                <a href="@Url.Action("Login", "User")" class="login-link">
-                                    <i class="fa fa-user" aria-hidden="true"></i> Tài Khoản
-                                </a>
+                                    <a href="@Url.Action("Login", "User")" class="login-link">
+                                        <i class="fa fa-user" aria-hidden="true"></i> Tài Khoản
+                                    </a>
+                                }
                             }
+
                         </div>
 
 

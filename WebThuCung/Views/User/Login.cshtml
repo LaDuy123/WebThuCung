@@ -1,7 +1,7 @@
 ﻿@model WebThuCung.Dto.LoginDto
 @{
     ViewData["Title"] = "Login";
-    Layout = "~/Views/Shared/_LayoutUser.cshtml";
+    Layout = "~/Views/Shared/_LayoutUsers.cshtml";
 }
 
 @* <section id="breadcrumb-wrapper3" class="breadcrumb-w-img">
@@ -22,74 +22,149 @@
     </div>
 </section> *@
 
-<div id="PageContainer" class="is-moved-by-drawer">
-    <main class="main-content" role="main">
-        <section id="page-wrapper">
-            <div class="wrapper">
-                <div class="inner">
-                    <div class="grid">
-                        <div class="grid__item large--one-third push--large--one-third text-center">
-                            <div class="note form-success" id="ResetSuccess" style="display:none;">
-                                Chúng tôi đã gửi một email với đường dẫn để giúp bạn cập nhật mật khẩu.
-                            </div>
+<section id="banner" class="py-3" style="background: #F9F3EC;">
+    <div class="container">
+        <div class="hero-content py-5 my-3">
+            <h2 class="display-1 mt-3 mb-0">Account</h2>
+            <nav class="breadcrumb">
+                <a class="breadcrumb-item nav-link" href="#">Home</a>
+                <a class="breadcrumb-item nav-link" href="#">Pages</a>
+                <span class="breadcrumb-item active" aria-current="page">Account</span>
+            </nav>
+        </div>
+    </div>
+</section>
 
-                            <div id="CustomerLoginForm" class="form-vertical">
-                                <h1 style="font-size:35px;">Đăng nhập</h1>
-                                <h4 style="color:red; text-align:center"> @ViewBag.Thongbao</h4>
-
-                                @using (Html.BeginForm("Login", "User", FormMethod.Post))
-                                {
-                                    @Html.AntiForgeryToken()
-                                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-                                    <div class="form-horizontal">
-                                        <div class="form-group" style="text-align:left;">
-                                            @Html.LabelFor(model => model.userCustomer, htmlAttributes: new { @class = "control-label col-md-2" })
-                                            <div class="col-md-10">
-                                                @Html.TextBoxFor(model => model.userCustomer, new { @class = "form-control text-box single-line input-full" })
-                                                @Html.ValidationMessageFor(model => model.userCustomer, "", new { @class = "text-danger" })
-                                            </div>
+<section class="login-tabs padding-large">
+    <div class="container my-5 py-5">
+        <div class="row">
+            <div class="tabs-listing">
+                <nav>
+                    <div class="nav nav-tabs d-flex justify-content-center border-dark-subtle mb-3" id="nav-tab" role="tablist">
+                        <button class="nav-link mx-3 fs-3 border-bottom border-dark-subtle border-0 text-uppercase active" id="nav-sign-in-tab" data-bs-toggle="tab" data-bs-target="#nav-sign-in" type="button" role="tab" aria-controls="nav-sign-in" aria-selected="true">
+                            Log In
+                        </button>
+                        <button class="nav-link mx-3 fs-3 border-bottom border-dark-subtle border-0 text-uppercase" id="nav-register-tab" data-bs-toggle="tab" data-bs-target="#nav-register" type="button" role="tab" aria-controls="nav-register" aria-selected="false">
+                            Sign Up
+                        </button>
+                    </div>
+                </nav>
+                <div class="tab-content" id="nav-tabContent">
+                    <!-- Log In Tab -->
+                    <div class="tab-pane fade active show" id="nav-sign-in" role="tabpanel" aria-labelledby="nav-sign-in-tab">
+                        <div class="col-lg-8 offset-lg-2 mt-5">
+                            <p class="mb-0">Log-In With Social</p>
+                            <hr class="my-1">
+                            <div class="row mt-4 mb-5">
+                                <div class="d-grid col-md-6 my-2">
+                                    <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1 ">
+                                        <div class="d-flex flex-wrap justify-content-center">
+                                            <iconify-icon icon="ion:logo-google" class="signup-social-icon me-2"></iconify-icon>
+                                            <p class="mb-0">Google</p>
                                         </div>
-
-                                        <div class="form-group" style="text-align:left;">
-                                            @Html.LabelFor(model => model.passwordCustomer, htmlAttributes: new { @class = "control-label col-md-2" })
-                                            <div class="col-md-10">
-                                                @Html.PasswordFor(model => model.passwordCustomer, new { @class = "form-control text-box single-line input-full" })
-                                                @Html.ValidationMessageFor(model => model.passwordCustomer, "", new { @class = "text-danger" })
-                                            </div>
+                                    </a>
+                                </div>
+                                <div class="d-grid col-md-6 my-2">
+                                    <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1 ">
+                                        <div class="d-flex flex-wrap justify-content-center">
+                                            <iconify-icon icon="ion:logo-facebook" class="signup-social-icon me-2"></iconify-icon>
+                                            <p class="mb-0">Facebook</p>
                                         </div>
-
-                                        <div class="form-group">
-                                            <div class="col-md-offset-2 col-md-10">
-                                                <input type="submit" value="Đăng nhập" class="btn btn--full" />
-                                                <p><a href="@Url.Action("Index", "User")">Trở về</a></p>
-                                                <p><a href="@Url.Action("Register", "User")">Đăng ký</a></p>
-                                                <p><a href="@Url.Action("ForgotPassword", "User")">Quên mật khẩu?</a></p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                }
-                            </div>
-
-                            <div id="RecoverPasswordForm" style="display: none;">
-                                <h2>Cài đặt lại mật khẩu</h2>
-                                <p>Mật khẩu mới sẽ được gửi về email của bạn.</p>
-                                <div class="form-vertical">
-                                    <form accept-charset="UTF-8" action="/account/recover" method="post">
-                                        <input name="form_type" type="hidden" value="recover_customer_password">
-                                        <input name="utf8" type="hidden" value="✓">
-                                        <label for="RecoverEmail" class="hidden-label">Email</label>
-                                        <input type="email" value="" name="email" id="RecoverEmail" class="input-full" placeholder="Email" autocorrect="off" autocapitalize="off">
-                                        <p>
-                                            <input type="submit" class="btn btn--full" value="Gửi">
-                                        </p>
-                                        <button type="button" id="HideRecoverPasswordLink" class="text-link">Bỏ qua</button>
-                                    </form>
+                                    </a>
                                 </div>
                             </div>
+
+                            <p class="mb-0">Or Log-In With Email</p>
+                            <hr class="my-1">
+
+                            @using (Html.BeginForm("Login", "User", FormMethod.Post))
+                            {
+                                @Html.AntiForgeryToken()
+                                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                                <div class="form-group flex-wrap">
+                                    <div class="form-input col-lg-12 my-4">
+                                        @Html.TextBoxFor(model => model.userName, new { @class = "form-control mb-3 p-4", placeholder = "Enter email address" })
+                                        @Html.ValidationMessageFor(model => model.userName, "", new { @class = "text-danger" })
+
+                                        @Html.PasswordFor(model => model.password, new { @class = "form-control mb-3 p-4", placeholder = "Enter password" })
+                                        @Html.ValidationMessageFor(model => model.password, "", new { @class = "text-danger" })
+
+                                        <label class="py-3 d-flex flex-wrap justify-content-between">
+                                            <div>
+                                                <input type="checkbox" class="d-inline">
+                                                <span class="label-body">Remember Me</span>
+                                            </div>
+
+                                            <div id="passwordHelpBlock" class="form-text">
+                                                <a href="@Url.Action("ForgotPassword", "User")" class="text-primary fw-bold">Forgot Password?</a>
+                                            </div>
+                                        </label>
+
+                                        <div class="d-grid my-3">
+                                            <input type="submit" value="Log In" class="btn btn-dark btn-lg rounded-1" />
+                                        </div>
+
+                                        <p><a href="@Url.Action("Register", "User")" class="text-primary fw-bold">Create a new account</a></p>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Sign Up Tab (No changes needed for this part based on your request) -->
+                    <div class="tab-pane fade" id="nav-register" role="tabpanel" aria-labelledby="nav-register-tab">
+                        <div class="col-lg-8 offset-lg-2 mt-5">
+                            <p class="mb-0">Sign-up With Social</p>
+                            <hr class="my-1">
+                            <div class="row mt-4 mb-5">
+                                <div class="d-grid col-md-6 my-2">
+                                    <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1 ">
+                                        <div class="d-flex flex-wrap justify-content-center">
+                                            <iconify-icon icon="ion:logo-google" class="signup-social-icon me-2"></iconify-icon>
+                                            <p class="mb-0">Google</p>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="d-grid col-md-6 my-2">
+                                    <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1 ">
+                                        <div class="d-flex flex-wrap justify-content-center">
+                                            <iconify-icon icon="ion:logo-facebook" class="signup-social-icon me-2"></iconify-icon>
+                                            <p class="mb-0">Facebook</p>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <p class="mb-0">Or Sign-Up With Email</p>
+                            <hr class="my-1">
+
+                            <form id="form1" class="form-group flex-wrap">
+                                <div class="form-input col-lg-12 my-4">
+                                    <input type="text" id="exampleInputName" name="name" placeholder="Your full name" class="form-control mb-3 p-4">
+                                    <input type="text" id="exampleInputEmail1" name="email" placeholder="Your email address" class="form-control mb-3 p-4">
+                                    <input type="password" id="inputPassword1" placeholder="Set your password" class="form-control mb-3 p-4">
+                                    <input type="password" id="inputPassword2" placeholder="Retype your password" class="form-control mb-3 p-4">
+
+                                    <label class="py-3 d-flex flex-wrap justify-content-between">
+                                        <div>
+                                            <input type="checkbox" class="d-inline">
+                                            <span class="label-body">Remember Me</span>
+                                        </div>
+
+                                        <div id="passwordHelpBlock" class="form-text">
+                                            <a href="#" class="text-primary fw-bold">Forgot Password?</a>
+                                        </div>
+                                    </label>
+
+                                    <div class="d-grid my-3">
+                                        <a href="#" class="btn btn-dark btn-lg rounded-1">Sign Up</a>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
-    </main>
-</div>
+        </div>
+    </div>
+</section>
