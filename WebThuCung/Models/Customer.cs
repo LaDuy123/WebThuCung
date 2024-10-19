@@ -11,7 +11,7 @@ namespace WebThuCung.Models
 
         [Required]
         [MaxLength(100)]
-        public string nameCustomer { get; set; }
+        public string? nameCustomer { get; set; }
 
         [Required]
         [MaxLength(11)]
@@ -19,7 +19,7 @@ namespace WebThuCung.Models
         public string Phone { get; set; }
 
         [MaxLength(200)]
-        public string Address { get; set; }
+        public string? Address { get; set; }
         [Required]
         [MaxLength(30)]
         public string userCustomer { get; set; } // TENDNKH
@@ -35,6 +35,13 @@ namespace WebThuCung.Models
 
         [MaxLength(200)]
         public string Image { get; set; } // HINHANH
+        public bool EmailConfirmed { get; set; } = false; // Trạng thái xác nhận email
+        [StringLength(6)]
+        public string? OtpCode { get; set; }
+
+        // Thời gian hết hạn của OTP
+        public DateTime? OtpExpiryTime { get; set; } = DateTime.Now;
+
 
         public ICollection<Order> Orders { get; set; }
     }

@@ -28,17 +28,17 @@ namespace WebThuCung.Dto
         [Required(ErrorMessage = "Số điện thoại không được để trống.")]
         public string Phone { get; set; } // Viết hoa chữ cái đầu
 
-        [Display(Name = "Email:")]
-        [Required(ErrorMessage = "Email không được để trống.")]
+        [Required(ErrorMessage = "Email không được trống")]
+        [EmailAddress(ErrorMessage = "Email không hợp lệ")]
         public string Email { get; set; } // Viết hoa chữ cái đầu
 
         [Display(Name = "Hình ảnh:")]
-        public string Image { get; set; } // Viết hoa chữ cái đầu
+        public string? Image { get; set; } // Viết hoa chữ cái đầu
 
         [Display(Name = "Ngày sinh:")]
         public DateTime DateBirth { get; set; } // Viết hoa chữ cái đầu
 
         [Display(Name = "Địa chỉ:")]
-        public string Address { get; set; } // Viết hoa chữ cái đầu
+        public string? Address { get; set; } // Viết hoa chữ cái đầu
     }
 }

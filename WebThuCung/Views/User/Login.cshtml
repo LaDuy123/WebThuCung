@@ -41,13 +41,14 @@
             <div class="tabs-listing">
                 <nav>
                     <div class="nav nav-tabs d-flex justify-content-center border-dark-subtle mb-3" id="nav-tab" role="tablist">
-                        <button class="nav-link mx-3 fs-3 border-bottom border-dark-subtle border-0 text-uppercase active" id="nav-sign-in-tab" data-bs-toggle="tab" data-bs-target="#nav-sign-in" type="button" role="tab" aria-controls="nav-sign-in" aria-selected="true">
+                        <a  class="nav-link mx-3 fs-3 border-bottom border-dark-subtle border-0 text-uppercase" role="button">
                             Log In
-                        </button>
-                        <button class="nav-link mx-3 fs-3 border-bottom border-dark-subtle border-0 text-uppercase" id="nav-register-tab" data-bs-toggle="tab" data-bs-target="#nav-register" type="button" role="tab" aria-controls="nav-register" aria-selected="false">
+                        </a>
+                        <a href="@Url.Action("Register", "User")" class="nav-link mx-3 fs-3 border-bottom border-dark-subtle border-0 text-uppercase active" id="nav-register-tab" data-bs-toggle="tab" data-bs-target="#nav-register" type="button" role="tab" aria-controls="nav-register" aria-selected="true">
                             Sign Up
-                        </button>
+                        </a>
                     </div>
+
                 </nav>
                 <div class="tab-content" id="nav-tabContent">
                     <!-- Log In Tab -->

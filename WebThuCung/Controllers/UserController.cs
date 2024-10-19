@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Mail;
+using System.Net;
 using WebThuCung.Data;
 using WebThuCung.Dto;
 using WebThuCung.Models;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using static System.Net.WebRequestMethods;
 
 namespace WebThuCung.Controllers
 {
@@ -71,23 +74,37 @@ namespace WebThuCung.Controllers
         [HttpPost]
         public IActionResult Register(RegisterDto model)
         {
+            // Kiểm tra xem model có hợp lệ không
             if (ModelState.IsValid)
             {
-                // Kiểm tra xem tên đăng nhập hoặc email đã tồn tại chưa
+                // Kiểm tra xem tên đăng nhập đã tồn tại chưa
                 if (KiemTraTenDn(model.userCustomer))
                 {
-                    ModelState.AddModelError("", "Tên đăng nhập đã tồn tại");
+                    ModelState.AddModelError("userCustomer", "Tên đăng nhập đã tồn tại");
+                    return View(model);
                 }
-                else if (KiemTraEmail(model.Email))
+
+                // Kiểm tra xem email đã tồn tại chưa
+                if (KiemTraEmail(model.Email))
                 {
-                    ModelState.AddModelError("", "Email đã tồn tại");
+                    ModelState.AddModelError("Email", "Email đã tồn tại");
+                    return View(model);
                 }
-                else
+
+                // Nếu không có lỗi xác thực nào, tiến hành tạo khách hàng
+                if (ModelState.IsValid)
                 {
+                    var otp = new Random().Next(100000, 999999).ToString();
                     // Tạo đối tượng KHACHHANG và gán thông tin từ form đăng ký
                     var khachHang = new Customer
-                    {                      
-                        userCustomer = model.userCustomer,                     
+                    {
+                        userCustomer = model.userCustomer,
+                        nameCustomer = model.Name,
+                        Email = model.Email,
+                        Phone = model.Phone,
+                        OtpCode = otp, // Lưu OTP trong cơ sở dữ liệu
+                        OtpExpiryTime = DateTime.Now.AddMinutes(5),
+                        Image = "avatar_user.png", // Có thể thay đổi nếu bạn xử lý hình ảnh upload
                     };
 
                     // Sử dụng BCrypt để băm mật khẩu
@@ -96,15 +113,17 @@ namespace WebThuCung.Controllers
                     // Thêm khách hàng mới vào cơ sở dữ liệu
                     _context.Customers.Add(khachHang);
                     _context.SaveChanges();
+                    SendOtpEmail(model.Email, otp);
 
-                    // Sau khi đăng ký thành công, chuyển hướng người dùng đến trang đăng nhập
-                    return RedirectToAction("Login");
+                    // Chuyển hướng tới trang nhập mã OTP
+                    return RedirectToAction("ConfirmOtp", new { email = model.Email });
                 }
             }
 
             // Trả về view với dữ liệu của model khi có lỗi
             return View(model);
         }
+
 
         [HttpGet]
         public IActionResult Login()
@@ -123,6 +142,11 @@ namespace WebThuCung.Controllers
                 // Kiểm tra nếu tài khoản tồn tại
                 if (customer != null)
                 {
+                    if (!customer.EmailConfirmed)
+                    {
+                        ModelState.AddModelError(string.Empty, "Email của bạn chưa được xác nhận.");
+                        return View(model); // Trả về view cùng thông báo lỗi
+                    }
                     // Kiểm tra mật khẩu
                     if (BCrypt.Net.BCrypt.Verify(model.password, customer.passwordCustomer))
                     {
@@ -163,5 +187,165 @@ namespace WebThuCung.Controllers
             return RedirectToAction("Index", "User");
         }
 
+        public IActionResult ConfirmOtp(string email)
+        {
+            var model = new ConfirmOtpDto { Email = email };
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ConfirmOtp(ConfirmOtpDto model)
+        {
+
+            var customer = _context.Customers.SingleOrDefault(c => c.Email == model.Email && c.OtpCode == model.Otp);
+
+            if (customer != null && customer.OtpExpiryTime > DateTime.Now)
+            {
+                // Xử lý cho customer
+                customer.EmailConfirmed = true;
+                customer.OtpCode = null; // Xóa OTP sau khi xác nhận thành công
+                customer.OtpExpiryTime = null;
+                _context.SaveChanges();
+
+                return RedirectToAction("Login");
+            }      
+            else
+            {
+                ModelState.AddModelError("Otp", "Mã OTP không đúng hoặc đã hết hạn.");
+            }
+
+            // Nếu có lỗi, trả về view với thông báo lỗi và các giá trị nhập
+            return View(model); // Gửi lại model về view
+        }
+        private void SendOtpEmail(string email, string otp)
+        {
+            using (var client = new SmtpClient("smtp.gmail.com"))
+            {
+                client.Port = 587; // Port cho TLS
+                client.EnableSsl = true; // Bật SSL
+                client.Credentials = new NetworkCredential(
+                    Environment.GetEnvironmentVariable("EMAIL_USERNAME"),
+                    Environment.GetEnvironmentVariable("EMAIL_PASSWORD")
+                );
+
+                var mailMessage = new MailMessage
+                {
+                    From = new MailAddress(Environment.GetEnvironmentVariable("EMAIL_USERNAME")),
+                    Subject = "Mã OTP Xác Nhận Địa Chỉ Email",
+                    Body = $"<h1>Xác Nhận Địa Chỉ Email</h1>" +
+                           $"<p>Đây là mã OTP của bạn: <strong>{otp}</strong></p>",
+                    IsBodyHtml = true,
+                };
+
+                mailMessage.To.Add(email);
+
+                try
+                {
+                    client.Send(mailMessage);
+                }
+                catch (SmtpException ex)
+                {
+                    Console.WriteLine($"Error sending email: {ex.Message}");
+                }
+            }
+        }
+        public IActionResult ConfirmOtpReset(string email)
+        {
+            var model = new ConfirmOtpDto { Email = email };
+            return View(model);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ConfirmOtpReset(ConfirmOtpDto model)
+        {
+            var customer = _context.Customers.SingleOrDefault(c => c.Email == model.Email && c.OtpCode == model.Otp);
+           
+
+            if (customer != null && customer.OtpExpiryTime > DateTime.Now)
+            {
+                // Xử lý cho customer
+                customer.OtpCode = null; // Xóa OTP sau khi xác nhận thành công
+                customer.OtpExpiryTime = null; // Xóa thông tin OTP
+                _context.SaveChanges();
+
+                // Chuyển hướng đến trang nhập lại mật khẩu
+                return RedirectToAction("ResetPassword", new { email = model.Email });
+            }        
+            else
+            {
+                ModelState.AddModelError("Otp", "Mã OTP không đúng hoặc đã hết hạn.");
+            }
+
+            // Nếu có lỗi, trả về view với thông báo lỗi và các giá trị nhập
+            return View(model); // Gửi lại model về view
+        }
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ForgotPassword(ForgotPasswordDto model)
+        {
+            if (ModelState.IsValid)
+            {
+
+                // Kiểm tra trong bảng customer
+                var customer = _context.Customers.SingleOrDefault(c => c.Email == model.Email);
+                if (customer != null)
+                {
+                    // Tạo mã OTP ngẫu nhiên
+                    var otp = new Random().Next(100000, 999999).ToString();
+                    customer.OtpCode = otp; // Gán mã OTP
+                    customer.OtpExpiryTime = DateTime.Now.AddMinutes(10); // Đặt thời gian hết hạn
+                    _context.SaveChanges();
+
+                    // Gửi email chứa mã OTP
+                    SendOtpEmail(model.Email, otp);
+                    return RedirectToAction("ConfirmOtpReset", new { email = model.Email });
+                }            
+
+                // Nếu không tìm thấy người dùng, thêm thông báo lỗi
+                ModelState.AddModelError(string.Empty, "Email không tồn tại.");
+            }
+
+            // Trả lại view với thông báo lỗi
+            return View(model);
+        }
+
+
+        public IActionResult ResetPassword(string email)
+        {
+            var model = new ResetPasswordDto { Email = email };
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ResetPassword(ResetPasswordDto model)
+        {
+            if (ModelState.IsValid)
+            {
+                // Tìm người dùng theo email
+                var customer = _context.Customers.SingleOrDefault(c => c.Email == model.Email);
+
+                if (customer != null)
+                {
+                    // Cập nhật mật khẩu cho customer
+                    customer.passwordCustomer = HashPassword(model.Password); // Băm mật khẩu
+                    _context.SaveChanges();
+                    return RedirectToAction("Login");
+                }
+                else
+                {
+                    // Nếu không tìm thấy người dùng, có thể gửi thông báo thành công giả để bảo mật
+                    return RedirectToAction("ResetPasswordConfirmation");
+                }
+            }
+            return View(model);
+        }
     }
 }
