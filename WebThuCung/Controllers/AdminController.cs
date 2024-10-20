@@ -41,7 +41,7 @@ namespace WebThuCung.Controllers
             if (ModelState.IsValid)
             {
                 // Tìm kiếm admin trong cơ sở dữ liệu
-                Admin ad = _context.Admins.SingleOrDefault(n => n.userAdmin == model.userName && n.passwordAdmin == model.password);
+                var ad = _context.Admins.SingleOrDefault(n => n.userAdmin == model.userName && n.passwordAdmin == model.password);
 
                 if (ad != null)
                 {
@@ -59,6 +59,14 @@ namespace WebThuCung.Controllers
             }
 
             return View(model);
+        }
+        public IActionResult ListAdmin()
+        {
+            // Lấy danh sách các admin từ cơ sở dữ liệu
+            var admins = _context.Admins.ToList();
+
+            // Truyền danh sách admin sang view
+            return View(admins);
         }
     }
 }

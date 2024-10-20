@@ -77,7 +77,7 @@ namespace WebThuCung.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("namBranch")
+                    b.Property<string>("nameBranch")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -92,7 +92,7 @@ namespace WebThuCung.Migrations
                     b.Property<string>("idCategory")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("namCategory")
+                    b.Property<string>("nameCategory")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
@@ -234,18 +234,43 @@ namespace WebThuCung.Migrations
                     b.Property<string>("idDiscount")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<int>("discountPercent")
+                        .HasColumnType("int");
+
                     b.Property<string>("idProduct")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("percent")
-                        .HasColumnType("int");
 
                     b.HasKey("idDiscount");
 
                     b.HasIndex("idProduct");
 
                     b.ToTable("Discount");
+                });
+
+            modelBuilder.Entity("WebThuCung.Models.ImageProduct", b =>
+                {
+                    b.Property<string>("idImageProduct")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Image")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("ProductidProduct")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("idProduct")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("idImageProduct");
+
+                    b.HasIndex("ProductidProduct");
+
+                    b.ToTable("ImageProduct");
                 });
 
             modelBuilder.Entity("WebThuCung.Models.Mission", b =>
@@ -366,30 +391,6 @@ namespace WebThuCung.Migrations
                     b.HasIndex("idMission");
 
                     b.ToTable("Role");
-                });
-
-            modelBuilder.Entity("WebThuCung.Models.Shape", b =>
-                {
-                    b.Property<string>("idShape")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Image")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("ProductidProduct")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("idProduct")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("idShape");
-
-                    b.HasIndex("ProductidProduct");
-
-                    b.ToTable("Shape");
                 });
 
             modelBuilder.Entity("WebThuCung.Models.Size", b =>
@@ -519,6 +520,17 @@ namespace WebThuCung.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("WebThuCung.Models.ImageProduct", b =>
+                {
+                    b.HasOne("WebThuCung.Models.Product", "Product")
+                        .WithMany("ImageProducts")
+                        .HasForeignKey("ProductidProduct")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("WebThuCung.Models.Order", b =>
                 {
                     b.HasOne("WebThuCung.Models.Customer", "Customer")
@@ -572,15 +584,6 @@ namespace WebThuCung.Migrations
                     b.Navigation("Admin");
 
                     b.Navigation("Mission");
-                });
-
-            modelBuilder.Entity("WebThuCung.Models.Shape", b =>
-                {
-                    b.HasOne("WebThuCung.Models.Product", "Product")
-                        .WithMany("Shapes")
-                        .HasForeignKey("ProductidProduct");
-
-                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("WebThuCung.Models.Size", b =>
@@ -648,7 +651,7 @@ namespace WebThuCung.Migrations
 
                     b.Navigation("Discounts");
 
-                    b.Navigation("Shapes");
+                    b.Navigation("ImageProducts");
 
                     b.Navigation("Sizes");
                 });

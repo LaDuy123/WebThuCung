@@ -39,7 +39,7 @@ namespace WebThuCung.Models
         public Color Color { get; set; }
         public ICollection<DetailVoteWarehouse> DetailVoteWarehouses { get; set; }
         public ICollection<Discount> Discounts { get; set; }
-        public ICollection<Shape> Shapes { get; set; }
+        public ICollection<ImageProduct> ImageProducts { get; set; }
         public ICollection<Size> Sizes { get; set; }
         public ICollection<DetailOrder> DetailOrders { get; set; }
     }

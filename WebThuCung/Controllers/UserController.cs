@@ -32,8 +32,8 @@ namespace WebThuCung.Controllers
                                      Image = sp.Image,
                                      idBranch = sp.idBranch,
                                      idCategori = sp.idCategory,
-                                     nameBranch = sp.Branch.namBranch,   // Lấy tên thương hiệu từ đối tượng liên quan
-                                     nameCategory = sp.Category.namCategory,     // Lấy tên loại từ đối tượng liên quan
+                                     nameBranch = sp.Branch.nameBranch,   // Lấy tên thương hiệu từ đối tượng liên quan
+                                     nameCategory = sp.Category.nameCategory,     // Lấy tên loại từ đối tượng liên quan
                                      Quantity = sp.Quantity,
                                      Description = sp.Description,
                                      nameColor = sp.Color.nameColor, // Lấy tên màu sắc từ đối tượng liên quan

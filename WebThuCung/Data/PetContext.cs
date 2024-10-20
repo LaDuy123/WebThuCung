@@ -11,7 +11,7 @@ namespace WebThuCung.Data
         public DbSet<Branch> Branchs { get; set; }
         public DbSet<Mission> Missions { get; set; }
         public DbSet<Discount> Discounts { get; set; }
-        public DbSet<Shape> Shapes { get; set; }
+        public DbSet<ImageProduct> ImageProducts { get; set; }
         public DbSet<Size> Sizes { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Color> Colors { get; set; }
