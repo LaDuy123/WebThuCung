@@ -23,6 +23,11 @@ namespace WebThuCung.Models
 
         [ForeignKey("Color")]
         public string idColor { get; set; }
+        [ForeignKey("idPet")]
+        // Foreign Key
+        public string idPet { get; set; }
+
+        // Navigation Propert
 
         [Required]
         public int Quantity { get; set; }
@@ -37,6 +42,8 @@ namespace WebThuCung.Models
         public Branch Branch { get; set; }
         public Category Category { get; set; }
         public Color Color { get; set; }
+        public Pet Pet { get; set; }
+
         public ICollection<DetailVoteWarehouse> DetailVoteWarehouses { get; set; }
         public ICollection<Discount> Discounts { get; set; }
         public ICollection<ImageProduct> ImageProducts { get; set; }

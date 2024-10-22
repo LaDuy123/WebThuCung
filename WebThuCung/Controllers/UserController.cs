@@ -46,18 +46,17 @@ namespace WebThuCung.Controllers
             return View(allProducts);
         }
     
-        #region Kiểm tra tên đăng nhập đã tồn tại
-        public bool KiemTraTenDn(string tendn)
-        {
-            return _context.Customers.Any(x => x.userCustomer == tendn);
-        }
-        #endregion
 
-        public bool KiemTraEmail(string email)
+        public bool Checkusername(string username)
+        {
+            return _context.Customers.Any(x => x.userCustomer == username);
+        }
+
+        public bool CheckEmail(string email)
         {
             return _context.Customers.Any(x => x.Email == email);
         }
-        public bool KiemTraEmailAdmin(string email)
+        public bool CheckEmailAdmin(string email)
         {
             return _context.Admins.Any(x => x.Email == email);
         }
@@ -82,19 +81,19 @@ namespace WebThuCung.Controllers
             if (ModelState.IsValid)
             {
                 // Kiểm tra xem tên đăng nhập đã tồn tại chưa
-                if (KiemTraTenDn(model.userCustomer))
+                if (Checkusername(model.userCustomer))
                 {
                     ModelState.AddModelError("userCustomer", "Tên đăng nhập đã tồn tại");
                     return View(model);
                 }
 
                 // Kiểm tra xem email đã tồn tại chưa
-                if (KiemTraEmail(model.Email))
+                if (CheckEmail(model.Email))
                 {
                     ModelState.AddModelError("Email", "Email đã tồn tại");
                     return View(model);
                 }
-                if (KiemTraEmailAdmin(model.Email))
+                if (CheckEmailAdmin(model.Email))
                 {
                     ModelState.AddModelError("Email", "Email này là của Admin");
                     return View(model);
@@ -104,7 +103,7 @@ namespace WebThuCung.Controllers
                 if (ModelState.IsValid)
                 {
                     var otp = new Random().Next(100000, 999999).ToString();
-                    // Tạo đối tượng KHACHHANG và gán thông tin từ form đăng ký
+                
                     var khachHang = new Customer
                     {
                         userCustomer = model.userCustomer,
@@ -123,8 +122,7 @@ namespace WebThuCung.Controllers
                     _context.Customers.Add(khachHang);
                     _context.SaveChanges();
                     SendOtpEmail(model.Email, otp);
-
-                    // Chuyển hướng tới trang nhập mã OTP
+                  
                     return RedirectToAction("ConfirmOtp", new { email = model.Email });
                 }
             }

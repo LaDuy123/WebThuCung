@@ -25,16 +25,21 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Size List</h5>
-                        
 
+                        <div class="mb-3">
+                            <a asp-action="Create" class="btn btn-primary">
+                                <i class="bi bi-plus-circle"></i> Create New Size
+                            </a>
+                        </div>
                         <!-- Table with stripped rows -->
                         <table class="table datatable">
                             <thead>
                                 <tr>
                                     <th>ID Size</th>
                                     <th>ID Product</th>
-                                    <th>Image</th>
-
+                                    <th>Name Size</th>
+                                    <th>Edit</th>
+                                    <th>Delete</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -46,7 +51,19 @@
                                             <td>@size.idSize</td>
                                             <td>@size.idProduct</td>
                                             <td>@size.nameSize</td>
+                                            <td>
+                                                <!-- Nút Edit -->
+                                                <a asp-action="Edit" asp-route-id="@size.idSize" class="btn btn-warning btn-sm">Edit</a>
+                                                <!-- Nút Delete -->
 
+                                            </td>
+                                            <td>
+                                                <!-- Nút Edit -->
+
+                                                <form asp-action="Delete" asp-route-id="@size.idSize" method="post" style="display:inline;">
+                                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this Size?');">Delete</button>
+                                                </form>
+                                            </td>
                                         </tr>
                                     }
                                 }

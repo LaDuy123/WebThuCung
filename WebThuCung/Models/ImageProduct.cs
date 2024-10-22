@@ -9,14 +9,13 @@ namespace WebThuCung.Models
         [Key]
         public string idImageProduct { get; set; }
 
-        [ForeignKey("SanPham")]
         public string idProduct { get; set; }
 
         [MaxLength(100)]
         public string Image { get; set; }
 
 
-        // Navigation Property
+        [ForeignKey("idProduct")]
         public Product Product { get; set; }
     }
 }

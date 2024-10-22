@@ -16,7 +16,7 @@
         </div>
     </div>
 </section>
-<section id="register" class="login-tabs padding-large" ">
+<section class="login-tabs padding-large">
     <div class="container my-5 py-5">
         <div class="row">
             <div class="tabs-listing">
@@ -31,7 +31,7 @@
                        
                     </div>
                 </nav>
-
+                <form asp-acti></form>
                 <div class="tab-content" id="nav-tabContent">
                     <!-- Sign Up Tab -->
                     <div class="tab-pane fade active show" id="nav-register" role="tabpanel" aria-labelledby="nav-register-tab">
@@ -60,45 +60,52 @@
                             <p class="mb-0">Or Sign-Up With Email</p>
                             <hr class="my-1">
 
-                            @using (Html.BeginForm("Register", "User", FormMethod.Post))
-                            {
+                            <form asp-action="Register" method="post">
                                 @Html.AntiForgeryToken()
-                                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                                <!-- Validation Summary -->
+                                @* <div asp-validation-summary="All" class="text-danger"></div> *@
 
                                 <!-- Username -->
                                 <div class="form-input col-lg-12 my-4">
-                                    @Html.TextBoxFor(model => model.userCustomer, new { @class = "form-control mb-3 p-4", placeholder = "Nhập tên đăng nhập" })
-                                    @Html.ValidationMessageFor(model => model.userCustomer, "", new { @class = "text-danger" })
+                                    <label asp-for="userCustomer" class="col-form-label">Username</label>
+                                    <input asp-for="userCustomer" class="form-control mb-3 p-4" placeholder="Nhập tên đăng nhập" />
+                                    <span asp-validation-for="userCustomer" class="text-danger"></span>
                                 </div>
 
                                 <!-- Email -->
                                 <div class="form-input col-lg-12 my-4">
-                                    @Html.TextBoxFor(model => model.Email, new { @class = "form-control mb-3 p-4", placeholder = "Nhập địa chỉ email của bạn" })
-                                    @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                                    <label asp-for="Email" class="col-form-label">Email</label>
+                                    <input asp-for="Email" class="form-control mb-3 p-4" placeholder="Nhập địa chỉ email của bạn" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
                                 </div>
 
                                 <!-- Password -->
                                 <div class="form-input col-lg-12 my-4">
-                                    @Html.PasswordFor(model => model.paswordCusstomer, new { @class = "form-control mb-3 p-4", placeholder = "Tạo mật khẩu" })
-                                    @Html.ValidationMessageFor(model => model.paswordCusstomer, "", new { @class = "text-danger" })
+                                    <label asp-for="paswordCusstomer" class="col-form-label">Password</label>
+                                    <input asp-for="paswordCusstomer" type="password" class="form-control mb-3 p-4" placeholder="Tạo mật khẩu" />
+                                    <span asp-validation-for="paswordCusstomer" class="text-danger"></span>
                                 </div>
 
                                 <!-- Confirm Password -->
                                 <div class="form-input col-lg-12 my-4">
-                                    @Html.PasswordFor(model => model.confirmPassword, new { @class = "form-control mb-3 p-4", placeholder = "Nhập lại mật khẩu" })
-                                    @Html.ValidationMessageFor(model => model.confirmPassword, "", new { @class = "text-danger" })
+                                    <label asp-for="confirmPassword" class="col-form-label">Confirm Password</label>
+                                    <input asp-for="confirmPassword" type="password" class="form-control mb-3 p-4" placeholder="Nhập lại mật khẩu" />
+                                    <span asp-validation-for="confirmPassword" class="text-danger"></span>
                                 </div>
 
                                 <!-- Full Name -->
                                 <div class="form-input col-lg-12 my-4">
-                                    @Html.TextBoxFor(model => model.Name, new { @class = "form-control mb-3 p-4", placeholder = "Nhập họ tên" })
-                                    @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                                    <label asp-for="Name" class="col-form-label">Full Name</label>
+                                    <input asp-for="Name" class="form-control mb-3 p-4" placeholder="Nhập họ tên" />
+                                    <span asp-validation-for="Name" class="text-danger"></span>
                                 </div>
 
                                 <!-- Phone -->
                                 <div class="form-input col-lg-12 my-4">
-                                    @Html.TextBoxFor(model => model.Phone, new { @class = "form-control mb-3 p-4", placeholder = "Nhập số điện thoại", onkeypress = "return isNumberKey(event)" })
-                                    @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
+                                    <label asp-for="Phone" class="col-form-label">Phone</label>
+                                    <input asp-for="Phone" class="form-control mb-3 p-4" placeholder="Nhập số điện thoại" onkeypress="return isNumberKey(event)" />
+                                    <span asp-validation-for="Phone" class="text-danger"></span>
                                 </div>
 
                                 <!-- Submit Button -->
@@ -110,7 +117,7 @@
                                 <p class="text-center mt-3">
                                     <a href="@Url.Action("Login", "User")" class="text-primary fw-bold">Trở về trang đăng nhập</a>
                                 </p>
-                            }
+                            </form><!-- End Register Form -->
                         </div>
                     </div>
                 </div>
@@ -119,14 +126,15 @@
     </div>
 </section>
 
+<script language='javascript'>
 
-
-<script>
     function isNumberKey(evt) {
-        var charCode = (evt.which) ? evt.which : event.keyCode;
-        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
             return false;
-        }
         return true;
     }
+
 </script>
+
+

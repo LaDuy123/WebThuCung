@@ -25,5 +25,10 @@ namespace WebThuCung.Models
         // Navigation Properties
         public Order Order { get; set; }
         public Product Product { get; set; }
+        public decimal CalculateTotalPrice()
+        {
+            return Quantity * Price; // Tính toán tổng giá
+        }
     }
+
 }

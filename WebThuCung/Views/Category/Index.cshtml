@@ -25,15 +25,20 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Category List</h5>
-                       
 
+                        <div class="mb-3">
+                            <a asp-action="Create" class="btn btn-primary">
+                                <i class="bi bi-plus-circle"></i> Create New Category
+                            </a>
+                        </div>
                         <!-- Table with stripped rows -->
                         <table class="table datatable">
                             <thead>
                                 <tr>
                                     <th>ID</th>
                                     <th>Name Categoey</th>
-                                  
+                                    <th>Edit</th>
+                                    <th>Delete</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -44,7 +49,19 @@
                                         <tr>
                                             <td>@category.idCategory</td>
                                             <td>@category.nameCategory</td>
-                                           
+                                            <td>
+                                                <!-- Nút Edit -->
+                                                <a asp-action="Edit" asp-route-id="@category.idCategory" class="btn btn-warning btn-sm">Edit</a>
+                                                <!-- Nút Delete -->
+
+                                            </td>
+                                            <td>
+                                                <!-- Nút Edit -->
+
+                                                <form asp-action="Delete" asp-route-id="@category.idCategory" method="post" style="display:inline;">
+                                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this Category?');">Delete</button>
+                                                </form>
+                                            </td>
                                         </tr>
                                     }
                                 }

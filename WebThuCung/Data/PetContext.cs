@@ -23,6 +23,7 @@ namespace WebThuCung.Data
         public DbSet<Customer> Customers { get; set; }
         public DbSet<DetailVoteWarehouse> DetailVoteWarehouses { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
+        public DbSet<Pet> Pets { get; set; }
 
 
     }
