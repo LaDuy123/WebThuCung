@@ -65,7 +65,7 @@
                         </div>
                         <div class="card position-relative">
                             <a asp-controller="Product" asp-action="Detail" asp-route-id="@product.idProduct">
-                                <img src="@Url.Content("~/images/" + product.Image)" class="img-fluid rounded-4" alt="@product.nameProduct">
+                                <img src="@Url.Content("~/images/" + product.Image)" class="img-fluid " alt="@product.nameProduct">
                             </a>
                             <div class="card-body p-0">
                                 <a href="@Url.Action("Details", "Product", new { id = product.idProduct })">
