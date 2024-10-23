@@ -28,30 +28,46 @@ namespace WebThuCung.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(BranchDto branchDto)
+        public IActionResult Create(BranchCreateDto model)
         {
-            // Kiểm tra xem chi nhánh có tồn tại không
-            var existingBranch = _context.Branchs.FirstOrDefault(s => s.idBranch == branchDto.idBranch);
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            var existingBranch = _context.Branchs.FirstOrDefault(b => b.idBranch == model.idBranch);
             if (existingBranch != null)
             {
-                ModelState.AddModelError("", $"Branch with ID '{branchDto.idBranch}' already exists.");
-                return View(branchDto); // Trả lại form với thông báo lỗi
+                ModelState.AddModelError("idBranch", "Branch ID already exists."); // Thêm lỗi vào ModelState
+                return View(model); // Trả về view với thông báo lỗi
+            }
+            // Xử lý tải lên logo
+            string logoFilePath = null;
+            if (model.Logo != null && model.Logo.Length > 0)
+            {
+                var logoPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/brand-logo", model.Logo.FileName);
+                using (var stream = new FileStream(logoPath, FileMode.Create))
+                {
+                    model.Logo.CopyTo(stream);
+                }
+                logoFilePath = model.Logo.FileName; // Cập nhật tên tệp logo
             }
 
-            // Tạo đối tượng Branch từ DTO
-            var branch = new Branch
+           
+
+            // Tạo đối tượng Branch và lưu vào cơ sở dữ liệu
+            var newBranch = new Branch
             {
-                idBranch = branchDto.idBranch,
-                nameBranch = branchDto.nameBranch,
-                Logo = branchDto.Logo
+                idBranch = model.idBranch,
+                nameBranch = model.nameBranch,
+                // Nếu bạn lưu đường dẫn logo và CV vào DB, thêm vào đây
+                Logo = logoFilePath,
+                
             };
 
-            // Thêm chi nhánh vào database
-            _context.Branchs.Add(branch);
+            _context.Branchs.Add(newBranch);
             _context.SaveChanges();
 
-            // Chuyển hướng người dùng đến trang danh sách các chi nhánh sau khi tạo thành công
-            return RedirectToAction("Index"); // Index là danh sách chi nhánh hoặc trang bạn muốn chuyển hướng đến
+            return RedirectToAction("Index"); // Chuyển hướng đến trang danh sách chi nhánh
         }
 
         [HttpGet]
@@ -73,11 +89,12 @@ namespace WebThuCung.Controllers
             {
                 idBranch = branch.idBranch,
                 nameBranch = branch.nameBranch,
-                Logo = branch.Logo
+                // Không cần lấy Logo ở đây vì sẽ không hiển thị trong input
             };
 
             return View(branchDto);
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -93,7 +110,23 @@ namespace WebThuCung.Controllers
 
                 // Cập nhật các giá trị từ DTO vào model
                 branch.nameBranch = branchDto.nameBranch;
-                branch.Logo = branchDto.Logo;
+
+                // Xử lý tải lên logo
+                if (branchDto.Logo != null && branchDto.Logo.Length > 0)
+                {
+                    var cvPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/brand-logo", branchDto.Logo.FileName);
+                    if (System.IO.File.Exists(cvPath))
+                    {
+                        System.IO.File.Delete(cvPath);
+                    }
+
+                    using (var stream = new FileStream(cvPath, FileMode.Create, FileAccess.Write))
+                    {
+                        branchDto.Logo.CopyTo(stream);
+                    }
+                    branch.Logo = branchDto.Logo.FileName;
+                }
+
 
                 _context.SaveChanges();
                 return RedirectToAction("Index"); // Quay lại trang danh sách Branch sau khi cập nhật
@@ -101,6 +134,7 @@ namespace WebThuCung.Controllers
 
             return View(branchDto);
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]

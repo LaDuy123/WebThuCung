@@ -42,7 +42,7 @@
                             <div style="margin-top:7px" class="form-group row">
                                 <label asp-for="idProduct" class="col-sm-2 col-form-label">Product</label>
                                 <div class="col-sm-10">
-                                    <select class="form-control" id="inputProduct" name="idProduct" required>
+                                    <select asp-for="idProduct" class="form-control" id="inputProduct" name="idProduct" required>
                                         <option value="">-- Select a Product --</option>
                                         @foreach (var product in ViewBag.Products as List<SelectListItem>)
                                         {
@@ -52,6 +52,7 @@
                                 </div>
                                 @* <span asp-validation-for="idProduct" class="text-danger"></span> *@
                             </div>
+
 
 
                             <!-- Size Name -->

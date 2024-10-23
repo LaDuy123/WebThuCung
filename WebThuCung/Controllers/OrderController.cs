@@ -19,7 +19,8 @@ namespace WebThuCung.Controllers
         {
             // Lấy danh sách các đơn hàng từ cơ sở dữ liệu
             var orders = _context.Orders
-                .Include(o => o.DetailOrders) // Include the related DetailOrders
+                .Include(o => o.DetailOrders)
+                .ThenInclude(p => p.Product)
                 .ToList();
 
             // Tính toán tổng giá trị cho mỗi đơn hàng
@@ -180,6 +181,7 @@ namespace WebThuCung.Controllers
             {
                 // Kiểm tra xem sản phẩm đã tồn tại trong đơn hàng hay chưa
                 var existingDetailOrder = _context.DetailOrders
+                    .Include(d => d.Product)
                     .FirstOrDefault(d => d.idOrder == detailOrderDto.idOrder && d.idProduct == detailOrderDto.idProduct);
 
                 if (existingDetailOrder != null)
@@ -189,14 +191,14 @@ namespace WebThuCung.Controllers
                 }
                 else
                 {
+                    var product = _context.Products.FirstOrDefault(p => p.idProduct == detailOrderDto.idProduct);
                     // Chuyển đổi từ DTO sang model DetailOrder
                     var detailOrder = new DetailOrder
                     {
                         idOrder = detailOrderDto.idOrder,
                         idProduct = detailOrderDto.idProduct,
                         Quantity = detailOrderDto.Quantity,
-                        Price = detailOrderDto.Price,
-                        totalPrice = detailOrderDto.Quantity * detailOrderDto.Price // Tính tổng giá
+                        totalPrice = detailOrderDto.Quantity * product.sellPrice // Tính tổng giá
                     };
 
                     _context.DetailOrders.Add(detailOrder);
@@ -236,13 +238,12 @@ namespace WebThuCung.Controllers
             {
                 return NotFound();
             }
-
+            //var product = _context.Products.FirstOrDefault(p => p.idProduct == detailOrderDto.idProduct);
             var detailOrderDto = new DetailOrderDto
             {
                 idOrder = detailOrder.idOrder,
                 idProduct = detailOrder.idProduct,
-                Quantity = detailOrder.Quantity,
-                Price = detailOrder.Price,
+                Quantity = detailOrder.Quantity,          
                 totalPrice = detailOrder.CalculateTotalPrice()
             };
 
@@ -269,10 +270,9 @@ namespace WebThuCung.Controllers
                 {
                     return NotFound();
                 }
-
+                var product = _context.Products.FirstOrDefault(p => p.idProduct == detailOrderDto.idProduct);
                 detailOrder.Quantity = detailOrderDto.Quantity;
-                detailOrder.Price = detailOrderDto.Price;
-                detailOrder.totalPrice = detailOrderDto.Quantity * detailOrderDto.Price;
+                detailOrder.totalPrice = detailOrderDto.Quantity * product.sellPrice;
 
                 _context.SaveChanges();
 

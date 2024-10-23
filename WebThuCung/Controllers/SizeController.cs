@@ -50,7 +50,7 @@ namespace WebThuCung.Controllers
                 var existingSize = _context.Sizes.FirstOrDefault(s => s.idSize == sizeDto.idSize);
                 if (existingSize != null)
                 {
-                    ModelState.AddModelError("", $"Size with ID '{sizeDto.idSize}' already exists.");
+                    ModelState.AddModelError("idSize", $"Size with ID '{sizeDto.idSize}' already exists.");
                     return View(sizeDto); // Trả lại form với thông báo lỗi
                 }
                             

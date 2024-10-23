@@ -6,7 +6,7 @@ namespace WebThuCung.Dto
     public class ImageProductDto
     {
         public string idImageProduct { get; set; }
-        public string Image { get; set; }
+        public IFormFile? Image { get; set; }
         public string idProduct { get; set; }
     }
 }

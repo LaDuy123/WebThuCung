@@ -1,4 +1,4 @@
-﻿@model WebThuCung.Dto.ImageProductDto
+﻿@model WebThuCung.Dto.ImageProductCreateDto
 
 @{
     ViewData["Title"] = "Create";
@@ -27,7 +27,7 @@
                         <div asp-validation-summary="All" class="text-danger"></div>
 
                         <!-- Edit ImageProduct Form -->
-                        <form asp-action="Create" method="post">
+                        <form asp-action="Create" method="post" enctype="multipart/form-data">
                             <!-- ImageProduct ID (readonly) -->
                             <div class="row mb-3">
                                 <label asp-for="idImageProduct" class="col-sm-2 col-form-label">ImageProduct ID</label>
@@ -60,9 +60,9 @@
                             <div class="row mb-3">
                                 <label asp-for="Image" class="col-sm-2 col-form-label">ImageProduct Name</label>
                                 <div class="col-sm-10">
-                                    <input asp-for="Image" class="form-control" placeholder="Image" required />
+                                    <input type="file" class="form-control" id="Image" name="Image" accept="image/*" />
                                     <!-- Hiển thị lỗi nếu có -->
-                                    @* <span asp-validation-for="nameImageProduct" class="text-danger"></span> *@
+                                    <span asp-validation-for="Image" class="text-danger"></span>
                                 </div>
                             </div>
 

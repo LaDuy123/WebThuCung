@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿
+using System.ComponentModel.DataAnnotations;
 
 namespace WebThuCung.Dto
 {
@@ -12,10 +13,10 @@ namespace WebThuCung.Dto
         [MaxLength(200, ErrorMessage = "Tên sản phẩm không được vượt quá 200 ký tự.")]
         public string nameProduct { get; set; }
 
-        // Giá bán sản phẩm
+        [Required(ErrorMessage = "Giá bán là bắt buộc.")]
         [DataType(DataType.Currency)]
         [Range(0, double.MaxValue, ErrorMessage = "Giá bán không được âm.")]
-        public decimal? sellPrice { get; set; }
+        public decimal sellPrice { get; set; }
 
         // ID chi nhánh (Branch) của sản phẩm
         [Required(ErrorMessage = "Chi nhánh là bắt buộc.")]
@@ -38,8 +39,7 @@ namespace WebThuCung.Dto
         public int Quantity { get; set; }
 
         // Hình ảnh sản phẩm
-        [MaxLength(100, ErrorMessage = "Đường dẫn hình ảnh không được vượt quá 100 ký tự.")]
-        public string Image { get; set; }
+        public IFormFile? Image { get; set; }
 
         // Mô tả sản phẩm
         [Required(ErrorMessage = "Mô tả sản phẩm là bắt buộc.")]

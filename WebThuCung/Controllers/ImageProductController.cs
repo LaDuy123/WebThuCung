@@ -35,7 +35,7 @@ namespace WebThuCung.Controllers
             return View();
         }
         [HttpPost]
-        public IActionResult Create(ImageProductDto imageProductDto)
+        public IActionResult Create(ImageProductCreateDto imageProductDto)
         {
             var products = _context.Products.Select(p => new SelectListItem
             {
@@ -51,14 +51,25 @@ namespace WebThuCung.Controllers
                 var existingImageProduct = _context.ImageProducts.FirstOrDefault(s => s.idImageProduct == imageProductDto.idImageProduct);
                 if (existingImageProduct != null)
                 {
-                    ModelState.AddModelError("", $"ImageProduct with ID '{imageProductDto.idImageProduct}' already exists.");
+                    ModelState.AddModelError("idImageProduct", $"ImageProduct with ID '{imageProductDto.idImageProduct}' already exists.");
                     return View(imageProductDto); // Trả lại form với thông báo lỗi
+                }
+
+                string ImageFilePath = null;
+                if (imageProductDto.Image != null && imageProductDto.Image.Length > 0)
+                {
+                    var ImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", imageProductDto.Image.FileName);
+                    using (var stream = new FileStream(ImagePath, FileMode.Create))
+                    {
+                        imageProductDto.Image.CopyTo(stream);
+                    }
+                    ImageFilePath = imageProductDto.Image.FileName; // Cập nhật tên tệp Image
                 }
 
                 var imageProduct = new ImageProduct
                 {
                     idImageProduct = imageProductDto.idImageProduct,
-                    Image = imageProductDto.Image,
+                    Image = ImageFilePath,
                     idProduct = imageProductDto.idProduct
                 };
                 _context.ImageProducts.Add(imageProduct);
@@ -99,7 +110,6 @@ namespace WebThuCung.Controllers
             var imageProductDto = new ImageProductDto
             {
                 idImageProduct = imageProduct.idImageProduct,
-                Image = imageProduct.Image,
                 idProduct = imageProduct.idProduct
             };
 
@@ -119,10 +129,23 @@ namespace WebThuCung.Controllers
                     return NotFound();
                 }
 
-                // Cập nhật các giá trị từ DTO vào model
-                imageProduct.Image = imageProductDto.Image;
+         
                 imageProduct.idProduct = imageProductDto.idProduct;
+                if (imageProductDto.Image != null && imageProductDto.Image.Length > 0)
+                {
+                    var cvPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", imageProductDto.Image.FileName);
+                    if (System.IO.File.Exists(cvPath))
+                    {
+                        System.IO.File.Delete(cvPath);
+                    }
 
+                    using (var stream = new FileStream(cvPath, FileMode.Create, FileAccess.Write))
+                    {
+                        imageProductDto.Image.CopyTo(stream);
+                    }
+                    imageProduct.Image = imageProductDto.Image.FileName;
+                }            
+                 
 
                 _context.SaveChanges(); // Lưu thay đổi vào cơ sở dữ liệu
 

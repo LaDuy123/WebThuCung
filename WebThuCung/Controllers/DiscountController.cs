@@ -51,7 +51,7 @@ namespace WebThuCung.Controllers
                var existingDiscount = _context.Discounts.FirstOrDefault(s => s.idDiscount == discountDto.idDiscount);
                 if (existingDiscount != null)
                 {
-                    ModelState.AddModelError("", $"Discount with ID '{discountDto.idDiscount}' already exists.");
+                    ModelState.AddModelError("idDiscount", $"Discount with ID '{discountDto.idDiscount}' already exists.");
                     return View(discountDto); // Trả lại form với thông báo lỗi
                 }
 

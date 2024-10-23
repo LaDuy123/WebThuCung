@@ -33,7 +33,7 @@ namespace WebThuCung.Controllers
                 var existingColor = _context.Colors.FirstOrDefault(s => s.idColor == colorDto.idColor);
                 if (existingColor != null)
                 {
-                    ModelState.AddModelError("", $"Color with ID '{colorDto.idColor}' already exists.");
+                    ModelState.AddModelError("idColor", $"Color with ID '{colorDto.idColor}' already exists.");
                     return View(colorDto); // Trả lại form với thông báo lỗi
                 }
                 var color = new Color

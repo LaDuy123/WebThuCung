@@ -24,7 +24,7 @@
                         <div asp-validation-summary="All" class="text-danger"></div>
 
                         <!-- Edit Branch Form -->
-                        <form asp-action="Edit" method="post">
+                        <form asp-action="Edit" method="post" enctype="multipart/form-data">
                             <!-- Branch ID (readonly) -->
                             <div class="row mb-3">
                                 <label for="inputIdBranch" class="col-sm-2 col-form-label">Branch ID</label>
@@ -52,7 +52,8 @@
                             <div class="row mb-3">
                                 <label for="inputLogo" class="col-sm-2 col-form-label">Logo</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" id="inputLogo" name="logo" value="@Model.Logo" />
+                                    <input type="file" class="form-control" id="inputLogo" name="logo"  accept="image/*" />
+                                    <!-- Hiển thị lỗi nếu có -->
                                     <span asp-validation-for="Logo" class="text-danger"></span>
                                 </div>
                             </div>

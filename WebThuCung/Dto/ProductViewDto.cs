@@ -12,11 +12,12 @@
         public string nameCategory { get; set; }
         public int Quantity { get; set; }
         public string Description { get; set; }
+        public string idColor { get; set; }
         public string nameColor { get; set; }
-        public int TenKichThuoc { get; set; }
-        public string Logo { get; set; }
-        public string ThanhToanOn { get; set; }
-        public string Sale { get; set; }
-    }
+        public List<string> Sizes { get; set; }
 
+        public string Logo { get; set; }
+        public List<int> Discounts { get; set; }
+
+    }
 }

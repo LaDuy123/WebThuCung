@@ -34,7 +34,7 @@ namespace WebThuCung.Controllers
                 var existingCategory = _context.Categories.FirstOrDefault(s => s.idCategory == categoryDto.idCategory);
                 if (existingCategory != null)
                 {
-                    ModelState.AddModelError("", $"Category with ID '{categoryDto.idCategory}' already exists.");
+                    ModelState.AddModelError("idCategory", $"Category with ID '{categoryDto.idCategory}' already exists.");
                     return View(categoryDto); // Trả lại form với thông báo lỗi
                 }
                 var category = new Category

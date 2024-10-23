@@ -29,15 +29,25 @@ namespace WebThuCung.Controllers
         // POST: Supplier/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(SupplierDto supplierDto)
+        public IActionResult Create(SupplierCreateDto supplierDto)
         {
             if (ModelState.IsValid)
             {
-                var existingColor = _context.Suppliers.FirstOrDefault(s => s.idSupplier == supplierDto.idSupplier);
-                if (existingColor != null)
+                var existingSupplier = _context.Suppliers.FirstOrDefault(s => s.idSupplier == supplierDto.idSupplier);
+                if (existingSupplier != null)
                 {
-                    ModelState.AddModelError("", $"Color with ID '{supplierDto.idSupplier}' already exists.");
+                    ModelState.AddModelError("idSupplier", $"Supplier with ID '{supplierDto.idSupplier}' already exists.");
                     return View(supplierDto); // Trả lại form với thông báo lỗi
+                }
+                string ImageFilePath = null;
+                if (supplierDto.Image != null && supplierDto.Image.Length > 0)
+                {
+                    var ImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/Customer", supplierDto.Image.FileName);
+                    using (var stream = new FileStream(ImagePath, FileMode.Create))
+                    {
+                        supplierDto.Image.CopyTo(stream);
+                    }
+                    ImageFilePath = supplierDto.Image.FileName; // Cập nhật tên tệp Image
                 }
                 // Chuyển đổi DTO sang model Supplier
                 var supplier = new Supplier
@@ -47,7 +57,7 @@ namespace WebThuCung.Controllers
                     Phone = supplierDto.Phone,
                     Address = supplierDto.Address,
                     Email = supplierDto.Email,
-                    Image = supplierDto.Image
+                    Image = ImageFilePath
                 };
 
                 _context.Suppliers.Add(supplier);
@@ -74,7 +84,7 @@ namespace WebThuCung.Controllers
                 Phone = supplier.Phone,
                 Address = supplier.Address,
                 Email = supplier.Email,
-                Image = supplier.Image
+
             };
 
             return View(supplierDto);
@@ -93,12 +103,20 @@ namespace WebThuCung.Controllers
                     return NotFound();
                 }
 
+                if (supplierDto.Image != null && supplierDto.Image.Length > 0)
+                {
+                    var cvPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/Customer", supplierDto.Image.FileName);
+                    using (var stream = new FileStream(cvPath, FileMode.Create))
+                    {
+                        supplierDto.Image.CopyToAsync(stream);
+                    }
+                    supplier.Image = supplierDto.Image.FileName;
+                }
                 supplier.nameSupplier = supplierDto.NameSupplier;
                 supplier.Phone = supplierDto.Phone;
                 supplier.Address = supplierDto.Address;
                 supplier.Email = supplierDto.Email;
-                supplier.Image = supplierDto.Image;
-
+               
                 _context.Update(supplier);
                 _context.SaveChanges();
                 return RedirectToAction("Index");

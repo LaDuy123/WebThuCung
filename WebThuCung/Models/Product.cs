@@ -13,7 +13,7 @@ namespace WebThuCung.Models
         [MaxLength(200)]
         public string nameProduct { get; set; }
 
-        public decimal? sellPrice { get; set; }
+        public decimal sellPrice { get; set; }
 
         [ForeignKey("Branch")]
         public string idBranch { get; set; }

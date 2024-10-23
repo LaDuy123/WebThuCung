@@ -32,7 +32,7 @@ namespace WebThuCung.Controllers
                 var existingPet = _context.Pets.FirstOrDefault(s => s.idPet == petDto.idPet);
                 if (existingPet != null)
                 {
-                    ModelState.AddModelError("", $"Pet with ID '{petDto.idPet}' already exists.");
+                    ModelState.AddModelError("idPet", $"Pet with ID '{petDto.idPet}' already exists.");
                     return View(petDto); // Trả lại form với thông báo lỗi
                 }
                 var pet = new Pet

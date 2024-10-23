@@ -30,18 +30,19 @@ namespace WebThuCung.Models
         {
             if (DetailOrders != null && DetailOrders.Any())
             {
-                totalOrder = DetailOrders.Sum(d => d.Price * d.Quantity);
+                totalOrder = DetailOrders.Sum(d => d.Quantity * (d.Product != null ? d.Product.sellPrice : 0));
             }
             else
             {
                 totalOrder = 0; // Nếu không có DetailOrder, đặt tổng là 0
             }
         }
+
     }
     public enum OrderStatus
     {
         Pending,
-        Accept,
+        Accepted,
         Rejected,// Đang chờ xử lý
         Complete   // Đã từ chối
     }

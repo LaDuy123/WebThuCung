@@ -154,6 +154,9 @@ namespace WebThuCung.Migrations
                         .HasMaxLength(11)
                         .HasColumnType("nvarchar(11)");
 
+                    b.Property<DateTime>("createdAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime?>("dateBirth")
                         .HasColumnType("datetime2");
 
@@ -186,9 +189,6 @@ namespace WebThuCung.Migrations
                     b.Property<string>("idProduct")
                         .HasColumnType("nvarchar(450)")
                         .HasColumnOrder(1);
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
@@ -371,7 +371,7 @@ namespace WebThuCung.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<decimal?>("sellPrice")
+                    b.Property<decimal>("sellPrice")
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("idProduct");
@@ -422,8 +422,9 @@ namespace WebThuCung.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("nameSize")
-                        .HasColumnType("int");
+                    b.Property<string>("nameSize")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("idSize");
 

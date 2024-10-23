@@ -21,7 +21,7 @@ namespace WebThuCung.Dto
         [EmailAddress(ErrorMessage = "Invalid email format.")]
         public string Email { get; set; }
 
-        [MaxLength(200, ErrorMessage = "Image path cannot exceed 200 characters.")]
-        public string Image { get; set; }
+
+        public IFormFile? Image { get; set; }
     }
 }

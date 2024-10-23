@@ -12,7 +12,6 @@ namespace WebThuCung.Dto
         [StringLength(100, ErrorMessage = "Branch Name cannot exceed 100 characters.")]
         public string nameBranch { get; set; }
 
-        [StringLength(100, ErrorMessage = "Logo name cannot exceed 100 characters.")]
-        public string Logo { get; set; }
+        public IFormFile? Logo { get; set; }
     }
 }

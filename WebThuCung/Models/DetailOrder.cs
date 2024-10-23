@@ -17,9 +17,6 @@ namespace WebThuCung.Models
         [Required]
         public int Quantity { get; set; }
 
-        [Required]
-        public decimal Price { get; set; }
-
         public decimal? totalPrice { get; set; }
 
         // Navigation Properties
@@ -27,7 +24,13 @@ namespace WebThuCung.Models
         public Product Product { get; set; }
         public decimal CalculateTotalPrice()
         {
-            return Quantity * Price; // Tính toán tổng giá
+            // Kiểm tra xem Product có khác null không trước khi truy cập Price
+            if (Product != null)
+            {
+                return Quantity * Product.sellPrice; // Sử dụng giá từ Product
+            }
+
+            return 0; // Nếu Product là null, trả về 0
         }
     }
 

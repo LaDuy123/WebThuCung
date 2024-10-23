@@ -32,6 +32,8 @@ namespace WebThuCung.Models
         public string Email { get; set; } // EMAIL
 
         public DateTime? dateBirth { get; set; } // NGAYSINH
+        public DateTime createdAt { get; set; } = DateTime.Now;
+
 
         [MaxLength(200)]
         public string Image { get; set; } // HINHANH

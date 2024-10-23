@@ -9,7 +9,7 @@ namespace WebThuCung.Dto
         // Mã định danh cho sản phẩm (Product)
         public string idProduct { get; set; }
 
-        [Range(0, int.MaxValue, ErrorMessage = "Size cannot be negative.")]
-        public int nameSize { get; set; }
+    
+        public string nameSize { get; set; }
     }
 }
