@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WebThuCung.Data;
 using WebThuCung.Dto;
-using WebThuCung.Migrations;
+
 using WebThuCung.Models;
 
 namespace WebThuCung.Controllers
@@ -22,7 +22,7 @@ namespace WebThuCung.Controllers
             var products = _context.Products
                             .Include(sp => sp.Branch)  // Bao gồm thông tin thương hiệu
                             .Include(sp => sp.Category)        // Bao gồm thông tin loại
-                            .Include(sp => sp.Color).ToList();
+                            .ToList();
 
             // Truyền danh sách admin sang view
             return View(products);
@@ -40,12 +40,6 @@ namespace WebThuCung.Controllers
             {
                 Value = c.idCategory,
                 Text = c.nameCategory
-            }).ToList();
-
-            ViewBag.Colors = _context.Colors.Select(c => new SelectListItem
-            {
-                Value = c.idColor,
-                Text = c.nameColor
             }).ToList();
 
             ViewBag.Pets = _context.Pets.Select(p => new SelectListItem
@@ -73,11 +67,6 @@ namespace WebThuCung.Controllers
                 Text = c.nameCategory
             }).ToList();
 
-            ViewBag.Colors = _context.Colors.Select(c => new SelectListItem
-            {
-                Value = c.idColor,
-                Text = c.nameColor
-            }).ToList();
 
             ViewBag.Pets = _context.Pets.Select(p => new SelectListItem
             {
@@ -109,7 +98,6 @@ namespace WebThuCung.Controllers
                     sellPrice = productDto.sellPrice,
                     idBranch = productDto.idBranch,
                     idCategory = productDto.idCategory,
-                    idColor = productDto.idColor,
                     idPet = productDto.idPet,
                     Quantity = productDto.Quantity,
                     Image = ImageFilePath,
@@ -145,7 +133,6 @@ namespace WebThuCung.Controllers
                 sellPrice = product.sellPrice,
                 idBranch = product.idBranch,
                 idCategory = product.idCategory,
-                idColor = product.idColor,
                 idPet = product.idPet,
                 Quantity = product.Quantity,
                 Description = product.Description
@@ -164,11 +151,7 @@ namespace WebThuCung.Controllers
                 Text = c.nameCategory
             }).ToList();
 
-            ViewBag.Colors = _context.Colors.Select(c => new SelectListItem
-            {
-                Value = c.idColor,
-                Text = c.nameColor
-            }).ToList();
+         
 
             ViewBag.Pets = _context.Pets.Select(p => new SelectListItem
             {
@@ -195,13 +178,6 @@ namespace WebThuCung.Controllers
                 Value = c.idCategory,
                 Text = c.nameCategory
             }).ToList();
-
-            ViewBag.Colors = _context.Colors.Select(c => new SelectListItem
-            {
-                Value = c.idColor,
-                Text = c.nameColor
-            }).ToList();
-
             ViewBag.Pets = _context.Pets.Select(p => new SelectListItem
             {
                 Value = p.idPet,
@@ -220,7 +196,6 @@ namespace WebThuCung.Controllers
                 product.sellPrice = productDto.sellPrice;
                 product.idBranch = productDto.idBranch;
                 product.idCategory = productDto.idCategory;
-                product.idColor = productDto.idColor;
                 product.idPet = productDto.idPet;
                 product.Quantity = productDto.Quantity;
                 product.Description = productDto.Description;
@@ -278,29 +253,36 @@ namespace WebThuCung.Controllers
 
             // Tìm sản phẩm dựa trên idProduct
             var product = _context.Products
-                  .Include(sp => sp.Branch)  // Bao gồm thông tin thương hiệu
-                                 .Include(sp => sp.Category)        // Bao gồm thông tin loại
-                                 .Include(sp => sp.Color)
-                                 .Include(sp => sp.Sizes)
-
+                .Include(sp => sp.Branch)           // Baogồm thông tin thương hiệu (Branch)
+                .Include(sp => sp.Category)     
+                .Include(sp => sp.Pet)         // Bao gồm thông tin loại (Category)
+                                                    // Bao gồm thông tin loại (Category)
+                .Include(sp => sp.ImageProducts)    // Bao gồm thông tin các hình ảnh sản phẩm
+              .Include(sp => sp.ProductColors)      // Bao gồm ProductColors
+        .ThenInclude(pc => pc.Color)      // Bao gồm thông tin Color
+    .Include(sp => sp.ProductSizes)       // Bao gồm ProductSizes
+        .ThenInclude(ps => ps.Size)         // Bao gồm thông tin kích thước
+                .Include(sp => sp.Discounts)        // Bao gồm thông tin giảm giá
                 .Where(p => p.idProduct == id)
                 .Select(p => new ProductViewDto
                 {
                     idProduct = p.idProduct,
                     nameProduct = p.nameProduct,
                     sellPrice = p.sellPrice,
-                    Image = p.Image,
+                    Image = p.Image, // Hình ảnh chính của sản phẩm
                     idBranch = p.idBranch,
                     idCategori = p.idCategory,
-                    nameBranch = p.Branch.nameBranch, // Giả sử Branch có mối quan hệ với Product
-                    nameCategory = p.Category.nameCategory, // Giả sử Category có mối quan hệ với Product
+                    idPet = p.idPet,
+                    nameBranch = p.Branch != null ? p.Branch.nameBranch : "N/A", // Tên thương hiệu, nếu có
+                    namePet = p.Pet != null ? p.Pet.namePet : "N/A", // Tên thương hiệu, nếu có
+                    nameCategory = p.Category != null ? p.Category.nameCategory : "N/A", // Tên loại, nếu có
                     Quantity = p.Quantity,
                     Description = p.Description,
-                    nameColor = p.Color.nameColor,
-                    Sizes = p.Sizes.Select(s => s.nameSize).ToList(),
-                    Logo = p.Branch.Logo, // Giả sử Logo là từ chi nhánh (Branch)
-                    Discounts = p.Discounts.Select(s => s.discountPercent).ToList(),
-
+                    Colors = p.ProductColors != null ? p.ProductColors.Select(pc => pc.Color.nameColor).ToList() : new List<string>(), // Lấy danh sách màu sắc
+                    Sizes = p.ProductSizes != null ? p.ProductSizes.Select(ps => ps.Size.nameSize).ToList() : new List<string>(),      // Lấy danh sách kích thước
+                    Logo = p.Branch != null ? p.Branch.Logo : null, // Logo của chi nhánh
+                    Discounts = p.Discounts != null ? p.Discounts.Select(s => s.discountPercent).ToList() : new List<int>(), // Phần trăm giảm giá
+                    ImageProducts = p.ImageProducts != null ? p.ImageProducts.Select(i => i.Image).ToList() : new List<string>() // Hình ảnh sản phẩm khác
                 })
                 .FirstOrDefault();
 
@@ -312,6 +294,7 @@ namespace WebThuCung.Controllers
             // Trả về view với thông tin chi tiết của sản phẩm
             return View(product);
         }
+
 
 
     }

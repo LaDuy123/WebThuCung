@@ -102,10 +102,14 @@ CSS STRUCTURE:
     --header-height-min: 80px;
   }
 }
-
+.color-selected {
+    border: 2px solid #007bff; /* ???ng vi?n màu xanh lam ??m */
+    font-weight: bold; /* T?ng ?? ??m c?a ch? */
+    background-color: #e9ecef; /* Màu n?n nh?t h?n */
+}
 /* Theme Colors */
 :root {
-  --accent-color: #DEAD6F;
+  /*--accent-color: #DEAD6F;*/
   --dark-color: #222222;
   --light-dark-color: #727272;
   --light-color: #fff;

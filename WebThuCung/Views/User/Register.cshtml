@@ -107,6 +107,49 @@
                                     <input asp-for="Phone" class="form-control mb-3 p-4" placeholder="Nhập số điện thoại" onkeypress="return isNumberKey(event)" />
                                     <span asp-validation-for="Phone" class="text-danger"></span>
                                 </div>
+                                <div class="form-input col-lg-12 my-4">
+                                    <label asp-for="idCountry" class="col-form-label">Country</label>
+                                    <select asp-for="idCountry" class="form-control mb-3 p-4" id="countryDropdown">
+                                        <option value="">-- Select Country --</option>
+                                        @foreach (var country in ViewBag.Countries)
+                                        {
+                                            <option value="@country.Value">@country.Text</option>
+                                        }
+                                    </select>
+                                    <span asp-validation-for="idCountry" class="text-danger"></span>
+                                </div>
+
+                                <!-- City Dropdown -->
+                                <div class="form-input col-lg-12 my-4">
+                                    <label asp-for="idCity" class="col-form-label">City</label>
+                                    <select asp-for="idCity" class="form-control mb-3 p-4" id="cityDropdown">
+                                        <option value="">-- Select City --</option>
+                                    </select>
+                                    <span asp-validation-for="idCity" class="text-danger"></span>
+                                </div>
+
+                                <!-- District Dropdown -->
+                                <div class="form-input col-lg-12 my-4">
+                                    <label asp-for="idDistrict" class="col-form-label">District</label>
+                                    <select asp-for="idDistrict" class="form-control mb-3 p-4" id="districtDropdown">
+                                        <option value="">-- Select District --</option>
+                                    </select>
+                                    <span asp-validation-for="idDistrict" class="text-danger"></span>
+                                </div>
+
+                                <!-- Ward Dropdown -->
+                                <div class="form-input col-lg-12 my-4">
+                                    <label asp-for="idWard" class="col-form-label">Ward</label>
+                                    <select asp-for="idWard" class="form-control mb-3 p-4" id="wardDropdown">
+                                        <option value="">-- Select Ward --</option>
+                                    </select>
+                                    <span asp-validation-for="idWard" class="text-danger"></span>
+                                </div>
+                                <div class="form-input col-lg-12 my-4">
+                                    <label asp-for="Address" class="col-form-label">Address</label>
+                                    <input asp-for="Address" class="form-control mb-3 p-4" placeholder="Nhập địa chỉ" />
+                                    <span asp-validation-for="Address" class="text-danger"></span>
+                                </div>
 
                                 <!-- Submit Button -->
                                 <div class="d-grid my-3">
@@ -137,4 +180,95 @@
 
 </script>
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    console.log("Cities Data: ", @Html.Raw(Json.Serialize(ViewBag.Cities)));
+    console.log("Countries Data: ", @Html.Raw(Json.Serialize(ViewBag.Countries)));
 
+
+</script>
+
+<script>
+    // $(document).ready(function () {
+    //     var cities = @Html.Raw(Json.Serialize(ViewBag.Cities));
+    //     console.log("Cities: ", cities); // Kiểm tra toàn bộ dữ liệu
+
+    //     $('#countryDropdown').change(function () {
+    //         var selectedCountry = $(this).val();
+    //         console.log("Selected Country: ", selectedCountry);
+
+    //         // Lọc thành phố dựa trên quốc gia đã chọn
+    //         var filteredCities = cities.filter(city => {
+             
+    //             return city.countryId == selectedCountry; // Sửa lại ở đây
+    //         });
+
+    //         console.log("Filtered Cities: ", filteredCities); // Kiểm tra các thành phố đã lọc
+
+    //         $('#cityDropdown').empty().append('<option value="">-- Chọn Thành Phố --</option>');
+    //         $.each(filteredCities, function (index, city) {
+    //             $('#cityDropdown').append('<option value="' + city.value + '">' + city.text + '</option>'); // Sửa lại ở đây
+    //         });
+
+    //         // Xóa các dropdown tiếp theo
+    //         $('#districtDropdown').empty().append('<option value="">-- Chọn Quận --</option>');
+    //         $('#wardDropdown').empty().append('<option value="">-- Chọn Phường --</option>');
+    //     });
+    // });
+
+    $(document).ready(function () {
+        var cities = @Html.Raw(Json.Serialize(ViewBag.Cities));
+        var districts = @Html.Raw(Json.Serialize(ViewBag.Districts));
+        var wards = @Html.Raw(Json.Serialize(ViewBag.Wards));
+
+        $('#countryDropdown').change(function () {
+            var selectedCountry = $(this).val();
+            var filteredCities = cities.filter(city => {
+
+                return city.countryId == selectedCountry; // Sửa lại ở đây
+            });
+
+            $('#cityDropdown').empty().append('<option value="">-- Select City --</option>');
+            $.each(filteredCities, function (index, city) {
+                $('#cityDropdown').append('<option value="' + city.value + '">' + city.text + '</option>');
+            });
+
+            // Clear the subsequent dropdowns
+            $('#districtDropdown').empty().append('<option value="">-- Select District --</option>');
+            $('#wardDropdown').empty().append('<option value="">-- Select Ward --</option>');
+        });
+
+        $('#cityDropdown').change(function () {
+            var selectedCity = $(this).val();
+
+            // Filter districts based on selected city
+         
+            var filteredDistricts = districts.filter(district => {
+
+                return district.cityId == selectedCity; // Sửa lại ở đây
+            });
+            $('#districtDropdown').empty().append('<option value="">-- Select District --</option>');
+            $.each(filteredDistricts, function (index, district) {
+                $('#districtDropdown').append('<option value="' + district.value + '">' + district.text + '</option>');
+            });
+
+            // Clear the ward dropdown
+            $('#wardDropdown').empty().append('<option value="">-- Select Ward --</option>');
+        });
+
+        $('#districtDropdown').change(function () {
+            var selectedDistrict = $(this).val();
+
+            // Filter wards based on selected district
+            var filteredWards = wards.filter(ward => {
+
+                return ward.districtId == selectedDistrict; // Sửa lại ở đây
+            });
+ 
+            $('#wardDropdown').empty().append('<option value="">-- Select Ward --</option>');
+            $.each(filteredWards, function (index, ward) {
+                $('#wardDropdown').append('<option value="' + ward.value + '">' + ward.text + '</option>');
+            });
+        });
+    });
+</script>

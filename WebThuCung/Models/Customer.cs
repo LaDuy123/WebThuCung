@@ -19,7 +19,7 @@ namespace WebThuCung.Models
         public string Phone { get; set; }
 
         [MaxLength(200)]
-        public string? Address { get; set; }
+        public string Address { get; set; }
         [Required]
         [MaxLength(30)]
         public string userCustomer { get; set; } // TENDNKH
@@ -33,7 +33,21 @@ namespace WebThuCung.Models
 
         public DateTime? dateBirth { get; set; } // NGAYSINH
         public DateTime createdAt { get; set; } = DateTime.Now;
+        [ForeignKey("Country")]
+        public string idCountry { get; set; }
+        public Country Country { get; set; }
 
+        [ForeignKey("City")]
+        public string idCity { get; set; }
+        public City City { get; set; }
+
+        [ForeignKey("District")]
+        public string idDistrict { get; set; }
+        public District District { get; set; }
+
+        [ForeignKey("Ward")]
+        public string idWard { get; set; }
+        public Ward Ward { get; set; }
 
         [MaxLength(200)]
         public string Image { get; set; } // HINHANH

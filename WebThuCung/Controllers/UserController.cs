@@ -7,6 +7,7 @@ using WebThuCung.Dto;
 using WebThuCung.Models;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using static System.Net.WebRequestMethods;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace WebThuCung.Controllers
 {
@@ -22,8 +23,7 @@ namespace WebThuCung.Controllers
             // Truy vấn lấy các sản phẩm cùng các thuộc tính liên quan sử dụng Include
             var allProducts = _context.Products
                                  .Include(sp => sp.Branch)  // Bao gồm thông tin thương hiệu
-                                 .Include(sp => sp.Category)        // Bao gồm thông tin loại
-                                 .Include(sp => sp.Color)      // Bao gồm thông tin màu sắc
+                                 .Include(sp => sp.Category)        // Bao gồm thông tin loại     // Bao gồm thông tin màu sắc
                                  .Select(sp => new ProductViewDto
                                  {
                                      idProduct = sp.idProduct,
@@ -35,8 +35,7 @@ namespace WebThuCung.Controllers
                                      nameBranch = sp.Branch.nameBranch,   // Lấy tên thương hiệu từ đối tượng liên quan
                                      nameCategory = sp.Category.nameCategory,     // Lấy tên loại từ đối tượng liên quan
                                      Quantity = sp.Quantity,
-                                     Description = sp.Description,
-                                     nameColor = sp.Color.nameColor, // Lấy tên màu sắc từ đối tượng liên quan
+                                     Description = sp.Description, // Lấy tên màu sắc từ đối tượng liên quan
                                      Logo = sp.Branch.Logo     // Lấy logo từ đối tượng liên quan
                                  })
                                  .OrderBy(p => p.idProduct)
@@ -69,6 +68,34 @@ namespace WebThuCung.Controllers
         [HttpGet]
         public IActionResult Register()
         {
+            ViewBag.Countries = _context.Countries.Select(c => new SelectListItem
+            {
+                Value = c.idCountry.ToString(),
+                Text = c.nameCountry
+            }).ToList();
+
+            // Đảm bảo chúng ta bao gồm ID quốc gia với các thành phố
+            ViewBag.Cities = _context.Cities.Select(c => new
+            {
+                Value = c.idCity.ToString(),
+                Text = c.nameCity,
+                CountryId = c.idCountry // Đảm bảo điều này khớp với quan hệ khóa ngoại đúng
+            }).ToList();
+
+            ViewBag.Districts = _context.Districts.Select(d => new
+            {
+                Value = d.idDistrict.ToString(),
+                Text = d.nameDistrict,
+                CityId = d.idCity // Đảm bảo điều này khớp với quan hệ khóa ngoại đúng
+            }).ToList();
+
+            ViewBag.Wards = _context.Wards.Select(w => new
+            {
+                Value = w.idWard.ToString(),
+                Text = w.nameWard,
+                DistrictId = w.idDistrict // Đảm bảo điều này khớp với quan hệ khóa ngoại đúng
+            }).ToList();
+
             return View();
         }
 
@@ -77,6 +104,34 @@ namespace WebThuCung.Controllers
         [HttpPost]
         public IActionResult Register(RegisterDto model)
         {
+            ViewBag.Countries = _context.Countries.Select(c => new SelectListItem
+            {
+                Value = c.idCountry.ToString(),
+                Text = c.nameCountry
+            }).ToList();
+
+            // Đảm bảo chúng ta bao gồm ID quốc gia với các thành phố
+            ViewBag.Cities = _context.Cities.Select(c => new
+            {
+                Value = c.idCity.ToString(),
+                Text = c.nameCity,
+                CountryId = c.idCountry // Đảm bảo điều này khớp với quan hệ khóa ngoại đúng
+            }).ToList();
+
+            ViewBag.Districts = _context.Districts.Select(d => new
+            {
+                Value = d.idDistrict.ToString(),
+                Text = d.nameDistrict,
+                CityId = d.idCity // Đảm bảo điều này khớp với quan hệ khóa ngoại đúng
+            }).ToList();
+
+            ViewBag.Wards = _context.Wards.Select(w => new
+            {
+                Value = w.idWard.ToString(),
+                Text = w.nameWard,
+                DistrictId = w.idDistrict // Đảm bảo điều này khớp với quan hệ khóa ngoại đúng
+            }).ToList();
+
             // Kiểm tra xem model có hợp lệ không
             if (ModelState.IsValid)
             {
@@ -110,8 +165,13 @@ namespace WebThuCung.Controllers
                         nameCustomer = model.Name,
                         Email = model.Email,
                         Phone = model.Phone,
+                        Address = model.Address,
                         OtpCode = otp, // Lưu OTP trong cơ sở dữ liệu
                         OtpExpiryTime = DateTime.Now.AddMinutes(5),
+                        idCountry = model.idCountry, // Giá trị từ model
+                        idCity = model.idCity,
+                        idDistrict = model.idDistrict,
+                        idWard = model.idWard,
                         Image = "avatar_user.png", // Có thể thay đổi nếu bạn xử lý hình ảnh upload
                     };
 

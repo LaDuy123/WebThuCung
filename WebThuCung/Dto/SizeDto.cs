@@ -7,7 +7,6 @@ namespace WebThuCung.Dto
         public string idSize { get; set; }
 
         // Mã định danh cho sản phẩm (Product)
-        public string idProduct { get; set; }
 
     
         public string nameSize { get; set; }

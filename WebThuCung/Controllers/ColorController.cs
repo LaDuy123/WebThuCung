@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using WebThuCung.Data;
 using WebThuCung.Dto;
 using WebThuCung.Models;
@@ -115,6 +116,22 @@ namespace WebThuCung.Controllers
             _context.SaveChanges();
 
             return RedirectToAction("Index"); // Quay lại danh sách Color sau khi xóa
+        }
+        public IActionResult ProductColor(string productid)
+        {
+            var pcolors = _context.ProductColors
+                .Include(c => c.Color).Where(d => d.idProduct == productid).ToList();
+
+            // Truyền danh sách admin sang view
+            return View(pcolors);
+        }
+        public IActionResult CreateProductColor()
+        {
+            var pcolors = _context.ProductColors
+                .Include(c => c.Color).ToList();
+
+            // Truyền danh sách admin sang view
+            return View(pcolors);
         }
 
     }

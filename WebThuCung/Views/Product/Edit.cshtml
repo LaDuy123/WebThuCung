@@ -115,21 +115,6 @@
                                 </div>
                             </div>
 
-                            <!-- Color Selection -->
-                            <div class="row mb-3">
-                                <label asp-for="idColor" class="col-sm-2 col-form-label">Color</label>
-                                <div class="col-sm-10">
-                                    <select asp-for="idColor" class="form-control">
-                                        <option value="">-- Select a Color --</option>
-                                        @foreach (var color in ViewBag.Colors as List<SelectListItem>)
-                                        {
-                                            <option value="@color.Value">@color.Text</option>
-                                        }
-                                    </select>
-                                    <span asp-validation-for="idColor" class="text-danger"></span>
-                                </div>
-                            </div>
-
                             <!-- Pet Selection -->
                             <div class="row mb-3">
                                 <label asp-for="idPet" class="col-sm-2 col-form-label">Pet</label>

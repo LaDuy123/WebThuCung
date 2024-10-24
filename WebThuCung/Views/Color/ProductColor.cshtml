@@ -1,4 +1,4 @@
-﻿@model IEnumerable<WebThuCung.Models.Size>
+﻿@model IEnumerable<WebThuCung.Models.ProductColor>
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
@@ -8,11 +8,11 @@
 <main id="main" class="main">
 
     <div class="pagetitle">
-        <h1>Size List</h1>
+        <h1>Color List</h1>
         <nav>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                <li class="breadcrumb-item">Size</li>
+                <li class="breadcrumb-item">Color</li>
                 <li class="breadcrumb-item active">List</li>
             </ol>
         </nav>
@@ -24,42 +24,43 @@
 
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Size List</h5>
+                        <h5 class="card-title">Color List</h5>
 
                         <div class="mb-3">
-                            <a asp-action="Create" class="btn btn-primary">
-                                <i class="bi bi-plus-circle"></i> Create New Size
+                            <a asp-action="CreateProductColor" class="btn btn-primary">
+                                <i class="bi bi-plus-circle"></i> Create New ProductColor
                             </a>
                         </div>
                         <!-- Table with stripped rows -->
                         <table class="table datatable">
                             <thead>
                                 <tr>
-                                    <th>ID Size</th>
-                                    <th>Name Size</th>
-                                    <th>Edit</th>
-                                    <th>Delete</th>
+                                    <th>ID Color</th>
+                                    <th>ID Product</th>
+                                    <th>Name Color</th>
+
                                 </tr>
                             </thead>
                             <tbody>
                                 @if (Model != null && Model.Any())
                                 {
-                                    foreach (var size in Model)
+                                    foreach (var color in Model)
                                     {
                                         <tr>
-                                            <td>@size.idSize</td>
-                                            <td>@size.nameSize</td>
+                                            <td>@color.idColor</td>
+                                            <td>@color.idProduct</td>
+                                            <td>@color.Color.nameColor</td>
                                             <td>
                                                 <!-- Nút Edit -->
-                                                <a asp-action="Edit" asp-route-id="@size.idSize" class="btn btn-warning btn-sm">Edit</a>
+                                                <a asp-action="Edit" asp-route-id="@color.idColor" class="btn btn-warning btn-sm">Edit</a>
                                                 <!-- Nút Delete -->
 
                                             </td>
                                             <td>
                                                 <!-- Nút Edit -->
 
-                                                <form asp-action="Delete" asp-route-id="@size.idSize" method="post" style="display:inline;">
-                                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this Size?');">Delete</button>
+                                                <form asp-action="Delete" asp-route-id="@color.idColor" method="post" style="display:inline;">
+                                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this Color?');">Delete</button>
                                                 </form>
                                             </td>
                                         </tr>
@@ -68,7 +69,8 @@
                                 else
                                 {
                                     <tr>
-                                        <td colspan="5" class="text-center">No sizes found.</td>
+                                        <td colspan="5" class="text-center">No colors found.</td>
+
                                     </tr>
                                 }
                             </tbody>

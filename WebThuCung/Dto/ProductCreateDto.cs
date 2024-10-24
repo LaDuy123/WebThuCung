@@ -25,9 +25,6 @@ namespace WebThuCung.Dto
         [Required(ErrorMessage = "Danh mục là bắt buộc.")]
         public string idCategory { get; set; }
 
-        // ID màu sắc (Color) của sản phẩm
-        [Required(ErrorMessage = "Màu sắc là bắt buộc.")]
-        public string idColor { get; set; }
 
         // ID thú cưng (Pet) của sản phẩm
         public string idPet { get; set; }

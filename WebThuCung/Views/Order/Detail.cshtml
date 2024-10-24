@@ -35,6 +35,8 @@
                                     <th>Quantity</th>
                                     <th>Price</th>
                                     <th>Total Price</th>
+                                    <th>Size</th>
+                                    <th>Color</th>
                                     <th>Edit</th>
                                     <th>Delete</th>
                                 </tr>
@@ -49,6 +51,8 @@
                                         <td>@detail.Quantity</td>
                                         <td>@detail.Product.sellPrice.ToString("C")</td>
                                         <td>@detail.totalPrice?.ToString("C")</td>
+                                        @* <td>@detail.nameSize</td>
+                                        <td>@detail.nameColor</td> *@
                                         <td>
                                             <!-- Nút Edit truyền cả idOrder và idProduct -->
                                             <a asp-action="EditDetail"

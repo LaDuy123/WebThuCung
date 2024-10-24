@@ -102,6 +102,27 @@ namespace WebThuCung.Migrations
                     b.ToTable("Category");
                 });
 
+            modelBuilder.Entity("WebThuCung.Models.City", b =>
+                {
+                    b.Property<string>("idCity")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("idCountry")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("nameCity")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("idCity");
+
+                    b.HasIndex("idCountry");
+
+                    b.ToTable("City");
+                });
+
             modelBuilder.Entity("WebThuCung.Models.Color", b =>
                 {
                     b.Property<string>("idColor")
@@ -115,6 +136,21 @@ namespace WebThuCung.Migrations
                     b.HasKey("idColor");
 
                     b.ToTable("Color");
+                });
+
+            modelBuilder.Entity("WebThuCung.Models.Country", b =>
+                {
+                    b.Property<string>("idCountry")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("nameCountry")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("idCountry");
+
+                    b.ToTable("Country");
                 });
 
             modelBuilder.Entity("WebThuCung.Models.Customer", b =>
@@ -160,6 +196,18 @@ namespace WebThuCung.Migrations
                     b.Property<DateTime?>("dateBirth")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("idCity")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("idCountry")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("idDistrict")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("idWard")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("nameCustomer")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -177,6 +225,14 @@ namespace WebThuCung.Migrations
 
                     b.HasKey("idCustomer");
 
+                    b.HasIndex("idCity");
+
+                    b.HasIndex("idCountry");
+
+                    b.HasIndex("idDistrict");
+
+                    b.HasIndex("idWard");
+
                     b.ToTable("Customer");
                 });
 
@@ -193,12 +249,24 @@ namespace WebThuCung.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
+                    b.Property<string>("idColor")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("idSize")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<decimal?>("totalPrice")
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("idOrder", "idProduct");
 
+                    b.HasIndex("idColor");
+
                     b.HasIndex("idProduct");
+
+                    b.HasIndex("idSize");
 
                     b.ToTable("DetailOrder");
                 });
@@ -246,6 +314,27 @@ namespace WebThuCung.Migrations
                     b.HasIndex("idProduct");
 
                     b.ToTable("Discount");
+                });
+
+            modelBuilder.Entity("WebThuCung.Models.District", b =>
+                {
+                    b.Property<string>("idDistrict")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("idCity")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("nameDistrict")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("idDistrict");
+
+                    b.HasIndex("idCity");
+
+                    b.ToTable("District");
                 });
 
             modelBuilder.Entity("WebThuCung.Models.ImageProduct", b =>
@@ -344,9 +433,6 @@ namespace WebThuCung.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("PetidPet")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
@@ -358,13 +444,9 @@ namespace WebThuCung.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("idColor")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("idPet")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("nameProduct")
                         .IsRequired()
@@ -376,15 +458,47 @@ namespace WebThuCung.Migrations
 
                     b.HasKey("idProduct");
 
-                    b.HasIndex("PetidPet");
-
                     b.HasIndex("idBranch");
 
                     b.HasIndex("idCategory");
 
-                    b.HasIndex("idColor");
+                    b.HasIndex("idPet");
 
                     b.ToTable("Product");
+                });
+
+            modelBuilder.Entity("WebThuCung.Models.ProductColor", b =>
+                {
+                    b.Property<string>("idColor")
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnOrder(0);
+
+                    b.Property<string>("idProduct")
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnOrder(1);
+
+                    b.HasKey("idColor", "idProduct");
+
+                    b.HasIndex("idProduct");
+
+                    b.ToTable("ProductColor");
+                });
+
+            modelBuilder.Entity("WebThuCung.Models.ProductSize", b =>
+                {
+                    b.Property<string>("idSize")
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnOrder(0);
+
+                    b.Property<string>("idProduct")
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnOrder(1);
+
+                    b.HasKey("idSize", "idProduct");
+
+                    b.HasIndex("idProduct");
+
+                    b.ToTable("ProductSIze");
                 });
 
             modelBuilder.Entity("WebThuCung.Models.Role", b =>
@@ -418,17 +532,11 @@ namespace WebThuCung.Migrations
                     b.Property<string>("idSize")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("idProduct")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("nameSize")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("idSize");
-
-                    b.HasIndex("idProduct");
 
                     b.ToTable("Size");
                 });
@@ -489,8 +597,73 @@ namespace WebThuCung.Migrations
                     b.ToTable("VoteWarehouse");
                 });
 
+            modelBuilder.Entity("WebThuCung.Models.Ward", b =>
+                {
+                    b.Property<string>("idWard")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("idDistrict")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("nameWard")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("idWard");
+
+                    b.HasIndex("idDistrict");
+
+                    b.ToTable("Ward");
+                });
+
+            modelBuilder.Entity("WebThuCung.Models.City", b =>
+                {
+                    b.HasOne("WebThuCung.Models.Country", "Country")
+                        .WithMany("Cities")
+                        .HasForeignKey("idCountry")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Country");
+                });
+
+            modelBuilder.Entity("WebThuCung.Models.Customer", b =>
+                {
+                    b.HasOne("WebThuCung.Models.City", "City")
+                        .WithMany("Customers")
+                        .HasForeignKey("idCity");
+
+                    b.HasOne("WebThuCung.Models.Country", "Country")
+                        .WithMany("Customers")
+                        .HasForeignKey("idCountry");
+
+                    b.HasOne("WebThuCung.Models.District", "District")
+                        .WithMany("Customers")
+                        .HasForeignKey("idDistrict");
+
+                    b.HasOne("WebThuCung.Models.Ward", "Ward")
+                        .WithMany("Customers")
+                        .HasForeignKey("idWard");
+
+                    b.Navigation("City");
+
+                    b.Navigation("Country");
+
+                    b.Navigation("District");
+
+                    b.Navigation("Ward");
+                });
+
             modelBuilder.Entity("WebThuCung.Models.DetailOrder", b =>
                 {
+                    b.HasOne("WebThuCung.Models.Color", "Color")
+                        .WithMany()
+                        .HasForeignKey("idColor")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("WebThuCung.Models.Order", "Order")
                         .WithMany("DetailOrders")
                         .HasForeignKey("idOrder")
@@ -503,9 +676,19 @@ namespace WebThuCung.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("WebThuCung.Models.Size", "Size")
+                        .WithMany()
+                        .HasForeignKey("idSize")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Color");
+
                     b.Navigation("Order");
 
                     b.Navigation("Product");
+
+                    b.Navigation("Size");
                 });
 
             modelBuilder.Entity("WebThuCung.Models.DetailVoteWarehouse", b =>
@@ -538,6 +721,17 @@ namespace WebThuCung.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("WebThuCung.Models.District", b =>
+                {
+                    b.HasOne("WebThuCung.Models.City", "City")
+                        .WithMany("Districts")
+                        .HasForeignKey("idCity")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("City");
+                });
+
             modelBuilder.Entity("WebThuCung.Models.ImageProduct", b =>
                 {
                     b.HasOne("WebThuCung.Models.Product", "Product")
@@ -562,10 +756,6 @@ namespace WebThuCung.Migrations
 
             modelBuilder.Entity("WebThuCung.Models.Product", b =>
                 {
-                    b.HasOne("WebThuCung.Models.Pet", "Pet")
-                        .WithMany("Products")
-                        .HasForeignKey("PetidPet");
-
                     b.HasOne("WebThuCung.Models.Branch", "Branch")
                         .WithMany("Products")
                         .HasForeignKey("idBranch")
@@ -578,9 +768,9 @@ namespace WebThuCung.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("WebThuCung.Models.Color", "Color")
+                    b.HasOne("WebThuCung.Models.Pet", "Pet")
                         .WithMany("Products")
-                        .HasForeignKey("idColor")
+                        .HasForeignKey("idPet")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -588,9 +778,45 @@ namespace WebThuCung.Migrations
 
                     b.Navigation("Category");
 
+                    b.Navigation("Pet");
+                });
+
+            modelBuilder.Entity("WebThuCung.Models.ProductColor", b =>
+                {
+                    b.HasOne("WebThuCung.Models.Color", "Color")
+                        .WithMany("ProductColors")
+                        .HasForeignKey("idColor")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebThuCung.Models.Product", "Product")
+                        .WithMany("ProductColors")
+                        .HasForeignKey("idProduct")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Color");
 
-                    b.Navigation("Pet");
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("WebThuCung.Models.ProductSize", b =>
+                {
+                    b.HasOne("WebThuCung.Models.Product", "Product")
+                        .WithMany("ProductSizes")
+                        .HasForeignKey("idProduct")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebThuCung.Models.Size", "Size")
+                        .WithMany("ProductSizess")
+                        .HasForeignKey("idSize")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("Size");
                 });
 
             modelBuilder.Entity("WebThuCung.Models.Role", b =>
@@ -610,17 +836,6 @@ namespace WebThuCung.Migrations
                     b.Navigation("Mission");
                 });
 
-            modelBuilder.Entity("WebThuCung.Models.Size", b =>
-                {
-                    b.HasOne("WebThuCung.Models.Product", "Product")
-                        .WithMany("Sizes")
-                        .HasForeignKey("idProduct")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("WebThuCung.Models.VoteWarehouse", b =>
                 {
                     b.HasOne("WebThuCung.Models.Supplier", "Supplier")
@@ -630,6 +845,17 @@ namespace WebThuCung.Migrations
                         .IsRequired();
 
                     b.Navigation("Supplier");
+                });
+
+            modelBuilder.Entity("WebThuCung.Models.Ward", b =>
+                {
+                    b.HasOne("WebThuCung.Models.District", "District")
+                        .WithMany("Wards")
+                        .HasForeignKey("idDistrict")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("District");
                 });
 
             modelBuilder.Entity("WebThuCung.Models.Admin", b =>
@@ -647,14 +873,35 @@ namespace WebThuCung.Migrations
                     b.Navigation("Products");
                 });
 
+            modelBuilder.Entity("WebThuCung.Models.City", b =>
+                {
+                    b.Navigation("Customers");
+
+                    b.Navigation("Districts");
+                });
+
             modelBuilder.Entity("WebThuCung.Models.Color", b =>
                 {
-                    b.Navigation("Products");
+                    b.Navigation("ProductColors");
+                });
+
+            modelBuilder.Entity("WebThuCung.Models.Country", b =>
+                {
+                    b.Navigation("Cities");
+
+                    b.Navigation("Customers");
                 });
 
             modelBuilder.Entity("WebThuCung.Models.Customer", b =>
                 {
                     b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("WebThuCung.Models.District", b =>
+                {
+                    b.Navigation("Customers");
+
+                    b.Navigation("Wards");
                 });
 
             modelBuilder.Entity("WebThuCung.Models.Mission", b =>
@@ -682,7 +929,14 @@ namespace WebThuCung.Migrations
 
                     b.Navigation("ImageProducts");
 
-                    b.Navigation("Sizes");
+                    b.Navigation("ProductColors");
+
+                    b.Navigation("ProductSizes");
+                });
+
+            modelBuilder.Entity("WebThuCung.Models.Size", b =>
+                {
+                    b.Navigation("ProductSizess");
                 });
 
             modelBuilder.Entity("WebThuCung.Models.Supplier", b =>
@@ -693,6 +947,11 @@ namespace WebThuCung.Migrations
             modelBuilder.Entity("WebThuCung.Models.VoteWarehouse", b =>
                 {
                     b.Navigation("DetailVoteWarehouses");
+                });
+
+            modelBuilder.Entity("WebThuCung.Models.Ward", b =>
+                {
+                    b.Navigation("Customers");
                 });
 #pragma warning restore 612, 618
         }

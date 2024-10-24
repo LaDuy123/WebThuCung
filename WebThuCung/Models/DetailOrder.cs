@@ -16,10 +16,15 @@ namespace WebThuCung.Models
 
         [Required]
         public int Quantity { get; set; }
-
+        [ForeignKey("Size")]
+        public string idSize { get; set; }
+        [ForeignKey("Color")]
+        public string idColor { get; set; }
         public decimal? totalPrice { get; set; }
 
         // Navigation Properties
+        public Size Size { get; set; }
+        public Color Color { get; set; }
         public Order Order { get; set; }
         public Product Product { get; set; }
         public decimal CalculateTotalPrice()

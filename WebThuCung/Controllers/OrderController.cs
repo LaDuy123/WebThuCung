@@ -169,6 +169,16 @@ namespace WebThuCung.Controllers
                 Value = p.idProduct.ToString(),
                 Text = p.nameProduct
             }).ToList();
+            ViewBag.Sizes = _context.Sizes.Select(s => new SelectListItem
+            {
+                Value = s.idSize.ToString(),
+                Text = s.nameSize
+            }).ToList();
+            ViewBag.Colors = _context.Colors.Select(c => new SelectListItem
+            {
+                Value = c.idColor.ToString(),
+                Text = c.nameColor
+            }).ToList();
 
             return View();
         }
@@ -177,6 +187,21 @@ namespace WebThuCung.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult CreateDetail(DetailOrderDto detailOrderDto)
         {
+            ViewBag.Products = _context.Products.Select(p => new SelectListItem
+            {
+                Value = p.idProduct.ToString(),
+                Text = p.nameProduct
+            }).ToList();
+            ViewBag.Sizes = _context.Sizes.Select(s => new SelectListItem
+            {
+                Value = s.idSize.ToString(),
+                Text = s.nameSize
+            }).ToList();
+            ViewBag.Colors = _context.Colors.Select(c => new SelectListItem
+            {
+                Value = c.idColor.ToString(),
+                Text = c.nameColor
+            }).ToList();
             if (ModelState.IsValid)
             {
                 // Kiểm tra xem sản phẩm đã tồn tại trong đơn hàng hay chưa
@@ -197,6 +222,8 @@ namespace WebThuCung.Controllers
                     {
                         idOrder = detailOrderDto.idOrder,
                         idProduct = detailOrderDto.idProduct,
+                        idColor = detailOrderDto.idColor,
+                        idSize = detailOrderDto.idSize,
                         Quantity = detailOrderDto.Quantity,
                         totalPrice = detailOrderDto.Quantity * product.sellPrice // Tính tổng giá
                     };
@@ -211,11 +238,7 @@ namespace WebThuCung.Controllers
 
             // Nếu không hợp lệ, tải lại form
             ViewBag.OrderId = detailOrderDto.idOrder;
-            ViewBag.Products = _context.Products.Select(p => new SelectListItem
-            {
-                Value = p.idProduct.ToString(),
-                Text = p.nameProduct
-            }).ToList();
+        
 
             return View(detailOrderDto);
         }
@@ -252,6 +275,16 @@ namespace WebThuCung.Controllers
                 Value = p.idProduct.ToString(),
                 Text = p.nameProduct
             }).ToList();
+            ViewBag.Sizes = _context.Sizes.Select(s => new SelectListItem
+            {
+                Value = s.idSize.ToString(),
+                Text = s.nameSize
+            }).ToList();
+            ViewBag.Colors = _context.Colors.Select(c => new SelectListItem
+            {
+                Value = c.idColor.ToString(),
+                Text = c.nameColor
+            }).ToList();
 
             return View(detailOrderDto);
         }
@@ -283,6 +316,16 @@ namespace WebThuCung.Controllers
             {
                 Value = p.idProduct.ToString(),
                 Text = p.nameProduct
+            }).ToList();
+            ViewBag.Sizes = _context.Sizes.Select(s => new SelectListItem
+            {
+                Value = s.idSize.ToString(),
+                Text = s.nameSize
+            }).ToList();
+            ViewBag.Colors = _context.Colors.Select(c => new SelectListItem
+            {
+                Value = c.idColor.ToString(),
+                Text = c.nameColor
             }).ToList();
 
             return View(detailOrderDto);

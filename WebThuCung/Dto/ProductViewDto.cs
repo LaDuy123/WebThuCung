@@ -8,13 +8,15 @@
         public string Image { get; set; }
         public string idBranch { get; set; }
         public string idCategori { get; set; }
+        public string idPet { get; set; }
         public string nameBranch { get; set; }
         public string nameCategory { get; set; }
+        public string namePet { get; set; }
         public int Quantity { get; set; }
         public string Description { get; set; }
-        public string idColor { get; set; }
-        public string nameColor { get; set; }
+        public List<string> Colors{ get; set; }
         public List<string> Sizes { get; set; }
+        public List<string>  ImageProducts {  get; set; }
 
         public string Logo { get; set; }
         public List<int> Discounts { get; set; }
