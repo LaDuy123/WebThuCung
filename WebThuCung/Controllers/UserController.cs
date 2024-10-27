@@ -20,6 +20,7 @@ namespace WebThuCung.Controllers
         }
         public IActionResult Index()
         {
+            var customerId = GetCustomerIdFromSession();
             // Truy vấn lấy các sản phẩm cùng các thuộc tính liên quan sử dụng Include
             var allProducts = _context.Products
                                  .Include(sp => sp.Branch)  // Bao gồm thông tin thương hiệu
@@ -42,10 +43,48 @@ namespace WebThuCung.Controllers
                                  .Take(6)  // Lấy ra 6 sản phẩm
                                  .ToList();
 
+
+            var savedProductIds = _context.SaveProducts
+                .Where(s => s.idCustomer == customerId)
+                .Select(s => s.idProduct)
+                .ToList();
+
+            // Gán danh sách cho ViewBag để sử dụng trong View
+            ViewBag.SavedProductIds = savedProductIds;
             return View(allProducts);
         }
-    
+        private int GetCustomerIdFromSession()
+        {
+            var customerEmail = HttpContext.Session.GetString("email");
+            var customer = _context.Customers.FirstOrDefault(c => c.Email == customerEmail);
+            return customer?.idCustomer ?? 0;
+        }
+        [HttpGet]
+        public IActionResult CheckAuthentication()
+        {
+            string email = HttpContext.Session.GetString("email");
 
+            if (!string.IsNullOrEmpty(email))
+            {
+                // Kiểm tra bảng Candidate
+                var customer = _context.Customers.FirstOrDefault(c => c.Email == email);
+                if (customer != null)
+                {
+                    return new JsonResult(new
+                    {
+                        isAuthenticated = true,
+                        iscustomer = true,
+                        avatar =  customer.Image// Giả sử bạn có trường Avatar trong Candidate
+                    });
+                }
+
+                // Kiểm tra bảng Recruiter
+             
+            }
+
+            // Nếu không tìm thấy email hoặc người dùng chưa đăng nhập
+            return new JsonResult(new { isAuthenticated = false });
+        }
         public bool Checkusername(string username)
         {
             return _context.Customers.Any(x => x.userCustomer == username);
@@ -231,11 +270,18 @@ namespace WebThuCung.Controllers
 
                 // Nếu vượt qua tất cả các kiểm tra, đăng nhập thành công
                 ViewBag.Thongbao = "Đăng nhập thành công";
-
+                TempData["success"] = "Đăng nhập thành công";
                 // Serialize thông tin khách hàng thành JSON và lưu vào Session
                 var customerJson = Newtonsoft.Json.JsonConvert.SerializeObject(customer);
                 HttpContext.Session.SetString("Taikhoan", customerJson);
+                HttpContext.Session.SetString("email", customer.Email);
+                HttpContext.Session.SetString("phone", customer.Phone);
 
+                // Lấy giá trị từ Session để gán vào ViewBag
+                var Phone = HttpContext.Session.GetString("phone");
+                var Email = HttpContext.Session.GetString("email");
+                ViewBag.Phone = Phone;
+                ViewBag.Email = Email;
                 // Chuyển hướng về trang chính sau khi đăng nhập thành công
                 return RedirectToAction("Index", "User");
             }
@@ -248,11 +294,12 @@ namespace WebThuCung.Controllers
 
         public IActionResult Logout()
         {
+            HttpContext.Session.Clear();
             HttpContext.Session.Remove("Taikhoan");
 
             ViewBag.Thongbao = "Bạn đã đăng xuất thành công.";
 
-            return RedirectToAction("Index", "User");
+            return RedirectToAction("Login", "User");
         }
 
         public IActionResult ConfirmOtp(string email)

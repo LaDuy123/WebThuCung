@@ -12,8 +12,8 @@ using WebThuCung.Data;
 namespace WebThuCung.Migrations
 {
     [DbContext(typeof(PetContext))]
-    [Migration("20241024103949_Initial")]
-    partial class Initial
+    [Migration("20241026034711_saveproduct")]
+    partial class saveproduct
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -165,6 +165,7 @@ namespace WebThuCung.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("idCustomer"));
 
                     b.Property<string>("Address")
+                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
@@ -200,15 +201,19 @@ namespace WebThuCung.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("idCity")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("idCountry")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("idDistrict")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("idWard")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("nameCustomer")
@@ -632,19 +637,27 @@ namespace WebThuCung.Migrations
                 {
                     b.HasOne("WebThuCung.Models.City", "City")
                         .WithMany("Customers")
-                        .HasForeignKey("idCity");
+                        .HasForeignKey("idCity")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("WebThuCung.Models.Country", "Country")
                         .WithMany("Customers")
-                        .HasForeignKey("idCountry");
+                        .HasForeignKey("idCountry")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("WebThuCung.Models.District", "District")
                         .WithMany("Customers")
-                        .HasForeignKey("idDistrict");
+                        .HasForeignKey("idDistrict")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("WebThuCung.Models.Ward", "Ward")
                         .WithMany("Customers")
-                        .HasForeignKey("idWard");
+                        .HasForeignKey("idWard")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("City");
 

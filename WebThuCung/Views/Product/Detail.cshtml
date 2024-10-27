@@ -71,7 +71,7 @@
                         </div>
                     </div>
                     <div class="product-price pt-3 pb-3">
-                        <strong class="text-primary display-6 fw-bold">@Model.sellPrice?.ToString("C")</strong>
+                        <strong class="text-primary display-6 fw-bold">@Model.sellPrice.ToString("C")</strong>
                         @if (Model.Discounts.Any())
                         {
                             <!-- Hiển thị tối đa 3 khuyến mãi từ danh sách -->
@@ -85,7 +85,6 @@
                             <!-- Nếu không có khuyến mãi, hiển thị thông báo -->
                             <span class="product-discount">Không có khuyến mãi</span>
                         }
-
                     </div>
                     <p>
                         @Model.Description
@@ -97,46 +96,39 @@
                                 <ul id="colorList" class="select-list list-unstyled d-flex">
                                     @if (Model.Sizes.Any())
                                     {
-                                       
-                                            @foreach (var color in Model.Colors)
-                                            {
-                                                <li class="select-item pe-3" title="@color">
-                                                    <a href="#" class="btn btn-light color-item" data-color="@color">@color</a>
-                                                </li>
-                                            }
-                                    
-                                    }
-                                    else
-                                    {
-                                        <!-- Nếu không có kích thước, hiển thị thông báo -->
-                                        <span class="btn btn-light">Màu sắc không có sẵn</span>
-                                    }
-
-                                    <!-- Bạn có thể thêm các tùy chọn màu khác vào đây nếu cần -->
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="swatch product-select pt-3" data-option-index="1">
-                            <h6 class="item-title fw-bold">Size:</h6>
-                            <ul id="sizeList" class="select-list list-unstyled d-flex">
-                               
-                                    @if (Model.Sizes.Any())
-                                    {
-                                        <!-- Hiển thị tối đa 3 kích thước từ danh sách -->
-                                        @foreach (var size in Model.Sizes.Take(3))
+                                        @foreach (var color in Model.Colors)
                                         {
-                                            <li class="select-item pe-3" title="@size">
-                                                  <a href = "#" class="btn btn-light size-item" data-size="@size">@size</a>
+                                            <li class="select-item pe-3" title="@color">
+                                                <a  class="btn btn-light color-item" data-color="@color">@color</a>
                                             </li>
                                         }
                                     }
                                     else
                                     {
                                         <!-- Nếu không có kích thước, hiển thị thông báo -->
-                                        <span class="btn btn-light">Kích thước không có sẵn</span>
+                                        <span class="btn btn-light">Màu sắc không có sẵn</span>
                                     }
-
-                               
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="swatch product-select pt-3" data-option-index="1">
+                            <h6 class="item-title fw-bold">Size:</h6>
+                            <ul id="sizeList" class="select-list list-unstyled d-flex">
+                                @if (Model.Sizes.Any())
+                                {
+                                    <!-- Hiển thị tối đa 3 kích thước từ danh sách -->
+                                    @foreach (var size in Model.Sizes.Take(3))
+                                    {
+                                        <li class="select-item pe-3" title="@size">
+                                            <a  class="btn btn-light size-item" data-size="@size">@size</a>
+                                        </li>
+                                    }
+                                }
+                                else
+                                {
+                                    <!-- Nếu không có kích thước, hiển thị thông báo -->
+                                    <span class="btn btn-light">Kích thước không có sẵn</span>
+                                }
                             </ul>
                         </div>
                         <div class="product-quantity pt-2">
@@ -161,11 +153,16 @@
                                         </button>
                                     </span>
                                 </div>
+                                @Html.AntiForgeryToken()
+
                                 <div class="d-flex flex-wrap pt-4">
-                                    <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
+                                    <a id="btnAddToCart" class="btn-cart me-3 px-4 pt-3 pb-3"
+                                       data-product-id="@Model.idProduct"
+                                       data-color=""
+                                       data-size="">
                                         <h5 class="text-uppercase m-0">Add to Cart</h5>
                                     </a>
-                                    <a href="#" class="btn-wishlist px-4 pt-3 ">
+                                    <a  class="btn-wishlist px-4 pt-3 ">
                                         <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
                                     </a>
                                 </div>
@@ -194,3 +191,116 @@
     </div>
 </section>
 
+<style>
+    .color-selected {
+        border: 2px solid grey; /* ???ng vi?n màu xanh lam ??m */
+        font-weight: bold; /* T?ng ?? ??m c?a ch? */
+        background-color: #e9ecef; /* Màu n?n nh?t h?n */
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        // Xử lý sự kiện khi nhấp vào mục màu
+        $('#colorList').on('click', '.color-item', function (e) {
+            e.preventDefault(); // Ngăn hành động mặc định của thẻ <a>
+            $('.color-item').removeClass('color-selected');
+            $(this).addClass('color-selected');
+
+            // Lưu màu đã chọn vào thuộc tính data-color của nút Add to Cart
+            $('#btnAddToCart').data('color', $(this).data('color'));
+        });
+
+        // Xử lý sự kiện khi nhấp vào mục kích thước
+        $('#sizeList').on('click', '.size-item', function (e) {
+            e.preventDefault(); // Ngăn hành động mặc định của thẻ <a>
+            $('.size-item').removeClass('color-selected');
+            $(this).addClass('color-selected');
+
+            // Lưu kích thước đã chọn vào thuộc tính data-size của nút Add to Cart
+            $('#btnAddToCart').data('size', $(this).data('size'));
+        });
+
+        // Xử lý sự kiện khi nhấp vào nút Add to Cart
+        $('#btnAddToCart').on('click', function (e) {
+            e.preventDefault();
+
+            let productId = $(this).data('product-id');
+            let color = $(this).data('color');
+            let size = $(this).data('size');
+            let quantity = $('#quantity').val();
+
+            console.log("ProductId:", productId);
+            console.log("Color:", color);
+            console.log("Size:", size);
+            console.log("Quantity:", quantity);
+
+            if (!color || !size) {
+                alert("Please select color and size.");
+                return;
+            }
+
+            $.ajax({
+                url: '/Product/AddToCart',
+                type: 'POST',
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                },
+                data: JSON.stringify({
+                    ProductId: productId,
+                    Color: color,
+                    Size: size,
+                    Quantity: quantity
+                }),
+                success: function (response) {
+                    if (response.success) {
+                        alert("Product added to cart successfully!");
+                    } else {
+                        if (response.redirectUrl) {
+                            // Chuyển hướng đến trang đăng nhập
+                            window.location.href = response.redirectUrl;
+                        } else {
+                            alert("Error adding product to cart: " + response.message);
+                        }
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Status: ", status);
+                    console.error("Error: ", error);
+                    console.error("Response Text: ", xhr.responseText);
+                    alert("Error adding product to cart.");
+                }
+            });
+
+        });
+
+    });
+
+</script>
+
+
+@* <script>
+    $(document).ready(function () {
+        // Xử lý sự kiện khi nhấp vào mục màu
+        $('#colorList').on('click', '.color-item', function (e) {
+            e.preventDefault(); // Ngăn hành động mặc định của thẻ <a>
+
+            // Xóa lớp 'color-selected' khỏi tất cả các mục
+            $('.color-item').removeClass('color-selected');
+
+            // Thêm lớp 'color-selected' vào mục đã nhấp
+            $(this).addClass('color-selected');
+        });
+
+        $('#sizeList').on('click', '.size-item', function (e) {
+            e.preventDefault(); // Ngăn hành động mặc định của thẻ <a>
+
+            // Xóa lớp 'color-selected' khỏi tất cả các mục
+            $('.size-item').removeClass('color-selected');
+
+            // Thêm lớp 'color-selected' vào mục đã nhấp
+            $(this).addClass('color-selected');
+        });
+    });
+</script> *@

@@ -1,4 +1,4 @@
-﻿
+﻿@model IEnumerable<WebThuCung.Dto.ProductViewDto>
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_LayoutUsers.cshtml";
@@ -59,10 +59,11 @@
             <div class="swiper-wrapper">
                 @foreach (var product in Model)
                 {
-                    <div class="swiper-slide">
-                        <div class="z-1 position-absolute rounded-3 m-3 px-3 border border-dark-subtle">
-                            New
-                        </div>
+                    // Kiểm tra xem sản phẩm đã lưu hay chưa
+                    bool isSaved = ViewBag.SavedProductIds != null &&
+                    ViewBag.SavedProductIds.Contains(product.idProduct);
+
+                    <div class="swiper-slide" data-productid="@product.idProduct">
                         <div class="card position-relative">
                             <a asp-controller="Product" asp-action="Detail" asp-route-id="@product.idProduct">
                                 <img src="@Url.Content("~/images/" + product.Image)" class="img-fluid rounded-4" alt="@product.nameProduct">
@@ -73,26 +74,13 @@
                                 </a>
 
                                 <div class="card-text">
-                                    <span class="rating secondary-font">
-                                        <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                                        <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                                        <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                                        <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                                        <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                                        5.0
-                                    </span>
-
                                     <h3 class="secondary-font text-primary">@product.sellPrice.ToString("C")</h3>
 
                                     <div class="d-flex flex-wrap mt-3">
-                                        <a href="@Url.Action("AddToCart", "Cart", new { id = product.idProduct })" class="btn-cart me-3 px-4 pt-3 pb-3">
-                                            <h5 class="text-uppercase m-0">Add to Cart</h5>
-                                        </a>
-                                        <a href="@Url.Action("AddToWishlist", "Wishlist", new { id = product.idProduct })" class="btn-wishlist px-4 pt-3">
-                                            <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
+                                        <a class="btn-wishlist px-4 pt-3 toggle">
+                                            <iconify-icon icon="fluent:heart-28-filled" class="fs-5" style="color: @(isSaved ? "black" : "rgb(162, 162, 162)")"></iconify-icon>
                                         </a>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
@@ -105,3 +93,42 @@
 
     </div>
 </section>
+<script>
+    $(document).ready(function () {
+        $('.toggle').on('click', function (e) {
+            e.preventDefault(); // Ngăn trang tải lại
+
+            var $this = $(this); // Phần tử được nhấn
+            var icon = $this.find('iconify-icon'); // Tìm phần tử icon bên trong .toggle
+            var idproduct = $this.closest('.swiper-slide').data('productid'); // Lấy ID sản phẩm
+
+            $.ajax({
+                url: '/Product/SaveProduct', // Đường dẫn đến action lưu sản phẩm
+                type: 'POST',
+                data: { idproduct: idproduct },
+                success: function (response) {
+                    if (response.success) {
+                        alert(response.message); // Hiển thị thông báo từ phản hồi
+
+                        // Thay đổi màu sắc dựa trên trạng thái sản phẩm
+                        if (icon.css('color') === 'rgb(162, 162, 162)') {
+                            icon.css('color', 'black'); // Đổi màu sang đen nếu sản phẩm được lưu
+                        } else {
+                            icon.css('color', 'rgb(162, 162, 162)'); // Đổi màu xám nếu sản phẩm bị xóa
+                        }
+                    } else {
+                        if (response.message === "Please log in to save products.") {
+                            // Chuyển hướng nếu người dùng chưa đăng nhập
+                            window.location.href = '/User/Login';
+                        } else {
+                            alert(response.message); // Hiển thị thông báo lỗi khác
+                        }
+                    }
+                },
+                error: function () {
+                    alert('An error occurred while saving the product.');
+                }
+            });
+        });
+    });
+</script>

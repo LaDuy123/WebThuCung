@@ -12,8 +12,8 @@ namespace WebThuCung.Dto
         [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0..")]
 
         public decimal? totalPrice { get; set; }
-        public string idSize { get; set; }
-        public string idColor { get; set; }
+        public string nameSize { get; set; }
+        public string nameColor { get; set; }
 
         // Để hiển thị tên sản phẩm trong view
 

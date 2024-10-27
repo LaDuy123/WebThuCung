@@ -1,4 +1,20 @@
-﻿(function($) {
+﻿$(document).on('click', '.avatar_img', function () {
+    var profileMenu = $('.profile');
+    if (profileMenu.css('display') === 'none') {
+        profileMenu.css('display', 'block'); // Hiển thị menu
+    } else {
+        profileMenu.css('display', 'none'); // Ẩn menu
+    }
+});
+
+// Ẩn menu khi nhấp ra ngoài menu
+$(document).click(function (e) {
+    if (!$(e.target).closest('.wrap_login').length) {
+        $('.profile').hide(); // Ẩn danh sách khi nhấp ra ngoài avatar
+    }
+});
+
+(function ($) {
 
   "use strict";
 
@@ -12,28 +28,28 @@
         $('body').removeClass('preloader-site');
     });
   }
-    $(document).ready(function () {
-        // Xử lý sự kiện khi nhấp vào mục màu
-        $('#colorList').on('click', '.color-item', function (e) {
-            e.preventDefault(); // Ngăn hành động mặc định của thẻ <a>
+    //$(document).ready(function () {
+    //    // Xử lý sự kiện khi nhấp vào mục màu
+    //    $('#colorList').on('click', '.color-item', function (e) {
+    //        e.preventDefault(); // Ngăn hành động mặc định của thẻ <a>
 
-            // Xóa lớp 'color-selected' khỏi tất cả các mục
-            $('.color-item').removeClass('color-selected');
+    //        // Xóa lớp 'color-selected' khỏi tất cả các mục
+    //        $('.color-item').removeClass('color-selected');
 
-            // Thêm lớp 'color-selected' vào mục đã nhấp
-            $(this).addClass('color-selected');
-        });
+    //        // Thêm lớp 'color-selected' vào mục đã nhấp
+    //        $(this).addClass('color-selected');
+    //    });
 
-        $('#sizeList').on('click', '.size-item', function (e) {
-            e.preventDefault(); // Ngăn hành động mặc định của thẻ <a>
+    //    $('#sizeList').on('click', '.size-item', function (e) {
+    //        e.preventDefault(); // Ngăn hành động mặc định của thẻ <a>
 
-            // Xóa lớp 'color-selected' khỏi tất cả các mục
-            $('.size-item').removeClass('color-selected');
+    //        // Xóa lớp 'color-selected' khỏi tất cả các mục
+    //        $('.size-item').removeClass('color-selected');
 
-            // Thêm lớp 'color-selected' vào mục đã nhấp
-            $(this).addClass('color-selected');
-        });
-    });
+    //        // Thêm lớp 'color-selected' vào mục đã nhấp
+    //        $(this).addClass('color-selected');
+    //    });
+    //});
   // init Chocolat light box
 	var initChocolat = function() {
 		Chocolat(document.querySelectorAll('.image-link'), {

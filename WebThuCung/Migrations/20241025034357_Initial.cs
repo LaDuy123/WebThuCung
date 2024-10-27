@@ -390,16 +390,16 @@ namespace WebThuCung.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     nameCustomer = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Phone = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    Address = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     userCustomer = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     passwordCustomer = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     dateBirth = table.Column<DateTime>(type: "datetime2", nullable: true),
                     createdAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    idCountry = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    idCity = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    idDistrict = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    idWard = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    idCountry = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    idCity = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    idDistrict = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    idWard = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Image = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
                     OtpCode = table.Column<string>(type: "nvarchar(6)", maxLength: 6, nullable: true),
@@ -413,21 +413,25 @@ namespace WebThuCung.Migrations
                         column: x => x.idCity,
                         principalTable: "City",
                         principalColumn: "idCity");
+
                     table.ForeignKey(
                         name: "FK_Customer_Country_idCountry",
                         column: x => x.idCountry,
                         principalTable: "Country",
                         principalColumn: "idCountry");
+
                     table.ForeignKey(
                         name: "FK_Customer_District_idDistrict",
                         column: x => x.idDistrict,
                         principalTable: "District",
                         principalColumn: "idDistrict");
+
                     table.ForeignKey(
                         name: "FK_Customer_Ward_idWard",
                         column: x => x.idWard,
                         principalTable: "Ward",
                         principalColumn: "idWard");
+                   
                 });
 
             migrationBuilder.CreateTable(

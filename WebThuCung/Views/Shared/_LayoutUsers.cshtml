@@ -22,7 +22,7 @@
           integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
 
     <link rel="stylesheet" type="text/css" href="~/css/vendor.css">
-    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="~/css/style.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -198,14 +198,28 @@
                 </div>
 
                 <div class="col-sm-8 col-lg-4 d-flex justify-content-end gap-5 align-items-center mt-4 mt-sm-0 justify-content-center justify-content-sm-end">
-                    <div class="support-box text-end d-none d-xl-block">
+                    @{
+                        var customerJson = Context.Session.GetString("Taikhoan");
+                        Customer customer = null;
+
+                        if (!string.IsNullOrEmpty(customerJson))
+                        {
+                            customer = Newtonsoft.Json.JsonConvert.DeserializeObject<Customer>(customerJson);
+                        }
+                    }
+
+                  @*   <div class="support-box text-end d-none d-xl-block">
                         <span class="fs-6 secondary-font text-muted">Phone</span>
-                        <h5 class="mb-0">+980-34984089</h5>
-                    </div>
+                        <h5 class="mb-0">@customer?.Phone</h5> <!-- Sử dụng toán tử null-conditional để tránh lỗi null reference -->
+                    </div> *@
                     <div class="support-box text-end d-none d-xl-block">
                         <span class="fs-6 secondary-font text-muted">Email</span>
-                        <h5 class="mb-0">waggy@gmail.com</h5>
+                        <h5 class="mb-0">@customer?.Email</h5> <!-- Sử dụng toán tử null-conditional để tránh lỗi null reference -->
                     </div>
+
+
+
+
 
 
 
@@ -222,7 +236,7 @@
 
                 <div class="d-flex d-lg-none align-items-end mt-3">
                     <ul class="d-flex justify-content-end list-unstyled m-0">
-                        <li>
+                        <li id="btn-login" class="in_login">
                             <a href="@Url.Action("Login", "User")" class="mx-3">
                                 <iconify-icon icon="healthicons:person" class="fs-4"></iconify-icon>
                             </a>
@@ -276,7 +290,7 @@
 
                         <ul class="navbar-nav menu-list list-unstyled d-flex gap-md-3 mb-0">
                             <li class="nav-item">
-                                <a href="index.html" class="nav-link active">Home</a>
+                                <a asp-controller="User" asp-action="Index" class="nav-link active">Home</a>
                             </li>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" role="button" id="pages" data-bs-toggle="dropdown"
@@ -368,16 +382,15 @@
                             </li>
                          
                         </ul>
+                      @*   <li class="wrap_login">
+                        <li id="btn-login" class="in_login"><a asp-action="Login" asp-controller="User" class="effect-3"><span>Login</span></a></li> *@
 
                         <div class="d-none d-lg-flex align-items-end">
                             <ul class="d-flex justify-content-end list-unstyled m-0">
+                                <li class="wrap_login">
+                                <li id="btn-login" class="in_login"><a asp-action="Login" asp-controller="User" class="effect-3"><iconify-icon icon="healthicons:person" class="fs-4"></iconify-icon></a></li>
                                 <li>
-                                    <a href="@Url.Action("Login", "User")" class="mx-3">
-                                        <iconify-icon icon="healthicons:person" class="fs-4"></iconify-icon>
-                                    </a>
-                                </li>
-                               @*  <li>
-                                    <a href="wishlist.html" class="mx-3">
+                                    <a asp-controller="Product" asp-action="SavedProduct" class="mx-3">
                                         <iconify-icon icon="mdi:heart" class="fs-4"></iconify-icon>
                                     </a>
                                 </li>
@@ -390,7 +403,7 @@
                                             03
                                         </span>
                                     </a>
-                                </li> *@
+                                </li>
                             </ul>
 
                         </div>
@@ -542,6 +555,98 @@
     <script src="~/js/plugins.js"></script>
     <script src="~/js/script.js"></script>
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <script>
+        const phone = '@ViewBag.Phone';
+        const email = '@ViewBag.Email';
+
+        console.log("Phone:", phone);
+        console.log("Email:", email);
+    </script>
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            // Gọi đến API kiểm tra xác thực người dùng
+            $.ajax({
+                url: '/User/CheckAuthentication',
+                success: function (response) {
+                    console.log(response);
+
+                    if (response.isAuthenticated) {
+                        const avatarUrl = "/images/customer/" + response.avatar;
+
+                        // Kiểm tra nếu nút đăng nhập tồn tại, sau đó xóa nó
+                        // var loginElement = document.querySelector('.in_login');
+                        // if (loginElement) {
+                        //     loginElement.remove();
+                        // }
+                        $('.in_login').remove();
+                        if (response.iscustomer) {
+                         
+                            // Nếu người dùng là Candidate
+                            $('.wrap_login').html(`
+                                        <li class="has-children">
+                                            <img class="avatar_img" src="${avatarUrl}" alt="Candidate Avatar"></img>
+                                            <ul class=" profile ">
+                                                <li><a href="/Profile/User">Profile</a></li>
+                                              
+                                                <li><a href="/User/ChangePassword">Change Password</a></li>
+                                                <li><a class="logout" href="#">Logout</a></li>
+                                            </ul>
+                                        </li>
+                                        `);
+                        }
+
+
+                        // Bắt sự kiện logout
+                        $('.logout').click(function (e) {
+                            e.preventDefault();
+                            $.ajax({
+                                url: '/User/Logout',
+                                method: 'POST',
+                                success: function () {
+                                    // Chuyển hướng sau khi đăng xuất thành công
+                                    window.location.href = '/';
+                                },
+                                error: function () {
+                                    alert('An error occurred during logout.');
+                                }
+                            });
+                        });
+                    }
+                },
+                error: function () {
+                    console.error('Failed to check authentication.');
+                }
+            });
+        });
+        // Mở modal
+        function openModal() {
+            document.getElementById("myModal").style.display = "block";
+        }
+
+        // Đóng modal
+        function closeModal() {
+            document.getElementById("myModal").style.display = "none";
+        }
+
+        // Đóng modal khi nhấn ra ngoài modal
+        window.onclick = function (event) {
+            var modal = document.getElementById("myModal");
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+        function showFileName() {
+            // Lấy đối tượng input file
+            var input = document.getElementById('fileselect');
+            // Lấy tên file
+            var fileName = input.files[0].name;
+            // Hiển thị tên file vào phần tử có id là "file-name"
+            document.getElementById('file-name').textContent = "File Selected: " + fileName;
+        }
+
+    </script>
 </body>
 
 </html>

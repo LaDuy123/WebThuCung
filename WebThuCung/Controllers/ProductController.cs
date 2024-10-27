@@ -24,7 +24,7 @@ namespace WebThuCung.Controllers
                             .Include(sp => sp.Category)        // Bao gồm thông tin loại
                             .ToList();
 
-            // Truyền danh sách admin sang view
+            // Truyền danh sách admin sang viewsds
             return View(products);
         }
         public IActionResult Create()
@@ -250,7 +250,7 @@ namespace WebThuCung.Controllers
             {
                 return NotFound(); // Trả về lỗi 404 nếu idProduct không tồn tại
             }
-
+            var customerid = GetCustomerIdFromSession();
             // Tìm sản phẩm dựa trên idProduct
             var product = _context.Products
                 .Include(sp => sp.Branch)           // Baogồm thông tin thương hiệu (Branch)
@@ -294,6 +294,228 @@ namespace WebThuCung.Controllers
             // Trả về view với thông tin chi tiết của sản phẩm
             return View(product);
         }
+        private int GetCustomerIdFromSession()
+        {
+            var customerEmail = HttpContext.Session.GetString("email");
+            var customer = _context.Customers.FirstOrDefault(c => c.Email == customerEmail);
+            return customer?.idCustomer ?? 0;
+        }
+        private string GenerateOrderId()
+        {
+            Random random = new Random();
+            int number = random.Next(10000, 99999); // Tạo ra một số ngẫu nhiên từ 10000 đến 99999
+            return "O" + number.ToString(); // Kết hợp với "O" để tạo ra idOrder
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public JsonResult AddToCart([FromBody] AddToCartViewDto model)
+        {
+            try
+            {
+                if (model == null || !ModelState.IsValid) // Kiểm tra nếu model là null hoặc không hợp lệ
+                {
+                    return Json(new { success = false, message = "Invalid data." });
+                }
+
+                int idCustomer = GetCustomerIdFromSession();
+
+                // Kiểm tra nếu idCustomer bằng 0, chuyển đến trang đăng nhập
+                if (idCustomer == 0)
+                {
+                    return Json(new { success = false, redirectUrl = Url.Action("Login", "User") });
+                }
+
+                // Kiểm tra đơn hàng hiện tại
+                var order = _context.Orders.FirstOrDefault(o => o.idCustomer == idCustomer && o.statusOrder == OrderStatus.Pending);
+
+                // Nếu không có đơn hàng hiện tại, tạo đơn hàng mới
+                if (order == null)
+                {
+                    order = new Order
+                    {
+                        idOrder = GenerateOrderId(), // Gán idOrder với hàm GenerateOrderId
+                        idCustomer = idCustomer,
+                        statusOrder = OrderStatus.Pending
+                    };
+                    _context.Orders.Add(order);
+                    _context.SaveChanges();
+                }
+
+                // Kiểm tra xem sản phẩm đã có trong đơn hàng chưa với cùng idProduct
+                var existingOrderDetail = _context.DetailOrders.FirstOrDefault(od =>
+                    od.idOrder == order.idOrder &&
+                    od.idProduct == model.ProductId &&
+                    od.nameColor == model.Color &&
+                    od.nameSize == model.Size);
+
+                if (existingOrderDetail != null)
+                {
+                    // Nếu sản phẩm đã tồn tại với màu sắc và kích thước giống nhau, cập nhật số lượng
+                    existingOrderDetail.Quantity += model.Quantity;
+                    existingOrderDetail.totalPrice = existingOrderDetail.Quantity * _context.Products.First(p => p.idProduct == model.ProductId).sellPrice; // Cập nhật tổng giá
+                    _context.DetailOrders.Update(existingOrderDetail);
+                }
+                else
+                {
+                    // Kiểm tra xem sản phẩm đã có trong đơn hàng cũ chưa với cùng idProduct
+                    var sameProductDetail = _context.DetailOrders.FirstOrDefault(od =>
+                        od.idOrder == order.idOrder &&
+                        od.idProduct == model.ProductId);
+
+                    if (sameProductDetail != null)
+                    {
+                        // Nếu trùng idProduct nhưng khác màu hoặc kích thước, tạo đơn hàng mới
+                        var newOrder = new Order
+                        {
+                            idOrder = GenerateOrderId(), // Tạo mã đơn hàng mới
+                            idCustomer = idCustomer,
+                            statusOrder = OrderStatus.Pending
+                        };
+                        _context.Orders.Add(newOrder);
+                        _context.SaveChanges();
+
+                        // Thêm chi tiết đơn hàng mới
+                        var newOrderDetail = new DetailOrder
+                        {
+                            idOrder = newOrder.idOrder,
+                            idProduct = model.ProductId,
+                            nameColor = model.Color,
+                            nameSize = model.Size,
+                            Quantity = model.Quantity,
+                            totalPrice = model.Quantity * _context.Products.First(p => p.idProduct == model.ProductId).sellPrice // Tính tổng giá
+                        };
+
+                        _context.DetailOrders.Add(newOrderDetail);
+                    }
+                    else
+                    {
+                        // Nếu sản phẩm hoàn toàn mới (không tồn tại trong đơn hàng hiện tại), tạo chi tiết đơn hàng mới
+                        var newOrderDetail = new DetailOrder
+                        {
+                            idOrder = order.idOrder,
+                            idProduct = model.ProductId,
+                            nameColor = model.Color,
+                            nameSize = model.Size,
+                            Quantity = model.Quantity,
+                            totalPrice = model.Quantity * _context.Products.First(p => p.idProduct == model.ProductId).sellPrice // Tính tổng giá
+                        };
+
+                        _context.DetailOrders.Add(newOrderDetail);
+                    }
+                }
+
+                _context.SaveChanges(); // Lưu các thay đổi vào database
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                var innerException = ex.InnerException != null ? ex.InnerException.Message : "No inner exception.";
+                return Json(new { success = false, message = ex.Message + " Inner Exception: " + innerException });
+            }
+        }
+
+        public IActionResult SavedProduct()
+        {
+            // Lấy customerId từ session (giả sử bạn đã lưu customerId trong session khi người dùng đăng nhập)
+            var customerId = GetCustomerIdFromSession();
+
+            // Kiểm tra xem customerId có hợp lệ không
+            if (customerId == 0)
+            {
+                // Nếu không có customerId trong session, chuyển hướng đến trang đăng nhập hoặc xử lý lỗi
+                return RedirectToAction("Login", "User");
+            }
+
+            // Lấy danh sách công việc đã lưu cho customer cụ thể
+            var saveProduct = _context.SaveProducts
+                .Where(s => s.idCustomer == customerId)  // Lọc theo customerId
+                .Include(s => s.Product)
+                .ToList();
+
+            // Nếu không có công việc nào được lưu
+            if (!saveProduct.Any())
+            {
+                // Có thể trả về một view khác hoặc hiển thị thông báo không có công việc đã lưu
+                ViewBag.Message = "Bạn chưa lưu công việc nào.";
+                return View(new List<SaveProduct>());
+            }
+
+            // Trả về view với danh sách công việc đã lưu
+            return View(saveProduct);
+        }
+
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> SaveProduct(string idproduct)
+        {
+            try
+            {
+                int customerid = GetCustomerIdFromSession();
+
+                if (customerid == 0)
+                {
+                    return Json(new { success = false, message = "Please log in to save products." });
+                }
+
+                var existingSaveProduct = await _context.SaveProducts
+                    .FirstOrDefaultAsync(s => s.idProduct == idproduct && s.idCustomer == customerid);
+
+                if (existingSaveProduct != null)
+                {
+                    _context.SaveProducts.Remove(existingSaveProduct);
+                    await _context.SaveChangesAsync();
+                    return Json(new { success = true, message = "Product has been removed from saved products." });
+                }
+                else
+                {
+                    var saveproduct = new SaveProduct
+                    {
+                        idProduct = idproduct,
+                        idCustomer = customerid,
+                        SavedAt = DateTime.Now
+                    };
+
+                    _context.SaveProducts.Add(saveproduct);
+                    await _context.SaveChangesAsync();
+                    return Json(new { success = true, message = "Product has been saved successfully!" });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving product: {ex.Message}");
+                return Json(new { success = false, message = "An error occurred while saving the product." });
+            }
+        }
+
+        [HttpPost]
+        public IActionResult DeleteSaveProduct(string productid)
+        {
+            var customerId = GetCustomerIdFromSession(); // Giả sử có hàm để lấy customer hiện tại
+
+            if (customerId == null)
+            {
+                return Json(new { success = false, message = "User not logged in." });
+            }
+
+            var saveProduct = _context.SaveProducts
+                .FirstOrDefault(sj => sj.idProduct == productid && sj.idCustomer == customerId);
+
+            if (saveProduct != null)
+            {
+                _context.SaveProducts.Remove(saveProduct);
+                _context.SaveChanges();
+                return Json(new { success = true, message = "Job has been deleted successfully!" });
+            }
+
+            return Json(new { success = false, message = "Saved job not found!" });
+        }
+
+
 
 
 

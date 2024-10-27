@@ -222,8 +222,8 @@ namespace WebThuCung.Controllers
                     {
                         idOrder = detailOrderDto.idOrder,
                         idProduct = detailOrderDto.idProduct,
-                        idColor = detailOrderDto.idColor,
-                        idSize = detailOrderDto.idSize,
+                        //idColor = detailOrderDto.idColor,
+                        //idSize = detailOrderDto.idSize,
                         Quantity = detailOrderDto.Quantity,
                         totalPrice = detailOrderDto.Quantity * product.sellPrice // Tính tổng giá
                     };

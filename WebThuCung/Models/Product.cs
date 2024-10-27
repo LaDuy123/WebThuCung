@@ -47,5 +47,7 @@ namespace WebThuCung.Models
         public ICollection<ProductColor> ProductColors { get; set; }
         public ICollection<ProductSize> ProductSizes { get; set; }
         public ICollection<DetailOrder> DetailOrders { get; set; }
+        public ICollection<SaveProduct> SaveProducts { get; set; } = new List<SaveProduct>();
+
     }
 }

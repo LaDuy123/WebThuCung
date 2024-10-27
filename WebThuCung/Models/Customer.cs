@@ -58,7 +58,7 @@ namespace WebThuCung.Models
         // Thời gian hết hạn của OTP
         public DateTime? OtpExpiryTime { get; set; } = DateTime.Now;
 
-
+        public ICollection<SaveProduct> SaveProducts { get; set; } = new List<SaveProduct>();
         public ICollection<Order> Orders { get; set; }
     }
 }
