@@ -1,4 +1,18 @@
-﻿$(document).on('click', '.avatar_img', function () {
+﻿//document.addEventListener("DOMContentLoaded", function () {
+//    const menuItems = document.querySelectorAll(".profile-menu-item");
+
+//    menuItems.forEach(item => {
+//        item.addEventListener("click", function () {
+//            // Xóa lớp 'active' khỏi tất cả các mục
+//            menuItems.forEach(i => i.classList.remove("active"));
+
+//            // Thêm lớp 'active' cho mục được chọn
+//            this.classList.add("active");
+//        });
+//    });
+//});
+
+$(document).on('click', '.avatar_img', function () {
     var profileMenu = $('.profile');
     if (profileMenu.css('display') === 'none') {
         profileMenu.css('display', 'block'); // Hiển thị menu

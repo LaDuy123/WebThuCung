@@ -26,6 +26,7 @@ namespace WebThuCung.Models
         // Navigation Properties
         public Customer Customer { get; set; }
         public ICollection<DetailOrder> DetailOrders { get; set; }
+        public ICollection<Transaction> Transactions { get; set; }
         public void CalculateTotalOrder()
         {
             if (DetailOrders != null && DetailOrders.Any())
@@ -41,10 +42,11 @@ namespace WebThuCung.Models
     }
     public enum OrderStatus
     {
+        InCart,
         Pending,
         Accepted,
         Rejected,// Đang chờ xử lý
-        Complete   // Đã từ chối
+        Complete  // Đã từ chối
     }
     public enum PaymentStatus
     {

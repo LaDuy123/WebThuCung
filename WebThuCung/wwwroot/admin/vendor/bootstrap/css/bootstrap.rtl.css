@@ -1734,7 +1734,7 @@ progress {
   }
   .col-xxl-4 {
     flex: 0 0 auto;
-    width: 33.33333333%;
+    width: 50%;
   }
   .col-xxl-5 {
     flex: 0 0 auto;

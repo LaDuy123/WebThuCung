@@ -1,4 +1,4 @@
-/*
+﻿/*
 Theme Name: Waggy
 Theme URI: https://templatesjungle.com/
 Author: TemplatesJungle
@@ -105,44 +105,44 @@ CSS STRUCTURE:
 .avatar_img {
     width: 45px; /* ??t chi?u r?ng c?a avatar (?i?u ch?nh theo mong mu?n) */
     height: 45px; /* ??t chi?u cao c?a avatar */
-    border-radius: 50%; /* T?o h�nh tr�n cho avatar */
-    object-fit: cover; /* ??m b?o ?nh kh�ng b? m�o */
+    border-radius: 50%; /* T?o hình tròn cho avatar */
+    object-fit: cover; /* ??m b?o ?nh không b? méo */
 }
 
 
-/* ?n danh s�ch th? <li> ban ??u */
-/* ?n danh s�ch th? <li> ban ??u */
+/* ?n danh sách th? <li> ban ??u */
+/* ?n danh sách th? <li> ban ??u */
 .profile {
     display: none;
-    position: absolute; /* ??t th�nh ph?n xu?t hi?n ? v? tr� c? ??nh */
+    position: absolute; /* ??t thành ph?n xu?t hi?n ? v? trí c? ??nh */
     background-color: white;
     border: 1px solid #ccc;
-    z-index: 1000; /* ??m b?o danh s�ch hi?n th? l�n tr�n */
+    z-index: 1000; /* ??m b?o danh sách hi?n th? lên trên */
     list-style: none;
     padding: 0;
     margin: 0;
     color: black;
 }
 
-    /* ??m b?o m?i m?c trong danh s�ch c� kho?ng c�ch ??u */
+    /* ??m b?o m?i m?c trong danh sách có kho?ng cách ??u */
     .profile li {
-        padding: 10px 15px; /* Th�m kho?ng c�ch tr�n v� d??i l� 10px, b�n tr�i v� b�n ph?i l� 15px */
-        border-bottom: 1px solid #ddd; /* Th�m ???ng ph�n c�ch gi?a c�c m?c */
+        padding: 10px 15px; /* Thêm kho?ng cách trên và d??i là 10px, bên trái và bên ph?i là 15px */
+        border-bottom: 1px solid #ddd; /* Thêm ???ng phân cách gi?a các m?c */
     }
 
         .profile li:last-child {
-            border-bottom: none; /* Lo?i b? ???ng ph�n c�ch ? m?c cu?i c�ng */
+            border-bottom: none; /* Lo?i b? ???ng phân cách ? m?c cu?i cùng */
         }
 
         .profile li a {
-            color: black; /* ??t m�u ch? li�n k?t th�nh ?en v� d�ng !important ?? ghi ?� c�c thu?c t�nh kh�c */
-            text-decoration: none; /* X�a g?ch ch�n n?u c� */
-            display: block; /* ??m b?o li�n k?t chi?m to�n b? kho?ng c�ch c?a m?c */
+            color: black; /* ??t màu ch? liên k?t thành ?en và dùng !important ?? ghi ?è các thu?c tính khác */
+            text-decoration: none; /* Xóa g?ch chân n?u có */
+            display: block; /* ??m b?o liên k?t chi?m toàn b? kho?ng cách c?a m?c */
         }
 
             .profile li a:hover {
                 color: green;
-                text-decoration: underline; /* Th�m g?ch ch�n khi hover */
+                text-decoration: underline; /* Thêm g?ch chân khi hover */
             }
 
 
@@ -716,4 +716,163 @@ Single Product section style start
 .nav-pills .show>.nav-link {
   color: var(--light-color);
   background-color: var(--accent-color);
+}
+
+/* style.css */
+/* General Styles */
+/** {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}*/
+
+/*body {
+    background-color: #f3f4f6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}*/
+
+/* Profile Container */
+.profile-container {
+    display: flex; /* Sử dụng flexbox để định dạng hai phần */
+    width: 100%; /* Chiều rộng toàn bộ */
+    height: 100vh; /* Đảm bảo container chiếm toàn bộ chiều cao của viewport */
+    background-color: #ffffff; /* Màu nền trắng */
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
+    border-radius: 10px; /* Bo góc */
+    overflow: hidden; /* Ẩn phần thừa */
+}
+
+/* Sidebar */
+.profile-sidebar {
+    width: 30%; /* Chiều rộng sidebar */
+    background-color: #ffffff; /* Màu nền trắng cho sidebar */
+    border-right: 1px solid #e6e6e6; /* Đường viền bên phải */
+    padding: 20px; /* Khoảng đệm cho sidebar */
+    position: sticky; /* Giữ sidebar cố định khi cuộn */
+    top: 0; /* Giữ ở đầu trang */
+    height: 100vh; /* Đảm bảo sidebar có chiều cao đầy đủ */
+    overflow-y: auto; /* Thêm thanh cuộn nếu nội dung dài */
+}
+
+/* Nội dung chính */
+.profile-form-container {
+    flex: 1; /* Để cho nội dung bên phải chiếm toàn bộ không gian còn lại */
+    padding: 20px; /* Khoảng đệm cho nội dung */
+    overflow-y: auto; /* Thêm thanh cuộn nếu nội dung vượt quá chiều cao */
+}
+
+
+.profile-header-section {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+}
+
+.profile-info-section h2 {
+    font-size: 1.2em;
+    margin-bottom: 5px;
+}
+
+.profile-info-section p {
+    font-size: 0.9em;
+    color: #888888;
+}
+
+.profile-menu {
+    list-style-type: none;
+    margin-top: 20px;
+}
+
+.profile-menu-item {
+    padding: 10px;
+    font-size: 0.9em;
+    color: #555555;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+    .profile-menu-item:hover {
+        background-color: #f0f0f0;
+    }
+
+    .profile-menu-item.active {
+        color: #7c4dff;
+        font-weight: bold;
+        border-left: 3px solid #7c4dff;
+        padding-left: 7px;
+        background-color: #f0f0f0;
+    }
+
+    .profile-menu-item span {
+        background-color: #f1f3f4;
+        color: #555555;
+        padding: 3px 7px;
+        border-radius: 12px;
+        font-size: 0.8em;
+    }
+
+/* Form Container */
+.profile-form-container {
+    width: 70%;
+    padding: 20px;
+}
+
+.profile-form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+    .profile-form-group label {
+        font-size: 0.9em;
+        color: #555555;
+        margin-bottom: 5px;
+    }
+
+    .profile-form-group input {
+        padding: 10px;
+        border: 1px solid #e6e6e6;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+        color: #555555;
+    }
+
+        .profile-form-group input::placeholder {
+            color: #b0b5c1;
+        }
+
+.profile-newsletter {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+    .profile-newsletter label {
+        margin-left: 5px;
+        font-size: 0.9em;
+        color: #555555;
+    }
+
+.profile-update-button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    border: none;
+    color: #ffffff;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin-top: 10px;
 }

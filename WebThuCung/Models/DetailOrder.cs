@@ -5,13 +5,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace WebThuCung.Models
 {
     [Table("DetailOrder")]
-    [PrimaryKey("idOrder", "idProduct")]
     public class DetailOrder
     {
-        [Key, Column(Order = 0)]
+        [Key] // Đặt một khóa chính cho bảng này
+        public int IdDetailOrder { get; set; }
+        [ForeignKey("Order")]
         public string idOrder { get; set; }
 
-        [Key, Column(Order = 1)]
+        [ForeignKey("Product")]
         public string idProduct { get; set; }
 
         [Required]

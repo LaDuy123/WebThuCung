@@ -11,39 +11,50 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace WebThuCung.Controllers
 {
-    public class UserController : Controller
+    public class UserController : BaseController
     {
         private readonly PetContext _context;
-        public UserController(PetContext context)
+        public UserController(PetContext context) : base(context)
         {
             _context = context;
         }
-        public IActionResult Index()
+        public IActionResult Index(string idCategory)
         {
             var customerId = GetCustomerIdFromSession();
-            // Truy vấn lấy các sản phẩm cùng các thuộc tính liên quan sử dụng Include
-            var allProducts = _context.Products
-                                 .Include(sp => sp.Branch)  // Bao gồm thông tin thương hiệu
-                                 .Include(sp => sp.Category)        // Bao gồm thông tin loại     // Bao gồm thông tin màu sắc
-                                 .Select(sp => new ProductViewDto
-                                 {
-                                     idProduct = sp.idProduct,
-                                     nameProduct = sp.nameProduct,
-                                     sellPrice = sp.sellPrice,
-                                     Image = sp.Image,
-                                     idBranch = sp.idBranch,
-                                     idCategori = sp.idCategory,
-                                     nameBranch = sp.Branch.nameBranch,   // Lấy tên thương hiệu từ đối tượng liên quan
-                                     nameCategory = sp.Category.nameCategory,     // Lấy tên loại từ đối tượng liên quan
-                                     Quantity = sp.Quantity,
-                                     Description = sp.Description, // Lấy tên màu sắc từ đối tượng liên quan
-                                     Logo = sp.Branch.Logo     // Lấy logo từ đối tượng liên quan
-                                 })
-                                 .OrderBy(p => p.idProduct)
-                                 .Take(6)  // Lấy ra 6 sản phẩm
-                                 .ToList();
 
+            // Bắt đầu truy vấn
+            var productsQuery = _context.Products
+                .Include(sp => sp.Branch)  // Bao gồm thông tin thương hiệu
+                .Include(sp => sp.Category) // Bao gồm thông tin loại
+                .AsQueryable(); // Chuyển đổi thành IQueryable để dễ dàng thêm điều kiện
 
+            // Nếu idCategory có giá trị, thêm điều kiện lọc
+            if (!string.IsNullOrEmpty(idCategory))
+            {
+                productsQuery = productsQuery.Where(sp => sp.idCategory == idCategory);
+            }
+
+            // Chọn các thuộc tính cần thiết
+            var allProducts = productsQuery
+                .Select(sp => new ProductViewDto
+                {
+                    idProduct = sp.idProduct,
+                    nameProduct = sp.nameProduct,
+                    sellPrice = sp.sellPrice,
+                    Image = sp.Image,
+                    idBranch = sp.idBranch,
+                    idCategori = sp.idCategory,
+                    nameBranch = sp.Branch.nameBranch, // Lấy tên thương hiệu từ đối tượng liên quan
+                    nameCategory = sp.Category.nameCategory, // Lấy tên loại từ đối tượng liên quan
+                    Quantity = sp.Quantity,
+                    Description = sp.Description, // Lấy tên màu sắc từ đối tượng liên quan
+                    Logo = sp.Branch.Logo // Lấy logo từ đối tượng liên quan
+                })
+                .OrderBy(p => p.idProduct)
+             // Lấy ra 6 sản phẩm
+                .ToList();
+
+            // Lấy danh sách ID sản phẩm đã lưu
             var savedProductIds = _context.SaveProducts
                 .Where(s => s.idCustomer == customerId)
                 .Select(s => s.idProduct)
@@ -51,8 +62,12 @@ namespace WebThuCung.Controllers
 
             // Gán danh sách cho ViewBag để sử dụng trong View
             ViewBag.SavedProductIds = savedProductIds;
+
+     
+
             return View(allProducts);
         }
+
         private int GetCustomerIdFromSession()
         {
             var customerEmail = HttpContext.Session.GetString("email");
@@ -66,7 +81,7 @@ namespace WebThuCung.Controllers
 
             if (!string.IsNullOrEmpty(email))
             {
-                // Kiểm tra bảng Candidate
+                // Kiểm tra bảng customer
                 var customer = _context.Customers.FirstOrDefault(c => c.Email == email);
                 if (customer != null)
                 {
@@ -74,7 +89,7 @@ namespace WebThuCung.Controllers
                     {
                         isAuthenticated = true,
                         iscustomer = true,
-                        avatar =  customer.Image// Giả sử bạn có trường Avatar trong Candidate
+                        avatar =  customer.Image// Giả sử bạn có trường Avatar trong customer
                     });
                 }
 
@@ -461,6 +476,366 @@ namespace WebThuCung.Controllers
                 }
             }
             return View(model);
+        }
+
+        public IActionResult Profile()
+        {
+            ViewBag.Countries = _context.Countries.Select(c => new SelectListItem
+            {
+                Value = c.idCountry.ToString(),
+                Text = c.nameCountry
+            }).ToList();
+
+            // Đảm bảo chúng ta bao gồm ID quốc gia với các thành phố
+            ViewBag.Cities = _context.Cities.Select(c => new
+            {
+                Value = c.idCity.ToString(),
+                Text = c.nameCity,
+                CountryId = c.idCountry // Đảm bảo điều này khớp với quan hệ khóa ngoại đúng
+            }).ToList();
+
+            ViewBag.Districts = _context.Districts.Select(d => new
+            {
+                Value = d.idDistrict.ToString(),
+                Text = d.nameDistrict,
+                CityId = d.idCity // Đảm bảo điều này khớp với quan hệ khóa ngoại đúng
+            }).ToList();
+
+            ViewBag.Wards = _context.Wards.Select(w => new
+            {
+                Value = w.idWard.ToString(),
+                Text = w.nameWard,
+                DistrictId = w.idDistrict // Đảm bảo điều này khớp với quan hệ khóa ngoại đúng
+            }).ToList();
+            int idCustomer = GetCustomerIdFromSession();
+            if (idCustomer == 0)
+            {
+                return RedirectToAction("Login", "User"); // Redirect về trang chủ hoặc trang khác
+            }// Lấy ID khách hàng từ session hoặc JWT
+
+            // Lấy thông tin khách hàng từ cơ sở dữ liệu, bao gồm các thông tin liên quan
+            var customer =  _context.Customers
+                .Include(c => c.Country)
+                .Include(c => c.City)
+                .Include(c => c.District)
+                .Include(c => c.Ward)
+                .FirstOrDefault(c => c.idCustomer == idCustomer);
+
+            if (customer == null)
+            {
+                TempData["error"] = "Không tìm thấy thông tin người dùng.";
+                return RedirectToAction("Index", "Home"); // Redirect về trang chủ hoặc trang khác
+            }
+
+            return View(customer); // Trả về View Profiler với model là thông tin người dùng
+        }
+        public IActionResult LoadProfilePartial()
+        {
+            int idCustomer = GetCustomerIdFromSession();
+            if (idCustomer == 0)
+            {
+                return RedirectToAction("Login", "User"); // Redirect về trang chủ hoặc trang khác
+            }// Lấy ID khách hàng từ session hoặc JWT
+
+            // Lấy thông tin khách hàng từ cơ sở dữ liệu, bao gồm các thông tin liên quan
+            var customer = _context.Customers
+                .Include(c => c.Country)
+                .Include(c => c.City)
+                .Include(c => c.District)
+                .Include(c => c.Ward)
+                .FirstOrDefault(c => c.idCustomer == idCustomer);
+
+            if (customer == null)
+            {
+                TempData["error"] = "Không tìm thấy thông tin người dùng.";
+                return RedirectToAction("Index", "Home"); // Redirect về trang chủ hoặc trang khác
+            }
+
+            return PartialView("_Profile", customer);
+        }
+
+        public IActionResult LoadAddressPartial()
+        {
+            ViewBag.Countries = _context.Countries.Select(c => new SelectListItem
+            {
+                Value = c.idCountry.ToString(),
+                Text = c.nameCountry
+            }).ToList();
+
+            // Đảm bảo chúng ta bao gồm ID quốc gia với các thành phố
+            ViewBag.Cities = _context.Cities.Select(c => new
+            {
+                Value = c.idCity.ToString(),
+                Text = c.nameCity,
+                CountryId = c.idCountry // Đảm bảo điều này khớp với quan hệ khóa ngoại đúng
+            }).ToList();
+
+            ViewBag.Districts = _context.Districts.Select(d => new
+            {
+                Value = d.idDistrict.ToString(),
+                Text = d.nameDistrict,
+                CityId = d.idCity // Đảm bảo điều này khớp với quan hệ khóa ngoại đúng
+            }).ToList();
+
+            ViewBag.Wards = _context.Wards.Select(w => new
+            {
+                Value = w.idWard.ToString(),
+                Text = w.nameWard,
+                DistrictId = w.idDistrict // Đảm bảo điều này khớp với quan hệ khóa ngoại đúng
+            }).ToList();
+            int idCustomer = GetCustomerIdFromSession();
+            if (idCustomer == 0)
+            {
+                return RedirectToAction("Login", "User"); // Redirect về trang chủ hoặc trang khác
+            }// Lấy ID khách hàng từ session hoặc JWT
+
+            // Lấy thông tin khách hàng từ cơ sở dữ liệu, bao gồm các thông tin liên quan
+            var customer = _context.Customers
+                .Include(c => c.Country)
+                .Include(c => c.City)
+                .Include(c => c.District)
+                .Include(c => c.Ward)
+                .FirstOrDefault(c => c.idCustomer == idCustomer);
+
+            if (customer == null)
+            {
+                TempData["error"] = "Không tìm thấy thông tin người dùng.";
+                return RedirectToAction("Index", "Home"); // Redirect về trang chủ hoặc trang khác
+            }
+            return PartialView("_Address", customer);
+        }
+        public IActionResult LoadOrderPartial()
+        {
+            int idCustomer = GetCustomerIdFromSession();
+            if (idCustomer == 0)
+            {
+                TempData["error"] = "Hãy đăng nhập.";
+                return RedirectToAction("Login", "User");
+            }
+
+            // Lấy tất cả các giao dịch của khách hàng cùng với đơn hàng tương ứng
+            var transactions = _context.Transactions
+                .Include(t => t.Order)
+                .ThenInclude(o => o.DetailOrders)
+                .ThenInclude(d => d.Product)
+                .Where(t => t.idCustomer == idCustomer)
+                .ToList();
+
+            // Kiểm tra nếu không có giao dịch nào
+            if (transactions == null || !transactions.Any())
+            {
+                ViewBag.Message = "Bạn chưa có giao dịch nào.";
+                return View();
+            }
+
+            return View("_Order", transactions);
+        }
+        [HttpGet]
+        public IActionResult ChangePasswordPartial()
+        {
+            var email = HttpContext.Session.GetString("email");
+
+            // Nếu không có email trong session, chuyển hướng đến trang đăng nhập hoặc thông báo lỗi
+            if (string.IsNullOrEmpty(email))
+            {
+                return RedirectToAction("Login", "Auth"); // Thay đổi tên controller nếu cần
+            }
+
+            // Tạo một đối tượng ChangePasswordModel với email từ session
+            var model = new ChangePasswordDto
+            {
+                Email = email // Chuyển email vào model
+            };
+
+            // Trả về view ChangePassword
+            return View("_ChangePassword", model);
+           
+        }
+        [HttpPost]
+        public IActionResult ChangePassword(ChangePasswordDto model)
+        {
+          
+            var email = HttpContext.Session.GetString("email");
+
+            // Kiểm tra xem email có hợp lệ không
+            if (string.IsNullOrEmpty(email))
+            {
+                ModelState.AddModelError(string.Empty, "Email không hợp lệ.");
+                return PartialView("_ChangePassword", model);
+            }
+
+            // Kiểm tra trong bảng customer
+            var customer = _context.Customers.SingleOrDefault(c => c.Email == email);
+            if (customer != null)
+            {
+                // Kiểm tra mật khẩu cũ
+                if (BCrypt.Net.BCrypt.Verify(model.CurrentPassword, customer.passwordCustomer))
+                {
+                    // Mã hóa mật khẩu mới và cập nhật vào cơ sở dữ liệu
+                    customer.passwordCustomer = BCrypt.Net.BCrypt.HashPassword(model.NewPassword);
+                    _context.SaveChanges();
+
+                    // Thông báo thành công
+                    TempData["success"] = "Mật khẩu của bạn đã được thay đổi thành công.";
+                    return View("_ChangePassword", model);
+                }
+                else
+                {
+                    TempData["error"] = "Mật khẩu cũ không chính xác.";
+                    return View("_ChangePassword", model);
+                }
+            }
+            return View("_ChangePassword", model);
+        }
+        public IActionResult UploadAvatar(IFormFile avatar)
+        {
+            if (avatar != null && avatar.Length > 0)
+            {
+                // Đường dẫn lưu trữ file ảnh
+                var uploads = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/customer");
+
+                // Sử dụng tên file gốc
+                var fileName = avatar.FileName;
+
+                // Đường dẫn lưu file
+                var filePath = Path.Combine(uploads, fileName);
+
+                // Lưu file vào thư mục "wwwroot/images/customer"
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    avatar.CopyTo(fileStream);
+                }
+
+                // Trả về tên file gốc cho client để hiển thị
+                return Json(new { fileName });
+            }
+
+            return BadRequest();
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Save(CustomerDto customerDto)
+        {
+            if (ModelState.IsValid)
+            {
+                int customerId = GetCustomerIdFromSession();
+                var existingCustomer =  _context.Customers.Find(customerId);
+                if (existingCustomer == null) return NotFound();
+
+                // Upload avatar nếu có file mới, nếu không giữ nguyên
+                if (customerDto.Image != null && customerDto.Image.Length > 0)
+                {
+                    var avatarPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/Customer", customerDto.Image.FileName);
+                    using (var stream = new FileStream(avatarPath, FileMode.Create))
+                    {
+                         customerDto.Image.CopyToAsync(stream);
+                    }
+                    existingCustomer.Image = customerDto.Image.FileName;
+                }
+
+           
+                _context.Customers.Update(existingCustomer);
+                _context.SaveChangesAsync();
+
+                return RedirectToAction("Profile");
+            }
+
+            return View("Profile");
+        }
+        [HttpPost]
+        public IActionResult UpdateProfile(CustomerDto customerDto)
+        {
+           
+            if (ModelState.IsValid)
+            {
+                var idCustomer = GetCustomerIdFromSession();
+                var customer = _context.Customers.Find(idCustomer);
+
+                if (customer != null)
+                {
+                    // Cập nhật thông tin khách hàng, giữ nguyên giá trị cũ nếu giá trị mới là null
+                    customer.nameCustomer = customerDto.nameCustomer ?? customer.nameCustomer;
+                    customer.Phone = customerDto.Phone ?? customer.Phone;
+                    customer.Address = customerDto.Address ?? customer.Address;
+                    customer.dateBirth = customerDto.dateBirth ?? customer.dateBirth;
+
+                    // Cập nhật thông tin địa chỉ
+
+                    TempData["success"] = "Cập nhật profile thành công.";
+                    // Lưu thay đổi vào cơ sở dữ liệu
+                    _context.SaveChanges();
+                    return PartialView("_Profile", customer);// Chuyển hướng sau khi cập nhật thành công
+                }
+            }
+
+            return PartialView("_Profile");
+        }
+        [HttpPost]
+        public IActionResult UpdateAddress(CustomerDto customerDto)
+        {
+            ViewBag.Countries = _context.Countries.Select(c => new SelectListItem
+            {
+                Value = c.idCountry.ToString(),
+                Text = c.nameCountry
+            }).ToList();
+
+            // Đảm bảo chúng ta bao gồm ID quốc gia với các thành phố
+            ViewBag.Cities = _context.Cities.Select(c => new
+            {
+                Value = c.idCity.ToString(),
+                Text = c.nameCity,
+                CountryId = c.idCountry // Đảm bảo điều này khớp với quan hệ khóa ngoại đúng
+            }).ToList();
+
+            ViewBag.Districts = _context.Districts.Select(d => new
+            {
+                Value = d.idDistrict.ToString(),
+                Text = d.nameDistrict,
+                CityId = d.idCity // Đảm bảo điều này khớp với quan hệ khóa ngoại đúng
+            }).ToList();
+
+            ViewBag.Wards = _context.Wards.Select(w => new
+            {
+                Value = w.idWard.ToString(),
+                Text = w.nameWard,
+                DistrictId = w.idDistrict // Đảm bảo điều này khớp với quan hệ khóa ngoại đúng
+            }).ToList();
+            if (ModelState.IsValid)
+            {
+                var idCustomer = GetCustomerIdFromSession();
+                var customer = _context.Customers.Find(idCustomer);
+
+                if (customer != null)
+                {
+                    // Cập nhật thông tin khách hàng, giữ nguyên giá trị cũ nếu giá trị mới là null
+
+
+                    // Cập nhật thông tin địa chỉ
+                    customer.idCountry = customerDto.idCountry ?? customer.idCountry;
+                    customer.idCity = customerDto.idCity ?? customer.idCity;
+                    customer.idDistrict = customerDto.idDistrict ?? customer.idDistrict;
+                    customer.idWard = customerDto.idWard ?? customer.idWard;
+                    customer.Address = customerDto.Address ?? customer.Address;
+
+                    TempData["success"] = "Cập nhật Address thành công.";
+
+                    _context.SaveChanges();
+                    return PartialView("_Address", customer);// Chuyển hướng sau khi cập nhật thành công
+                }
+            }
+
+            return PartialView("_Address");
+        }
+
+        public IActionResult Contact()
+        {
+            return View();
+        }
+        public IActionResult Blog()
+        {
+            return View();
         }
     }
 }

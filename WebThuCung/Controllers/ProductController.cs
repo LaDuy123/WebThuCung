@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
+using System.Text;
 using WebThuCung.Data;
 using WebThuCung.Dto;
 
@@ -8,11 +10,11 @@ using WebThuCung.Models;
 
 namespace WebThuCung.Controllers
 {
-    public class ProductController : Controller
+    public class ProductController : BaseController
     {
         private readonly PetContext _context; // Biến để truy cập cơ sở dữ liệu
 
-        public ProductController(PetContext context)
+        public ProductController(PetContext context) : base(context)
         {
             _context = context;
         }
@@ -50,6 +52,243 @@ namespace WebThuCung.Controllers
 
             return View();
         }
+        [HttpGet]
+        public IActionResult SearchByPet(string petName)
+        {
+            var customerId = GetCustomerIdFromSession();
+            // Lấy danh sách các sản phẩm theo tên thú cưng (namePet) và ánh xạ sang ProductViewDto
+            var products = _context.Products
+                                   .Include(p => p.Pet)
+                                   .Include(p => p.Branch)
+                                   .Include(p => p.Category)
+                                   .Where(p => p.Pet.namePet == petName) // Tìm kiếm theo tên thú cưng
+                                   .Select(sp => new ProductViewDto
+                                   {
+                                       idProduct = sp.idProduct,
+                                       nameProduct = sp.nameProduct,
+                                       sellPrice = sp.sellPrice,
+                                       Image = sp.Image,
+                                       idBranch = sp.idBranch,
+                                       idCategori = sp.idCategory,
+                                       nameBranch = sp.Branch.nameBranch,       // Lấy tên thương hiệu từ đối tượng liên quan
+                                       nameCategory = sp.Category.nameCategory, // Lấy tên loại từ đối tượng liên quan
+                                       Quantity = sp.Quantity,
+                                       Description = sp.Description,
+                                       Logo = sp.Branch.Logo                    // Lấy logo từ đối tượng liên quan
+                                   })
+                                   .ToList();
+            var savedProductIds = _context.SaveProducts
+            .Where(s => s.idCustomer == customerId)
+            .Select(s => s.idProduct)
+            .ToList();
+
+            // Gán danh sách cho ViewBag để sử dụng trong View
+            ViewBag.SavedProductIds = savedProductIds;
+            // Truyền dữ liệu sản phẩm vào View
+            return View(products);
+        }
+        [HttpGet]
+        public IActionResult Shop()
+        {
+            var customerId = GetCustomerIdFromSession();
+
+            // Bắt đầu truy vấn
+            var productsQuery = _context.Products
+                .Include(sp => sp.Branch)  // Bao gồm thông tin thương hiệu
+                .Include(sp => sp.Category) // Bao gồm thông tin loại
+                .AsQueryable(); // Chuyển đổi thành IQueryable để dễ dàng thêm điều kiện
+
+
+            // Chọn các thuộc tính cần thiết
+            var allProducts = productsQuery
+                .Select(sp => new ProductViewDto
+                {
+                    idProduct = sp.idProduct,
+                    nameProduct = sp.nameProduct,
+                    sellPrice = sp.sellPrice,
+                    Image = sp.Image,
+                    idBranch = sp.idBranch,
+                    idCategori = sp.idCategory,
+                    nameBranch = sp.Branch.nameBranch, // Lấy tên thương hiệu từ đối tượng liên quan
+                    nameCategory = sp.Category.nameCategory, // Lấy tên loại từ đối tượng liên quan
+                    Quantity = sp.Quantity,
+                    Description = sp.Description, // Lấy tên màu sắc từ đối tượng liên quan
+                    Logo = sp.Branch.Logo // Lấy logo từ đối tượng liên quan
+                })
+                .OrderBy(p => p.idProduct)
+                .Take(9) // Lấy ra 6 sản phẩm
+                .ToList();
+
+            // Lấy danh sách ID sản phẩm đã lưu
+            var savedProductIds = _context.SaveProducts
+                .Where(s => s.idCustomer == customerId)
+                .Select(s => s.idProduct)
+                .ToList();
+
+            // Gán danh sách cho ViewBag để sử dụng trong View
+            ViewBag.SavedProductIds = savedProductIds;
+
+
+
+            return View(allProducts);
+        }
+        [HttpGet]
+        public IActionResult ProductByCategory(string idCategory)
+        {
+            var customerId = GetCustomerIdFromSession();
+
+            // Kiểm tra nếu idCategory là "Shop by Category" hoặc rỗng thì lấy toàn bộ sản phẩm
+            var productsQuery = _context.Products
+                .Include(p => p.Category)
+                .Include(p => p.Branch)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(idCategory) && idCategory != "Shop by Category")
+            {
+                productsQuery = productsQuery.Where(p => p.idCategory == idCategory);
+            }
+
+            // Lấy dữ liệu cần thiết và chuyển sang DTO
+            var products = productsQuery
+                .Select(p => new ProductViewDto
+                {
+                    idProduct = p.idProduct,
+                    nameProduct = p.nameProduct,
+                    sellPrice = p.sellPrice,
+                    Image = p.Image,
+                    idBranch = p.idBranch,
+                    idCategori = p.idCategory,
+                    nameBranch = p.Branch.nameBranch,
+                    nameCategory = p.Category.nameCategory,
+                    Quantity = p.Quantity,
+                    Description = p.Description,
+                    Logo = p.Branch.Logo
+                })
+                .ToList();
+
+            // Lấy danh sách sản phẩm đã lưu của khách hàng hiện tại
+            var savedProductIds = _context.SaveProducts
+                .Where(s => s.idCustomer == customerId)
+                .Select(s => s.idProduct)
+                .ToList();
+
+            // Gán danh sách ID sản phẩm đã lưu vào ViewBag để sử dụng trong View
+            ViewBag.SavedProductIds = savedProductIds;
+
+            // Trả về Partial View với danh sách sản phẩm
+            return PartialView("_ProductByCategory", products);
+        }
+
+
+        [HttpGet]
+        public IActionResult FilterProducts(string categoryId, string branchId, string petId)
+        {
+            var customerId = GetCustomerIdFromSession();
+
+            // Khởi tạo truy vấn với thông tin liên kết cần thiết
+            var productsQuery = _context.Products
+                .Include(sp => sp.Branch)
+                .Include(sp => sp.Category)
+                .Include(sp => sp.Pet) // Bao gồm thông tin thú cưng
+                .AsQueryable(); // Chuyển đổi thành IQueryable để có thể áp dụng các điều kiện
+
+            if (!string.IsNullOrEmpty(categoryId))
+            {
+                productsQuery = productsQuery.Where(p => p.idCategory == categoryId);
+            }
+
+            if (!string.IsNullOrEmpty(branchId))
+            {
+                productsQuery = productsQuery.Where(p => p.idBranch == branchId);
+            }
+
+            if (!string.IsNullOrEmpty(petId))
+            {
+                productsQuery = productsQuery.Where(p => p.idPet == petId);
+            }
+
+            // Lấy danh sách sản phẩm từ truy vấn
+            var products = productsQuery
+                .Select(sp => new ProductViewDto
+                {
+                    idProduct = sp.idProduct,
+                    nameProduct = sp.nameProduct,
+                    sellPrice = sp.sellPrice,
+                    Image = sp.Image,
+                    idBranch = sp.idBranch,
+                    idCategori = sp.idCategory,
+                    nameBranch = sp.Branch.nameBranch,
+                    nameCategory = sp.Category.nameCategory,
+                    Quantity = sp.Quantity,
+                    Description = sp.Description,
+                    Logo = sp.Branch.Logo
+                })
+                .ToList();
+
+            // Lấy danh sách ID sản phẩm đã lưu
+            var savedProductIds = _context.SaveProducts
+                .Where(s => s.idCustomer == customerId)
+                .Select(s => s.idProduct)
+                .ToList();
+
+            // Gán danh sách cho ViewBag để sử dụng trong View
+            ViewBag.SavedProductIds = savedProductIds;
+
+            // Trả về PartialView với danh sách sản phẩm
+            return PartialView("FilterProducts", products);
+        }
+
+
+
+        public string RemoveDiacritics(string text)
+        {
+            var normalizedString = text.Normalize(NormalizationForm.FormD);
+            var stringBuilder = new StringBuilder();
+
+            foreach (var c in normalizedString)
+            {
+                var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+                if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+                {
+                    stringBuilder.Append(c);
+                }
+            }
+
+            return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
+        }
+
+        public IActionResult SearchResults(string query)
+        {
+            // Chuẩn hóa từ khóa tìm kiếm
+            string normalizedQuery = RemoveDiacritics(query.ToLower());
+
+            // Lấy tất cả các sản phẩm trước, sau đó xử lý tìm kiếm trong bộ nhớ
+            var products = _context.Products
+                .Include(p => p.Branch)
+                .Include(p => p.Category)
+                .AsEnumerable()  // Chuyển sang client-side evaluation
+                .Where(p => RemoveDiacritics(p.nameProduct.ToLower()).Contains(normalizedQuery))
+                .Select(p => new ProductViewDto
+                {
+                    idProduct = p.idProduct,
+                    nameProduct = p.nameProduct,
+                    sellPrice = p.sellPrice,
+                    Image = p.Image,
+                    idBranch = p.idBranch,
+                    idCategori = p.idCategory,
+                    nameBranch = p.Branch.nameBranch,
+                    nameCategory = p.Category.nameCategory,
+                    Quantity = p.Quantity,
+                    Description = p.Description,
+                    Logo = p.Branch.Logo
+                })
+                .ToList();
+
+            // Trả về View với danh sách sản phẩm tìm kiếm
+            return View(products);
+        }
+
+
 
         // POST: Product/Create
         [HttpPost]
@@ -307,7 +546,6 @@ namespace WebThuCung.Controllers
             return "O" + number.ToString(); // Kết hợp với "O" để tạo ra idOrder
         }
 
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public JsonResult AddToCart([FromBody] AddToCartViewDto model)
@@ -326,9 +564,9 @@ namespace WebThuCung.Controllers
                 {
                     return Json(new { success = false, redirectUrl = Url.Action("Login", "User") });
                 }
-
+                var product = _context.Products.FirstOrDefault(p => p.idProduct == model.ProductId);
                 // Kiểm tra đơn hàng hiện tại
-                var order = _context.Orders.FirstOrDefault(o => o.idCustomer == idCustomer && o.statusOrder == OrderStatus.Pending);
+                var order = _context.Orders.FirstOrDefault(o => o.idCustomer == idCustomer && o.statusOrder == OrderStatus.InCart);
 
                 // Nếu không có đơn hàng hiện tại, tạo đơn hàng mới
                 if (order == null)
@@ -337,7 +575,7 @@ namespace WebThuCung.Controllers
                     {
                         idOrder = GenerateOrderId(), // Gán idOrder với hàm GenerateOrderId
                         idCustomer = idCustomer,
-                        statusOrder = OrderStatus.Pending
+                        statusOrder = OrderStatus.InCart
                     };
                     _context.Orders.Add(order);
                     _context.SaveChanges();
@@ -354,56 +592,23 @@ namespace WebThuCung.Controllers
                 {
                     // Nếu sản phẩm đã tồn tại với màu sắc và kích thước giống nhau, cập nhật số lượng
                     existingOrderDetail.Quantity += model.Quantity;
-                    existingOrderDetail.totalPrice = existingOrderDetail.Quantity * _context.Products.First(p => p.idProduct == model.ProductId).sellPrice; // Cập nhật tổng giá
+                    existingOrderDetail.totalPrice = existingOrderDetail.Quantity * product.sellPrice;  // Cập nhật tổng giá
                     _context.DetailOrders.Update(existingOrderDetail);
                 }
                 else
                 {
-                    // Kiểm tra xem sản phẩm đã có trong đơn hàng cũ chưa với cùng idProduct
-                    var sameProductDetail = _context.DetailOrders.FirstOrDefault(od =>
-                        od.idOrder == order.idOrder &&
-                        od.idProduct == model.ProductId);
-
-                    if (sameProductDetail != null)
+                    // Nếu sản phẩm hoàn toàn mới (không tồn tại trong đơn hàng hiện tại), tạo chi tiết đơn hàng mới
+                    var newOrderDetail = new DetailOrder
                     {
-                        // Nếu trùng idProduct nhưng khác màu hoặc kích thước, tạo đơn hàng mới
-                        var newOrder = new Order
-                        {
-                            idOrder = GenerateOrderId(), // Tạo mã đơn hàng mới
-                            idCustomer = idCustomer,
-                            statusOrder = OrderStatus.Pending
-                        };
-                        _context.Orders.Add(newOrder);
-                        _context.SaveChanges();
+                        idOrder = order.idOrder,
+                        idProduct = model.ProductId,
+                        nameColor = model.Color,
+                        nameSize = model.Size,
+                        Quantity = model.Quantity,
+                        totalPrice = model.Quantity * product.sellPrice // Tính tổng giá
+                    };
 
-                        // Thêm chi tiết đơn hàng mới
-                        var newOrderDetail = new DetailOrder
-                        {
-                            idOrder = newOrder.idOrder,
-                            idProduct = model.ProductId,
-                            nameColor = model.Color,
-                            nameSize = model.Size,
-                            Quantity = model.Quantity,
-                            totalPrice = model.Quantity * _context.Products.First(p => p.idProduct == model.ProductId).sellPrice // Tính tổng giá
-                        };
-
-                        _context.DetailOrders.Add(newOrderDetail);
-                    }
-                    else
-                    {
-                        // Nếu sản phẩm hoàn toàn mới (không tồn tại trong đơn hàng hiện tại), tạo chi tiết đơn hàng mới
-                        var newOrderDetail = new DetailOrder
-                        {
-                            idOrder = order.idOrder,
-                            idProduct = model.ProductId,
-                            nameColor = model.Color,
-                            nameSize = model.Size,
-                            Quantity = model.Quantity,
-                            totalPrice = model.Quantity * _context.Products.First(p => p.idProduct == model.ProductId).sellPrice // Tính tổng giá
-                        };
-
-                        _context.DetailOrders.Add(newOrderDetail);
-                    }
+                    _context.DetailOrders.Add(newOrderDetail);
                 }
 
                 _context.SaveChanges(); // Lưu các thay đổi vào database
@@ -416,6 +621,324 @@ namespace WebThuCung.Controllers
                 return Json(new { success = false, message = ex.Message + " Inner Exception: " + innerException });
             }
         }
+
+        public IActionResult ViewCart()
+        {
+            int idCustomer = GetCustomerIdFromSession();
+            if (idCustomer == 0)
+            {
+                TempData["error"] = "Hãy đăng nhập.";
+                return RedirectToAction("Login", "User");
+            }
+
+            var order = _context.Orders
+                .Include(o => o.DetailOrders)
+                
+                .ThenInclude(d => d.Product)
+                .FirstOrDefault(o => o.idCustomer == idCustomer && o.statusOrder == OrderStatus.InCart);
+
+            // Kiểm tra nếu đơn hàng hoặc DetailOrders là null hoặc DetailOrders không có sản phẩm nào
+            if (order == null || order.DetailOrders == null || !order.DetailOrders.Any())
+            {
+                ViewBag.Message = "Giỏ hàng của bạn đang trống.";
+                return View();
+            }
+
+            // Tính toán tổng đơn hàng
+            order.CalculateTotalOrder(); // Gọi phương thức tính tổng đơn hàng
+
+            return View(order); // Truyền đơn hàng có trạng thái "InCart" vào View
+        }
+        public IActionResult MyOrder()
+        {
+            int idCustomer = GetCustomerIdFromSession();
+            if (idCustomer == 0)
+            {
+                TempData["error"] = "Hãy đăng nhập.";
+                return RedirectToAction("Login", "User");
+            }
+
+            // Lấy tất cả các giao dịch của khách hàng cùng với đơn hàng tương ứng
+            var transactions = _context.Transactions
+                .Include(t => t.Order)
+                .ThenInclude(o => o.DetailOrders)
+                .ThenInclude(d => d.Product)
+                .Where(t => t.idCustomer == idCustomer )
+                .ToList();
+
+            // Kiểm tra nếu không có giao dịch nào
+            if (transactions == null || !transactions.Any())
+            {
+                ViewBag.Message = "Bạn chưa có giao dịch nào.";
+                return View();
+            }
+
+            return View(transactions);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Transaction(
+     string name, string address, string phone, string email, string note,
+     List<int> selectedDetailIds, string paymentType)
+        {
+            int idCustomer = GetCustomerIdFromSession();
+
+            // Lấy giỏ hàng hiện tại
+            var currentCart = _context.Orders
+                .Include(o => o.DetailOrders)
+                .FirstOrDefault(o => o.idCustomer == idCustomer && o.statusOrder == OrderStatus.InCart);
+
+            if (currentCart == null)
+            {
+                TempData["ErrorMessage"] = "Giỏ hàng trống.";
+                return RedirectToAction("ViewCart");
+            }
+
+            // Tính tổng số tiền dựa trên các DetailOrder đã chọn
+            decimal totalAmount = currentCart.DetailOrders
+                .Where(d => selectedDetailIds.Contains(d.IdDetailOrder))
+                .Sum(d => d.totalPrice ?? 0);
+
+            // Tạo đơn hàng mới
+            var newOrder = new Order
+            {
+                idOrder = GenerateOrderId(),
+                idCustomer = idCustomer,
+                statusOrder = OrderStatus.Pending,
+                totalOrder = totalAmount
+            };
+            _context.Orders.Add(newOrder);
+            _context.SaveChanges();
+
+            // Tạo một transaction từ dữ liệu người dùng đã nhập
+            var transaction = new Transaction
+            {
+                nameCustomer = name,
+                shippingAddress = address,
+                phoneNumber = phone,
+                Email = email,
+                TotalAmount = totalAmount,
+                createdDate = DateTime.Now,
+                cpdatedDate = DateTime.Now,
+                Note = note,
+                idCustomer = idCustomer,
+                idOrder = newOrder.idOrder
+            };
+            _context.Transactions.Add(transaction);
+            _context.SaveChanges();
+
+            // Lọc các DetailOrder trong giỏ hàng mà người dùng đã chọn
+            var selectedDetails = currentCart.DetailOrders
+                .Where(d => selectedDetailIds.Contains(d.IdDetailOrder))
+                .ToList();
+
+            foreach (var detail in selectedDetails)
+            {
+                var newOrderDetail = new DetailOrder
+                {
+                    idOrder = newOrder.idOrder,
+                    idProduct = detail.idProduct,
+                    Quantity = detail.Quantity,
+                    nameColor = detail.nameColor,
+                    nameSize = detail.nameSize,
+                    totalPrice = detail.totalPrice
+                };
+                _context.DetailOrders.Add(newOrderDetail);
+            }
+
+            // Xóa các DetailOrder đã chuyển đi
+            _context.DetailOrders.RemoveRange(selectedDetails);
+            _context.SaveChanges();
+
+            // Thêm thông tin thanh toán cho giao dịch
+            if (paymentType == "immediate")
+            {
+                var payment = new Payment
+                {
+                    idTransaction = transaction.idTransaction,
+                    Amount = totalAmount,
+                    CreatedDate = DateTime.Now,
+                    QRCodeUrl = GenerateQRCodeUrl(transaction.idOrder, totalAmount, transaction.nameCustomer)
+                };
+                _context.Payments.Add(payment);
+                _context.SaveChanges();
+
+                TempData["success"] = "Đặt hàng thành công!";
+                return RedirectToAction("ShowQRCode", new { paymentId = payment.Id });
+            }
+            else if (paymentType == "later")
+            {
+                TempData["success"] = "Đặt hàng thành công! Bạn có thể thanh toán sau.";
+                return RedirectToAction("MyOrder");
+            }
+
+            return RedirectToAction("ViewCart");
+        }
+
+        private string GenerateQRCodeUrl(string idorder, decimal amount, string customerName)
+        {
+            // Thông tin tài khoản ngân hàng
+            string bankCode = "MB"; // Thay bằng mã ngân hàng của bạn
+            string accountNumber = "0000856986704"; // Thay bằng số tài khoản của bạn
+
+            // Tạo mô tả giao dịch bao gồm ID đơn hàng và tên khách hàng
+            string transactionDescription = $"{customerName} thanh toán đơn hàng {idorder} ";
+
+            // Tạo URL QR code tích hợp tài khoản ngân hàng và thông tin thanh toán
+            string qrUrl = $"https://img.vietqr.io/image/{bankCode}-{accountNumber}-qr_only.png?amount={amount}&addInfo={Uri.EscapeDataString(transactionDescription)}";
+
+            return qrUrl;
+        }
+
+
+        public IActionResult ShowQRCode(int paymentId)
+        {
+            var payment = _context.Payments.FirstOrDefault(p => p.Id == paymentId);
+
+            if (payment == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy thông tin thanh toán.";
+                return RedirectToAction("ViewCart");
+            }
+
+            // Tải dữ liệu giao dịch liên quan nếu cần
+            var transaction = _context.Transactions
+                .Include(t => t.Order)
+                .ThenInclude(t => t.DetailOrders)
+                .ThenInclude(d => d.Product)
+                .FirstOrDefault(t => t.idTransaction == payment.idTransaction);
+            if (transaction != null)
+            {
+                ViewBag.Transaction = transaction;
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy thông tin giao dịch.";
+                return RedirectToAction("ViewCart");
+            }
+
+            return View(payment);
+        }
+
+        [HttpPost]
+        public IActionResult PaymentNotification(PaymentNotificationDto notification)
+        {
+            var payment = _context.Payments.FirstOrDefault(p => p.idTransaction == notification.TransactionId);
+            // Tải dữ liệu giao dịch liên quan nếu cần
+            var transaction = _context.Transactions
+                .Include(t => t.Order)
+                .ThenInclude(t => t.DetailOrders)
+                .ThenInclude(d => d.Product)
+                .FirstOrDefault(t => t.idTransaction == payment.idTransaction);
+
+            if (payment != null && notification.IsSuccess)
+            {
+                TempData["success"] = "Thanh toán thành công!";
+                transaction.Order.statusPay = PaymentStatus.Paid;
+                _context.SaveChanges();
+
+                // Thông báo cho người dùng
+              
+            }
+
+            return Ok(); // Trả về phản hồi cho dịch vụ thanh toán
+        }
+
+        private void NotifyUser(Payment payment)
+        {
+            // Gửi thông báo cho người dùng về việc thanh toán thành công
+            // Ví dụ: gửi email hoặc tin nhắn
+        }
+
+
+
+
+
+        [HttpPost]
+        public IActionResult DeleteDetailOrder(int id)
+        {
+            // Kiểm tra id không hợp lệ
+            if (id <= 0)
+            {
+                return BadRequest("ID không hợp lệ.");
+            }
+
+            // Tìm DetailOrder trong cơ sở dữ liệu
+            var detail = _context.DetailOrders.Find(id);
+            if (detail == null)
+            {
+                return NotFound("Sản phẩm không tồn tại.");
+            }
+
+            try
+            {
+                // Lấy idOrder từ DetailOrder trước khi xóa
+                var orderId = detail.idOrder;
+
+                // Xóa sản phẩm khỏi giỏ hàng
+                _context.DetailOrders.Remove(detail);
+                _context.SaveChanges();
+
+                // Kiểm tra xem Order có còn DetailOrder nào không
+                var remainingDetails = _context.DetailOrders
+                    .Any(d => d.idOrder == orderId);
+
+                if (!remainingDetails)
+                {
+                    // Nếu không còn DetailOrder nào, xóa Order và Transaction liên quan
+                    var order = _context.Orders.FirstOrDefault(o => o.idOrder == orderId);
+                    if (order != null)
+                    {
+                        // Tìm Transaction liên quan đến Order này
+                        var transaction = _context.Transactions
+                            .FirstOrDefault(t => t.idOrder == orderId);
+
+                        if (transaction != null)
+                        {
+                            _context.Transactions.Remove(transaction);
+                        }
+
+                        _context.Orders.Remove(order);
+                        _context.SaveChanges();
+                    }
+                }
+                else
+                {
+                    // Nếu vẫn còn DetailOrder, cập nhật lại totalOrder cho Order và Transaction
+                    decimal newTotalOrder = _context.DetailOrders
+                        .Where(d => d.idOrder == orderId)
+                        .Sum(d => d.totalPrice ?? 0);
+
+                    var order = _context.Orders.FirstOrDefault(o => o.idOrder == orderId);
+                    if (order != null)
+                    {
+                        order.totalOrder = newTotalOrder;
+                    }
+
+                    var transaction = _context.Transactions
+                        .FirstOrDefault(t => t.idOrder == orderId);
+                    if (transaction != null)
+                    {
+                        transaction.TotalAmount = newTotalOrder;
+                    }
+
+                    _context.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Xử lý ngoại lệ nếu có lỗi khi xóa
+                return StatusCode(500, $"Đã xảy ra lỗi khi xóa sản phẩm: {ex.Message}");
+            }
+
+            // Trả về thông báo thành công
+            return Ok("Sản phẩm đã được xóa thành công và cập nhật đơn hàng.");
+        }
+
+
+
+
 
         public IActionResult SavedProduct()
         {
@@ -439,7 +962,7 @@ namespace WebThuCung.Controllers
             if (!saveProduct.Any())
             {
                 // Có thể trả về một view khác hoặc hiển thị thông báo không có công việc đã lưu
-                ViewBag.Message = "Bạn chưa lưu công việc nào.";
+                ViewBag.Message = "Bạn chưa lưu sản phẩm nào nào.";
                 return View(new List<SaveProduct>());
             }
 
@@ -509,10 +1032,10 @@ namespace WebThuCung.Controllers
             {
                 _context.SaveProducts.Remove(saveProduct);
                 _context.SaveChanges();
-                return Json(new { success = true, message = "Job has been deleted successfully!" });
+                return Json(new { success = true, message = "Product has been deleted successfully!" });
             }
 
-            return Json(new { success = false, message = "Saved job not found!" });
+            return Json(new { success = false, message = "Saved product not found!" });
         }
 
 

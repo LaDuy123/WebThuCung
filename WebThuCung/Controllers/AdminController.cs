@@ -433,10 +433,13 @@ decimal totalRevenueLastMonth = ordersLastMonth
 
                 if (ad != null)
                 {
-                    ViewBag.Thongbao = "Đăng nhập thành công";
+                    TempData["success"] = "Đăng nhập thành công";
+                    // Serialize thông tin khách hàng thành JSON và lưu vào Session
+                    var adminJson = Newtonsoft.Json.JsonConvert.SerializeObject(ad);
+                    HttpContext.Session.SetString("TaikhoanAdmin", adminJson);
+                    HttpContext.Session.SetString("email", ad.Email);
 
-                    // Lưu thông tin admin vào session dưới dạng chuỗi JSON
-                    HttpContext.Session.SetString("Taikhoanadmin", JsonConvert.SerializeObject(ad));
+               
 
                     return RedirectToAction("Index", "Admin");
                 }
@@ -457,6 +460,41 @@ decimal totalRevenueLastMonth = ordersLastMonth
             return View(admins);
         }
 
-      
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            HttpContext.Session.Remove("TaikhoanAdmin");
+
+            ViewBag.Thongbao = "Bạn đã đăng xuất thành công.";
+
+            return RedirectToAction("Login", "Admin");
+        }
+        [HttpGet]
+        public IActionResult CheckAuthentication()
+        {
+            string email = HttpContext.Session.GetString("email");
+
+            if (!string.IsNullOrEmpty(email))
+            {
+                // Kiểm tra bảng customer
+                var admin = _context.Admins.FirstOrDefault(c => c.Email == email);
+                if (admin != null)
+                {
+                    return new JsonResult(new
+                    {
+                        isAuthenticated = true,
+                        isadmin = true,
+                        avatar = admin.Avatar// Giả sử bạn có trường Avatar trong customer
+                    });
+                }
+
+                // Kiểm tra bảng Recruiter
+
+            }
+
+            // Nếu không tìm thấy email hoặc người dùng chưa đăng nhập
+            return new JsonResult(new { isAuthenticated = false });
+        }
+
     }
 }

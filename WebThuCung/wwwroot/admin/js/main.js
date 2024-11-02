@@ -6,6 +6,21 @@
 * License: https://bootstrapmade.com/license/
 */
 
+$(document).on('click', '.avatar_img', function () {
+    var profileMenu = $('.profile');
+    if (profileMenu.css('display') === 'none') {
+        profileMenu.css('display', 'block'); // Hi?n th? menu
+    } else {
+        profileMenu.css('display', 'none'); // ?n menu
+    }
+});
+
+// ?n menu khi nh?p ra ngoài menu
+$(document).click(function (e) {
+    if (!$(e.target).closest('.wrap_login').length) {
+        $('.profile').hide(); // ?n danh sách khi nh?p ra ngoài avatar
+    }
+});
 (function() {
   "use strict";
 

@@ -185,15 +185,17 @@
                 </div>
 
                 <div class="col-sm-6 offset-sm-2 offset-md-0 col-lg-5 d-none d-lg-block">
-                    <div class="search-bar border rounded-2 px-3 border-dark-subtle">
-                        <form id="search-form" class="text-center d-flex align-items-center" action="" method="">
-                            <input type="text" class="form-control border-0 bg-transparent"
-                                   placeholder="Search for more than 10,000 products" />
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                                <path fill="currentColor"
-                                      d="M21.71 20.29L18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a1 1 0 0 0 1.42 0a1 1 0 0 0 0-1.39ZM11 18a7 7 0 1 1 7-7a7 7 0 0 1-7 7Z" />
-                            </svg>
-                        </form>
+                    <div class="search-bar border rounded-2  border-dark-subtle">
+                        <div class="search-bar border rounded-2 border-dark-subtle">
+                            <form id="search-form" class="text-center d-flex align-items-center"
+                                  action="@Url.Action("SearchResults", "Product")" method="get">
+                               @*  @Html.AntiForgeryToken() *@
+                                <input type="text" name="query" class="form-control border-0 bg-transparent" placeholder="Search Here" />
+                                <button type="submit" class="btn p-0">
+                                    <iconify-icon icon="tabler:search" class="fs-4 me-3"></iconify-icon>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
 
@@ -280,13 +282,11 @@
                     </div>
 
                     <div class="offcanvas-body justify-content-between">
-                        <select class="filter-categories border-0 mb-0 me-5">
+                        <select class="filter-categories border-0 mb-0 me-5" id="categoryDropdown">
                             <option>Shop by Category</option>
-                            <option>Clothes</option>
-                            <option>Food</option>
-                            <option>Food</option>
-                            <option>Toy</option>
+                            @await Component.InvokeAsync("Category")
                         </select>
+
 
                         <ul class="navbar-nav menu-list list-unstyled d-flex gap-md-3 mb-0">
                             <li class="nav-item">
@@ -302,7 +302,7 @@
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="shop.html" class="dropdown-item">
+                                        <a asp-controller="Product" asp-action="Shop" class="dropdown-item">
                                             Shop<span class="badge bg-success text-dark ms-2">PRO</span>
                                         </a>
                                     </li>
@@ -369,13 +369,13 @@
                                 </ul>
                             </li>
                             <li class="nav-item">
-                                <a href="shop.html" class="nav-link">Shop</a>
+                                <a asp-controller="Product" asp-action="Shop" class="nav-link">Shop</a>
                             </li>
                             <li class="nav-item">
-                                <a href="blog.html" class="nav-link">Blog</a>
+                                <a asp-controller="User" asp-action="Blog" class="nav-link">Blog</a>
                             </li>
                             <li class="nav-item">
-                                <a href="contact.html" class="nav-link">Contact</a>
+                                <a asp-controller="User" asp-action="Contact" class="nav-link">Contact</a>
                             </li>
                             <li class="nav-item">
                                 <a href="#" class="nav-link">Others</a>
@@ -396,12 +396,9 @@
                                 </li>
 
                                 <li class="">
-                                    <a href="#" class="mx-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCart"
-                                       aria-controls="offcanvasCart">
+                                    <a asp-controller ="Product" asp-action="ViewCart" class="mx-3" >
                                         <iconify-icon icon="mdi:cart" class="fs-4 position-relative"></iconify-icon>
-                                        <span class="position-absolute translate-middle badge rounded-circle bg-primary pt-2">
-                                            03
-                                        </span>
+                                            @await Html.PartialAsync("_CartCount")
                                     </a>
                                 </li>
                             </ul>
@@ -588,7 +585,7 @@
                                         <li class="has-children">
                                             <img class="avatar_img" src="${avatarUrl}" alt="Candidate Avatar"></img>
                                             <ul class=" profile ">
-                                                <li><a href="/Profile/User">Profile</a></li>
+                                                <li><a href="/User/Profile">Profile</a></li>
                                               
                                                 <li><a href="/User/ChangePassword">Change Password</a></li>
                                                 <li><a class="logout" href="#">Logout</a></li>

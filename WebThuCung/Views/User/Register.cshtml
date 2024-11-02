@@ -221,54 +221,75 @@
         var districts = @Html.Raw(Json.Serialize(ViewBag.Districts));
         var wards = @Html.Raw(Json.Serialize(ViewBag.Wards));
 
+        // Load existing values on page load
+        var selectedCountry = $('#countryDropdown').val();
+        var selectedCity = $('#cityDropdown').val();
+        var selectedDistrict = $('#districtDropdown').val();
+
+        // Filter and populate City dropdown based on the selected Country
+        if (selectedCountry) {
+            var filteredCities = cities.filter(city => city.countryId == selectedCountry);
+            $('#cityDropdown').empty().append('<option value="">-- Select City --</option>');
+            $.each(filteredCities, function (index, city) {
+                $('#cityDropdown').append('<option value="' + city.value + '"' + (city.value == selectedCity ? ' selected' : '') + '>' + city.text + '</option>');
+            });
+        }
+
+        // Filter and populate District dropdown based on the selected City
+        if (selectedCity) {
+            var filteredDistricts = districts.filter(district => district.cityId == selectedCity);
+            $('#districtDropdown').empty().append('<option value="">-- Select District --</option>');
+            $.each(filteredDistricts, function (index, district) {
+                $('#districtDropdown').append('<option value="' + district.value + '"' + (district.value == selectedDistrict ? ' selected' : '') + '>' + district.text + '</option>');
+            });
+        }
+
+        // Filter and populate Ward dropdown based on the selected District
+        if (selectedDistrict) {
+            var filteredWards = wards.filter(ward => ward.districtId == selectedDistrict);
+            $('#wardDropdown').empty().append('<option value="">-- Select Ward --</option>');
+            $.each(filteredWards, function (index, ward) {
+                $('#wardDropdown').append('<option value="' + ward.value + '"' + (ward.value == $('#wardDropdown').val() ? ' selected' : '') + '>' + ward.text + '</option>');
+            });
+        }
+
+        // Country change event
         $('#countryDropdown').change(function () {
             var selectedCountry = $(this).val();
-            var filteredCities = cities.filter(city => {
-
-                return city.countryId == selectedCountry; // Sửa lại ở đây
-            });
+            var filteredCities = cities.filter(city => city.countryId == selectedCountry);
 
             $('#cityDropdown').empty().append('<option value="">-- Select City --</option>');
             $.each(filteredCities, function (index, city) {
                 $('#cityDropdown').append('<option value="' + city.value + '">' + city.text + '</option>');
             });
 
-            // Clear the subsequent dropdowns
             $('#districtDropdown').empty().append('<option value="">-- Select District --</option>');
             $('#wardDropdown').empty().append('<option value="">-- Select Ward --</option>');
         });
 
+        // City change event
         $('#cityDropdown').change(function () {
             var selectedCity = $(this).val();
+            var filteredDistricts = districts.filter(district => district.cityId == selectedCity);
 
-            // Filter districts based on selected city
-         
-            var filteredDistricts = districts.filter(district => {
-
-                return district.cityId == selectedCity; // Sửa lại ở đây
-            });
             $('#districtDropdown').empty().append('<option value="">-- Select District --</option>');
             $.each(filteredDistricts, function (index, district) {
                 $('#districtDropdown').append('<option value="' + district.value + '">' + district.text + '</option>');
             });
 
-            // Clear the ward dropdown
             $('#wardDropdown').empty().append('<option value="">-- Select Ward --</option>');
         });
 
+        // District change event
         $('#districtDropdown').change(function () {
             var selectedDistrict = $(this).val();
+            var filteredWards = wards.filter(ward => ward.districtId == selectedDistrict);
 
-            // Filter wards based on selected district
-            var filteredWards = wards.filter(ward => {
-
-                return ward.districtId == selectedDistrict; // Sửa lại ở đây
-            });
- 
             $('#wardDropdown').empty().append('<option value="">-- Select Ward --</option>');
             $.each(filteredWards, function (index, ward) {
                 $('#wardDropdown').append('<option value="' + ward.value + '">' + ward.text + '</option>');
             });
         });
     });
+
 </script>

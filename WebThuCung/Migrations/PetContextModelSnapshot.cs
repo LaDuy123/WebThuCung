@@ -243,16 +243,22 @@ namespace WebThuCung.Migrations
 
             modelBuilder.Entity("WebThuCung.Models.DetailOrder", b =>
                 {
-                    b.Property<string>("idOrder")
-                        .HasColumnType("nvarchar(450)")
-                        .HasColumnOrder(0);
+                    b.Property<int>("IdDetailOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                    b.Property<string>("idProduct")
-                        .HasColumnType("nvarchar(450)")
-                        .HasColumnOrder(1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdDetailOrder"));
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
+
+                    b.Property<string>("idOrder")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("idProduct")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("nameColor")
                         .IsRequired()
@@ -265,7 +271,9 @@ namespace WebThuCung.Migrations
                     b.Property<decimal?>("totalPrice")
                         .HasColumnType("decimal(18,2)");
 
-                    b.HasKey("idOrder", "idProduct");
+                    b.HasKey("IdDetailOrder");
+
+                    b.HasIndex("idOrder");
 
                     b.HasIndex("idProduct");
 
@@ -403,6 +411,32 @@ namespace WebThuCung.Migrations
                     b.HasIndex("idCustomer");
 
                     b.ToTable("Order");
+                });
+
+            modelBuilder.Entity("WebThuCung.Models.Payment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("QRCodeUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("idTransaction")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Payment");
                 });
 
             modelBuilder.Entity("WebThuCung.Models.Pet", b =>
@@ -594,6 +628,61 @@ namespace WebThuCung.Migrations
                     b.HasKey("idSupplier");
 
                     b.ToTable("Supplier");
+                });
+
+            modelBuilder.Entity("WebThuCung.Models.Transaction", b =>
+                {
+                    b.Property<int>("idTransaction")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("idTransaction"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<decimal?>("TotalAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("cpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("createdDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("idCustomer")
+                        .HasColumnType("int");
+
+                    b.Property<string>("idOrder")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("nameCustomer")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("phoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("shippingAddress")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.HasKey("idTransaction");
+
+                    b.HasIndex("idCustomer");
+
+                    b.HasIndex("idOrder");
+
+                    b.ToTable("Transaction");
                 });
 
             modelBuilder.Entity("WebThuCung.Models.VoteWarehouse", b =>
@@ -868,6 +957,25 @@ namespace WebThuCung.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("WebThuCung.Models.Transaction", b =>
+                {
+                    b.HasOne("WebThuCung.Models.Customer", "Customer")
+                        .WithMany("Transactions")
+                        .HasForeignKey("idCustomer")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebThuCung.Models.Order", "Order")
+                        .WithMany("Transactions")
+                        .HasForeignKey("idOrder")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Order");
+                });
+
             modelBuilder.Entity("WebThuCung.Models.VoteWarehouse", b =>
                 {
                     b.HasOne("WebThuCung.Models.Supplier", "Supplier")
@@ -929,6 +1037,8 @@ namespace WebThuCung.Migrations
                     b.Navigation("Orders");
 
                     b.Navigation("SaveProducts");
+
+                    b.Navigation("Transactions");
                 });
 
             modelBuilder.Entity("WebThuCung.Models.District", b =>
@@ -946,6 +1056,8 @@ namespace WebThuCung.Migrations
             modelBuilder.Entity("WebThuCung.Models.Order", b =>
                 {
                     b.Navigation("DetailOrders");
+
+                    b.Navigation("Transactions");
                 });
 
             modelBuilder.Entity("WebThuCung.Models.Pet", b =>

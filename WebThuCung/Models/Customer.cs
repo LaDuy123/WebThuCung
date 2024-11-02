@@ -28,7 +28,8 @@ namespace WebThuCung.Models
         [MaxLength(200)]
         public string passwordCustomer { get; set; } // MATKHAUKH
 
-        [MaxLength(100)]
+        [Required(ErrorMessage = "Email không được trống")]
+        [EmailAddress(ErrorMessage = "Email không hợp lệ")]
         public string Email { get; set; } // EMAIL
 
         public DateTime? dateBirth { get; set; } // NGAYSINH
@@ -60,5 +61,6 @@ namespace WebThuCung.Models
 
         public ICollection<SaveProduct> SaveProducts { get; set; } = new List<SaveProduct>();
         public ICollection<Order> Orders { get; set; }
+        public ICollection<Transaction> Transactions { get; set; }
     }
 }

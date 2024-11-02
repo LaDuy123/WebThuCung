@@ -32,8 +32,10 @@ namespace WebThuCung.Data
         public DbSet<District> Districts { get; set; }
         public DbSet<Ward> Wards { get; set; }
         public DbSet<SaveProduct> SaveProducts { get; set; }
+        public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<Payment> Payments { get; set; }
 
 
 
-    }
+	}
 }
