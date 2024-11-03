@@ -9,7 +9,6 @@ namespace WebThuCung.Data
 
         public DbSet<Admin> Admins { get; set; }
         public DbSet<Branch> Branchs { get; set; }
-        public DbSet<Mission> Missions { get; set; }
         public DbSet<Discount> Discounts { get; set; }
         public DbSet<ImageProduct> ImageProducts { get; set; }
         public DbSet<Size> Sizes { get; set; }
@@ -37,5 +36,5 @@ namespace WebThuCung.Data
 
 
 
-	}
+    }
 }

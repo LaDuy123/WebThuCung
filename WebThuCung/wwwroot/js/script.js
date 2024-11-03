@@ -13,7 +13,7 @@
 //});
 
 $(document).on('click', '.avatar_img', function () {
-    var profileMenu = $('.profile');
+    var profileMenu = $('.profileavatar');
     if (profileMenu.css('display') === 'none') {
         profileMenu.css('display', 'block'); // Hiển thị menu
     } else {

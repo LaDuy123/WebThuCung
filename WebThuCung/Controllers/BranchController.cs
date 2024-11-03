@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebThuCung.Data;
 using WebThuCung.Dto;
 using WebThuCung.Models;
@@ -14,6 +15,8 @@ namespace WebThuCung.Controllers
         {
             _context = context;
         }
+
+
         public IActionResult Index()
         {
             // Lấy danh sách các admin từ cơ sở dữ liệu
@@ -21,11 +24,14 @@ namespace WebThuCung.Controllers
 
             // Truyền danh sách admin sang view
             return View(branchs);
+
         }
+        [Authorize(Roles = "Admin,StaffProduct")]
         public IActionResult Create()
         {
             return View();
         }
+
 
         [HttpPost]
         public IActionResult Create(BranchCreateDto model)
@@ -69,6 +75,7 @@ namespace WebThuCung.Controllers
 
             return RedirectToAction("Index"); // Chuyển hướng đến trang danh sách chi nhánh
         }
+        [Authorize(Roles = "Admin,StaffProduct")]
 
         [HttpGet]
         public IActionResult Edit(string id)
@@ -135,6 +142,7 @@ namespace WebThuCung.Controllers
             return View(branchDto);
         }
 
+        [Authorize(Roles = "Admin,StaffProduct")]
 
         [HttpPost]
         [ValidateAntiForgeryToken]

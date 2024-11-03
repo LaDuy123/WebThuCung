@@ -1,4 +1,4 @@
-/**
+﻿/**
 * Template Name: NiceAdmin
 * Template URL: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/
 * Updated: Apr 20 2024 with Bootstrap v5.3.3
@@ -6,19 +6,19 @@
 * License: https://bootstrapmade.com/license/
 */
 
-$(document).on('click', '.avatar_img', function () {
-    var profileMenu = $('.profile');
+$(document).on('click', '.avatar_imgadmin', function () {
+    var profileMenu = $('.profileavataradmin');
     if (profileMenu.css('display') === 'none') {
-        profileMenu.css('display', 'block'); // Hi?n th? menu
+        profileMenu.css('display', 'block'); // Hiển thị menu
     } else {
-        profileMenu.css('display', 'none'); // ?n menu
+        profileMenu.css('display', 'none'); // Ẩn menu
     }
 });
 
-// ?n menu khi nh?p ra ngo�i menu
+// ?n menu khi nh?p ra ngoài menu
 $(document).click(function (e) {
     if (!$(e.target).closest('.wrap_login').length) {
-        $('.profile').hide(); // ?n danh s�ch khi nh?p ra ngo�i avatar
+        $('.profile').hide(); // ?n danh sách khi nh?p ra ngoài avatar
     }
 });
 (function() {

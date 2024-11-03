@@ -1,4 +1,5 @@
-﻿@model WebThuCung.Dto.ProductViewDto
+﻿
+@model WebThuCung.Dto.ProductViewDto
 @{
     ViewData["Title"] = "Detail";
     Layout = "~/Views/Shared/_LayoutUsers.cshtml";
@@ -27,7 +28,7 @@
                         <div class="swiper product-large-slider">
                             <div class="swiper-wrapper">
                                 <div class="swiper-slide">
-                                    <img src="~/images/@Model.Image" class="img-fluid" alt="@Model.nameProduct" />
+                                    <img src="~/images/@Model.Image" class="img-fluid main-image" alt="@Model.nameProduct" />
                                 </div>
                             </div>
                         </div>
@@ -42,7 +43,7 @@
                                     @foreach (var image in Model.ImageProducts.Take(3))
                                     {
                                         <div class="swiper-slide">
-                                            <img src="~/images/@image" class="img-fluid" />
+                                            <img src="~/images/@image" class="img-fluid thumbnail-image" />
                                         </div>
                                     }
                                 }
@@ -50,7 +51,7 @@
                                 {
                                     <!-- Nếu không có hình ảnh, hiển thị hình ảnh mặc định -->
                                     <div class="swiper-slide">
-                                        <img src="~/images/item1.jpg" class="img-fluid" />
+                                        <img src="~/images/item1.jpg" class="img-fluid thumbnail-image" />
                                     </div>
                                 }
                             </div>
@@ -99,7 +100,7 @@
                                         @foreach (var color in Model.Colors)
                                         {
                                             <li class="select-item pe-3" title="@color">
-                                                <a  class="btn btn-light color-item" data-color="@color">@color</a>
+                                                <a class="btn btn-light color-item" data-color="@color">@color</a>
                                             </li>
                                         }
                                     }
@@ -120,7 +121,7 @@
                                     @foreach (var size in Model.Sizes.Take(3))
                                     {
                                         <li class="select-item pe-3" title="@size">
-                                            <a  class="btn btn-light size-item" data-size="@size">@size</a>
+                                            <a class="btn btn-light size-item" data-size="@size">@size</a>
                                         </li>
                                     }
                                 }
@@ -162,7 +163,7 @@
                                        data-size="">
                                         <h5 class="text-uppercase m-0">Add to Cart</h5>
                                     </a>
-                                    <a  class="btn-wishlist px-4 pt-3 ">
+                                    <a class="btn-wishlist px-4 pt-3 ">
                                         <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
                                     </a>
                                 </div>
@@ -199,36 +200,42 @@
     }
 </style>
 <script>
+
     $(document).ready(function () {
-        // Xử lý sự kiện khi nhấp vào mục màu
         $('#colorList').on('click', '.color-item', function (e) {
-            e.preventDefault(); // Ngăn hành động mặc định của thẻ <a>
+            e.preventDefault();
             $('.color-item').removeClass('color-selected');
             $(this).addClass('color-selected');
 
-            // Lưu màu đã chọn vào thuộc tính data-color của nút Add to Cart
             $('#btnAddToCart').data('color', $(this).data('color'));
         });
 
-        // Xử lý sự kiện khi nhấp vào mục kích thước
         $('#sizeList').on('click', '.size-item', function (e) {
-            e.preventDefault(); // Ngăn hành động mặc định của thẻ <a>
-            $('.size-item').removeClass('color-selected');
-            $(this).addClass('color-selected');
+            e.preventDefault();
+            $('.size-item').removeClass('size-selected');
+            $(this).addClass('size-selected');
 
-            // Lưu kích thước đã chọn vào thuộc tính data-size của nút Add to Cart
             $('#btnAddToCart').data('size', $(this).data('size'));
         });
 
-        // Xử lý sự kiện khi nhấp vào nút Add to Cart
+        // Add event listener for thumbnail clicks
+        $('.product-thumbnail-slider .thumbnail-image').on('click', function () {
+            // Get the source of the clicked thumbnail
+            var newSrc = $(this).attr('src');
+
+            // Replace the main image source with the clicked thumbnail's source and ensure it keeps the same styling
+            $('.product-large-slider .main-image').attr('src', newSrc).css({
+                'width': '100%',  // Ensures the image fills the parent container
+                'height': 'auto'  // Maintains aspect ratio
+            });
+        });
+
         $('#btnAddToCart').on('click', function (e) {
             e.preventDefault();
-
             let productId = $(this).data('product-id');
             let color = $(this).data('color');
             let size = $(this).data('size');
             let quantity = $('#quantity').val();
-
             console.log("ProductId:", productId);
             console.log("Color:", color);
             console.log("Size:", size);
@@ -258,7 +265,7 @@
                         alert("Product added to cart successfully!");
                     } else {
                         if (response.redirectUrl) {
-                            // Chuyển hướng đến trang đăng nhập
+                            // Redirect to login page
                             window.location.href = response.redirectUrl;
                         } else {
                             alert("Error adding product to cart: " + response.message);
@@ -272,11 +279,6 @@
                     alert("Error adding product to cart.");
                 }
             });
-
         });
-
     });
-
 </script>
-
-

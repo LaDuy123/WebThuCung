@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
@@ -29,29 +30,7 @@ namespace WebThuCung.Controllers
             // Truyền danh sách admin sang viewsds
             return View(products);
         }
-        public IActionResult Create()
-        {
-            // Có thể truyền danh sách chi nhánh, danh mục, màu sắc, v.v. vào ViewBag nếu cần
-            ViewBag.Branchs = _context.Branchs.Select(b => new SelectListItem
-            {
-                Value = b.idBranch,
-                Text = b.nameBranch
-            }).ToList();
-
-            ViewBag.Categories = _context.Categories.Select(c => new SelectListItem
-            {
-                Value = c.idCategory,
-                Text = c.nameCategory
-            }).ToList();
-
-            ViewBag.Pets = _context.Pets.Select(p => new SelectListItem
-            {
-                Value = p.idPet,
-                Text = p.namePet
-            }).ToList();
-
-            return View();
-        }
+       
         [HttpGet]
         public IActionResult SearchByPet(string petName)
         {
@@ -181,7 +160,7 @@ namespace WebThuCung.Controllers
 
 
         [HttpGet]
-        public IActionResult FilterProducts(string categoryId, string branchId, string petId)
+        public IActionResult FilterProducts(string categoryId, string branchId, string petId, decimal? minPrice, decimal? maxPrice)
         {
             var customerId = GetCustomerIdFromSession();
 
@@ -189,8 +168,8 @@ namespace WebThuCung.Controllers
             var productsQuery = _context.Products
                 .Include(sp => sp.Branch)
                 .Include(sp => sp.Category)
-                .Include(sp => sp.Pet) // Bao gồm thông tin thú cưng
-                .AsQueryable(); // Chuyển đổi thành IQueryable để có thể áp dụng các điều kiện
+                .Include(sp => sp.Pet)
+                .AsQueryable();
 
             if (!string.IsNullOrEmpty(categoryId))
             {
@@ -207,7 +186,20 @@ namespace WebThuCung.Controllers
                 productsQuery = productsQuery.Where(p => p.idPet == petId);
             }
 
-            // Lấy danh sách sản phẩm từ truy vấn
+            // Lọc theo giá nếu có giá trị minPrice và maxPrice
+            if (minPrice.HasValue && maxPrice.HasValue)
+            {
+                productsQuery = productsQuery.Where(p => p.sellPrice >= minPrice && p.sellPrice <= maxPrice);
+            }
+            else if (minPrice.HasValue)
+            {
+                productsQuery = productsQuery.Where(p => p.sellPrice >= minPrice);
+            }
+            else if (maxPrice.HasValue)
+            {
+                productsQuery = productsQuery.Where(p => p.sellPrice <= maxPrice);
+            }
+
             var products = productsQuery
                 .Select(sp => new ProductViewDto
                 {
@@ -225,18 +217,16 @@ namespace WebThuCung.Controllers
                 })
                 .ToList();
 
-            // Lấy danh sách ID sản phẩm đã lưu
             var savedProductIds = _context.SaveProducts
                 .Where(s => s.idCustomer == customerId)
                 .Select(s => s.idProduct)
                 .ToList();
 
-            // Gán danh sách cho ViewBag để sử dụng trong View
             ViewBag.SavedProductIds = savedProductIds;
 
-            // Trả về PartialView với danh sách sản phẩm
             return PartialView("FilterProducts", products);
         }
+
 
 
 
@@ -289,7 +279,30 @@ namespace WebThuCung.Controllers
         }
 
 
+        [Authorize(Roles = "Admin,StaffProduct")]
+        public IActionResult Create()
+        {
+            // Có thể truyền danh sách chi nhánh, danh mục, màu sắc, v.v. vào ViewBag nếu cần
+            ViewBag.Branchs = _context.Branchs.Select(b => new SelectListItem
+            {
+                Value = b.idBranch,
+                Text = b.nameBranch
+            }).ToList();
 
+            ViewBag.Categories = _context.Categories.Select(c => new SelectListItem
+            {
+                Value = c.idCategory,
+                Text = c.nameCategory
+            }).ToList();
+
+            ViewBag.Pets = _context.Pets.Select(p => new SelectListItem
+            {
+                Value = p.idPet,
+                Text = p.namePet
+            }).ToList();
+
+            return View();
+        }
         // POST: Product/Create
         [HttpPost]
         public IActionResult Create(ProductCreateDto productDto)
@@ -351,6 +364,7 @@ namespace WebThuCung.Controllers
 
             return View(productDto);
         }
+        [Authorize(Roles = "Admin,StaffProduct")]
         [HttpGet]
         public IActionResult Edit(string id)
         {
@@ -459,7 +473,7 @@ namespace WebThuCung.Controllers
 
             return View(productDto);
         }
-
+        [Authorize(Roles = "Admin,StaffProduct")]
         // POST: Product/Delete/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -481,6 +495,7 @@ namespace WebThuCung.Controllers
 
             return RedirectToAction("Index"); // Quay lại danh sách sản phẩm sau khi xóa
         }
+      
 
         [HttpGet]
         public IActionResult Detail(string id)
@@ -775,6 +790,42 @@ namespace WebThuCung.Controllers
 
             return RedirectToAction("ViewCart");
         }
+        [HttpPost]
+        public IActionResult CheckOrCreatePayment(int idTransaction)
+        {
+            var transaction = _context.Transactions
+                .Include(t => t.Order)
+                .FirstOrDefault(t => t.idTransaction == idTransaction);
+
+            if (transaction == null)
+            {
+                return Json(new { success = false, message = "Giao dịch không tồn tại." });
+            }
+
+            // Kiểm tra xem đã có payment nào cho giao dịch này chưa
+            var existingPayment = _context.Payments.FirstOrDefault(p => p.idTransaction == idTransaction);
+
+            if (existingPayment != null)
+            {
+                // Nếu đã có payment, trả về paymentId để chuyển hướng tới ShowQRCode
+                return Json(new { success = true, paymentId = existingPayment.Id });
+            }
+
+            // Nếu chưa có payment, tạo payment mới
+            var payment = new Payment
+            {
+                idTransaction = transaction.idTransaction,
+                Amount = transaction.TotalAmount ?? 0,
+                CreatedDate = DateTime.Now,
+                QRCodeUrl = GenerateQRCodeUrl(transaction.Order.idOrder, transaction.TotalAmount ?? 0, transaction.nameCustomer)
+            };
+
+            _context.Payments.Add(payment);
+            _context.SaveChanges();
+
+            return Json(new { success = true, paymentId = payment.Id });
+        }
+
 
         private string GenerateQRCodeUrl(string idorder, decimal amount, string customerName)
         {

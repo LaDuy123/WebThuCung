@@ -59,7 +59,11 @@
                     <div class="info-item">
                         <h4>Đơn hàng #: @transaction.Order.idOrder</h4> <!-- ID đơn hàng -->
                     </div><!-- Thay đổi IdOrder cho đúng với thuộc tính của bạn -->
-
+                    <div class="info-item text-end">
+                        <button type="button" class="btn btn-primary" onclick="processOnlinePayment(@transaction.idTransaction)">
+                            Thanh toán online
+                        </button>
+                    </div>
                     @if (transaction.Order != null)
                     {
                         <table class="table">
@@ -181,6 +185,25 @@
                 }
             });
         }
+    }
+
+    function processOnlinePayment(transactionId) {
+        $.ajax({
+            url: '@Url.Action("CheckOrCreatePayment", "Product")', // Gọi tới phương thức CheckOrCreatePayment
+            type: 'POST',
+            data: { idTransaction: transactionId },
+            success: function (response) {
+                if (response.success) {
+                    // Chuyển hướng đến trang ShowQRCode với id của payment vừa được tạo
+                    window.location.href = '@Url.Action("ShowQRCode", "Product")' + '?paymentId=' + response.paymentId;
+                } else {
+                    alert(response.message || "Lỗi xảy ra khi xử lý thanh toán.");
+                }
+            },
+            error: function () {
+                alert("Đã xảy ra lỗi khi xử lý thanh toán.");
+            }
+        });
     }
 
 </script>

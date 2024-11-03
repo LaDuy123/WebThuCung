@@ -5,6 +5,12 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 using WebThuCung.Models;
 using WebThuCung.Dto;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using System.Security.Claims;
+using NuGet.Configuration;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebThuCung.Controllers
 {
@@ -16,20 +22,44 @@ namespace WebThuCung.Controllers
         {
             _context = context;
         }
+        private string GetAdminIdFromSession()
+        {
+            var adminEmail = HttpContext.Session.GetString("email");
+            var admin = _context.Admins.FirstOrDefault(c => c.Email == adminEmail);
+            return admin?.idAdmin; // Trả về idAdmin (string) hoặc null
+        }
+        public IActionResult AccessDenied()
+        {
+            TempData["error"] = "Bạn không có quyền truy cập "; 
+
+            // Có thể trả về một view AccessDenied hoặc chuyển hướng đến một trang mong muốn
+            return View();
+        }
+
+
+
         public IActionResult Index(string period = "today")
         {
+            var adminId = GetAdminIdFromSession();
+
+            if (string.IsNullOrEmpty(adminId))
+            {
+                // Xử lý nếu không có idAdmin, ví dụ: chuyển hướng đến trang đăng nhập
+                return RedirectToAction("Login", "Admin");
+            }
             // Lấy dữ liệu bán hàng (số đơn hàng theo ngày, tuần, tháng)
             var salesData = GetSalesData(period);
             var revenueData = GetRevenueData(period);
             var customerData = GetCustomerData(period);
             var topSellingData = GetTopSellingProducts(period);
-
+            var adminData = GetAdminData();
             var model = new DashboardViewDto
             {
                 Sales = salesData,
                 Revenue = revenueData,
                 Customer = customerData,
-                TopSellingProducts = topSellingData
+                TopSellingProducts = topSellingData,
+                Admin = adminData
             };
 
 
@@ -38,8 +68,99 @@ namespace WebThuCung.Controllers
             // Trả về view Index với model đã khởi tạo
             return View(model);
         }
+        private AdminDto GetAdminData()
+        {
+            var adminID = GetAdminIdFromSession(); // Lấy ID của admin từ session
+
+            // Tìm admin dựa trên ID
+            var admin = _context.Admins.FirstOrDefault(a => a.idAdmin == adminID);
+
+            if (admin != null)
+            {
+                return new AdminDto
+                {
+                    idAdmin = admin.idAdmin,
+                    Name = admin.Name,
+                    Address = admin.Address,
+                    Phone = admin.Phone,
+                    userAdmin = admin.userAdmin,
+                    Email = admin.Email,
+                    // Có thể thêm các thuộc tính khác nếu cần
+                };
+            }
+
+            return null; // Hoặc có thể trả về một đối tượng AdminDto rỗng nếu không tìm thấy
+        }
 
 
+
+        public IActionResult UploadAvatar(IFormFile avatar)
+        {
+            if (avatar != null && avatar.Length > 0)
+            {
+                // Đường dẫn lưu trữ file ảnh
+                var uploads = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/admin/img");
+
+                // Sử dụng tên file gốc
+                var fileName = avatar.FileName;
+
+                // Đường dẫn lưu file
+                var filePath = Path.Combine(uploads, fileName);
+
+                // Kiểm tra xem file đã tồn tại hay chưa
+                if (System.IO.File.Exists(filePath))
+                {
+                    // Nếu tệp tồn tại, xóa nó
+                    System.IO.File.Delete(filePath);
+                }
+
+                // Lưu file vào thư mục "wwwroot/admin/img"
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    avatar.CopyTo(fileStream);
+                }
+
+                // Trả về tên file gốc cho client để hiển thị
+                return Json(new { fileName });
+            }
+
+            return BadRequest();
+        }
+        private int GetCustomerIdFromSession()
+        {
+            var customerEmail = HttpContext.Session.GetString("email");
+            var customer = _context.Customers.FirstOrDefault(c => c.Email == customerEmail);
+            return customer?.idCustomer ?? 0;
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult SaveAvatar(AdminDto adminDto)
+        {
+            if (ModelState.IsValid)
+            {
+                var  AdminId = GetAdminIdFromSession();
+                var existingAdmin = _context.Admins.Find(AdminId);
+                if (existingAdmin == null) return NotFound();
+
+                // Upload avatar nếu có file mới, nếu không giữ nguyên
+                if (adminDto.Avatar != null && adminDto.Avatar.Length > 0)
+                {
+
+
+                    existingAdmin.Avatar = adminDto.Avatar.FileName; // Cập nhật tên hình đại diện
+                }
+
+
+                _context.Admins.Update(existingAdmin);
+                _context.SaveChangesAsync();
+
+                return RedirectToAction("Profile");
+            }
+
+            return View("Profile");
+        }
         private SalesViewDto GetSalesData(string period)
         {
             // Lấy ngày hôm nay
@@ -423,24 +544,77 @@ decimal totalRevenueLastMonth = ordersLastMonth
         }
 
         // POST: Xử lý đăng nhập
+        //[HttpPost]
+        //public IActionResult Login(LoginDto model)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        // Tìm kiếm admin trong cơ sở dữ liệu
+        //        var ad = _context.Admins.Include(a => a.Role).SingleOrDefault(n => n.userAdmin == model.userName && n.passwordAdmin == model.password);
+
+        //        if (ad != null)
+        //        {
+        //            TempData["success"] = "Đăng nhập thành công";
+        //            // Serialize thông tin khách hàng thành JSON và lưu vào Session
+        //            var settings = new JsonSerializerSettings
+        //            {
+        //                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+        //            };
+        //            var adminJson = Newtonsoft.Json.JsonConvert.SerializeObject(ad, settings);
+        //            HttpContext.Session.SetString("TaikhoanAdmin", adminJson);
+        //            HttpContext.Session.SetString("email", ad.Email);
+
+        //            return RedirectToAction("Index", "Admin");
+        //        }
+        //        else
+        //        {
+        //            ViewBag.Thongbao = "Tên đăng nhập hoặc mật khẩu không đúng";
+        //        }
+        //    }
+
+        //    return View(model);
+        //}
         [HttpPost]
-        public IActionResult Login(LoginDto model)
+        public async Task<IActionResult> Login(LoginDto model)
         {
             if (ModelState.IsValid)
             {
                 // Tìm kiếm admin trong cơ sở dữ liệu
-                var ad = _context.Admins.SingleOrDefault(n => n.userAdmin == model.userName && n.passwordAdmin == model.password);
+                var ad = await _context.Admins.Include(a => a.Role)
+                                               .SingleOrDefaultAsync(n => n.userAdmin == model.userName && n.passwordAdmin == model.password);
 
                 if (ad != null)
                 {
                     TempData["success"] = "Đăng nhập thành công";
-                    // Serialize thông tin khách hàng thành JSON và lưu vào Session
-                    var adminJson = Newtonsoft.Json.JsonConvert.SerializeObject(ad);
+
+                    // Tạo Claims cho người dùng
+                    var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, ad.userAdmin),
+                new Claim(ClaimTypes.Email, ad.Email),
+                new Claim(ClaimTypes.Role, ad.Role.Name) // Gán vai trò cho người dùng
+            };
+
+                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                    var authProperties = new AuthenticationProperties
+                    {
+                        IsPersistent = true, // Lưu lại thông tin đăng nhập
+                        ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30) // Thời gian hết hạn
+                    };
+
+                    // Đăng nhập cho người dùng
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                                                   new ClaimsPrincipal(claimsIdentity),
+                                                   authProperties);
+                    var settings = new JsonSerializerSettings
+                    {
+                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                    };
+                    var adminJson = Newtonsoft.Json.JsonConvert.SerializeObject(ad, settings);
+
                     HttpContext.Session.SetString("TaikhoanAdmin", adminJson);
                     HttpContext.Session.SetString("email", ad.Email);
-
-               
-
                     return RedirectToAction("Index", "Admin");
                 }
                 else
@@ -451,6 +625,20 @@ decimal totalRevenueLastMonth = ordersLastMonth
 
             return View(model);
         }
+        [Authorize]
+        public IActionResult Profilerole()
+        {
+            var username = User.Identity.Name; // Lấy tên người dùng
+            var email = User.FindFirstValue(ClaimTypes.Email); // Lấy email
+            var role = User.FindFirstValue(ClaimTypes.Role); // Lấy vai trò
+
+            ViewBag.Username = username;
+            ViewBag.Email = email;
+            ViewBag.Role = role;
+
+            return View();
+        }
+
         public IActionResult ListAdmin()
         {
             // Lấy danh sách các admin từ cơ sở dữ liệu
@@ -495,6 +683,109 @@ decimal totalRevenueLastMonth = ordersLastMonth
             // Nếu không tìm thấy email hoặc người dùng chưa đăng nhập
             return new JsonResult(new { isAuthenticated = false });
         }
+        public IActionResult LoadProfilePartial()
+        {
+            var idAdmin = GetAdminIdFromSession();
+            if (string.IsNullOrEmpty(idAdmin))
+            {
+                // Xử lý nếu không có idAdmin, ví dụ: chuyển hướng đến trang đăng nhập
+                return RedirectToAction("Login", "Admin");
+            }
+
+            // Lấy thông tin khách hàng từ cơ sở dữ liệu, bao gồm các thông tin liên quan
+            var admin = _context.Admins
+           .FirstOrDefault(c => c.idAdmin == idAdmin);
+
+            if (admin == null)
+            {
+                TempData["error"] = "Không tìm thấy thông tin người dùng.";
+                return RedirectToAction("Index", "Home"); // Redirect về trang chủ hoặc trang khác
+            }
+
+            return PartialView("ProfileOverview", admin);
+        }
+        public IActionResult Profile()
+        {
+          
+            var idAdmin = GetAdminIdFromSession();
+            if (string.IsNullOrEmpty(idAdmin))
+            {
+                // Xử lý nếu không có idAdmin, ví dụ: chuyển hướng đến trang đăng nhập
+                return RedirectToAction("Login", "Admin");
+            }
+
+            // Lấy thông tin khách hàng từ cơ sở dữ liệu, bao gồm các thông tin liên quan
+            var admin = _context.Admins
+              .FirstOrDefault(c => c.idAdmin == idAdmin);
+
+            if (admin == null)
+            {
+                TempData["error"] = "Không tìm thấy thông tin người dùng.";
+                return RedirectToAction("Index", "Home"); // Redirect về trang chủ hoặc trang khác
+            }
+
+            return View(admin); // Trả về View Profiler với model là thông tin người dùng
+        }
+        [HttpGet]
+        public IActionResult EditProfilePartial()
+        {
+            var idAdmin = GetAdminIdFromSession();
+            if (string.IsNullOrEmpty(idAdmin))
+            {
+                return RedirectToAction("Login", "Admin");
+            }
+
+            var admin = _context.Admins.FirstOrDefault(c => c.idAdmin == idAdmin);
+            if (admin == null)
+            {
+                TempData["error"] = "Không tìm thấy thông tin người dùng.";
+                return RedirectToAction("Index", "Home");
+            }
+            var adminDto = new AdminDto
+            {
+                Name = admin.Name,  
+                Address = admin.Address,
+                Phone = admin.Phone,
+                Email = admin.Email,
+               
+            };
+            return PartialView("ProfileEdit", adminDto);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditProfile(AdminDto model)
+        {
+            var idAdmin = GetAdminIdFromSession();
+            if (string.IsNullOrEmpty(idAdmin))
+            {
+                return RedirectToAction("Login", "Admin");
+            }
+
+            var admin = _context.Admins.Find(idAdmin);
+            if (admin == null)
+            {
+                TempData["error"] = "Không tìm thấy thông tin người dùng.";
+                return RedirectToAction("Index", "Home");
+            }
+
+
+            // Cập nhật thông tin từ model, giữ nguyên giá trị cũ nếu giá trị mới là null
+            admin.Name = model.Name ?? admin.Name;
+            admin.Address = model.Address ?? admin.Address;
+            admin.Phone = model.Phone ?? admin.Phone;
+            admin.Email = model.Email ?? admin.Email;
+
+            // Nếu cần cập nhật thêm các thông tin khác
+            // admin.OtherProperty = model.OtherProperty ?? admin.OtherProperty;
+
+            _context.SaveChanges(); // Lưu thay đổi vào cơ sở dữ liệu
+
+            TempData["success"] = "Cập nhật thông tin thành công.";
+
+            return PartialView("ProfileOverview", admin); // Chuyển hướng đến phần thông tin hồ sơ sau khi cập nhật
+        }
+
+
 
     }
 }

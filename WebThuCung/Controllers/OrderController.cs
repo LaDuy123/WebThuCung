@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WebThuCung.Data;
@@ -32,7 +33,7 @@ namespace WebThuCung.Controllers
             // Truyền danh sách đơn hàng sang view
             return View(orders);
         }
-
+        [Authorize(Roles = "Admin,StaffOrder")]
         // GET: Order/Edit/{id}
         [HttpGet]
         public IActionResult Edit(string id)
@@ -106,7 +107,7 @@ namespace WebThuCung.Controllers
 
             return View(orderDto);
         }
-
+        [Authorize(Roles = "Admin,StaffOrder")]
         // POST: Order/Delete/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]

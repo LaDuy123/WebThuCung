@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebThuCung.Data;
 using WebThuCung.Dto;
 using WebThuCung.Models;
@@ -20,6 +21,7 @@ namespace WebThuCung.Controllers
             // Truyền danh sách admin sang view
             return View(pets);
         }
+        [Authorize(Roles = "Admin,StaffProduct")]
         public IActionResult Create()
         {
             return View();
@@ -46,7 +48,7 @@ namespace WebThuCung.Controllers
             }
             return View(petDto);
         }
-
+        [Authorize(Roles = "Admin,StaffProduct")]
         // Hiển thị form Edit
         [HttpGet]
         public IActionResult Edit(string id)
@@ -94,7 +96,7 @@ namespace WebThuCung.Controllers
 
             return View(petDto);
         }
-
+        [Authorize(Roles = "Admin,StaffProduct")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(string id)

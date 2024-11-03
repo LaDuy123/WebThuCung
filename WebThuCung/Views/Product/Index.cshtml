@@ -42,6 +42,9 @@
                                     <th>Category</th>
                                     <th>Quantity</th>
                                     <th>Image</th>
+                                    <th>Size</th> <!-- Cột Size -->
+                                    <th>Color</th> <!-- Cột Color -->
+                                    <th>Image Products</th>
                                     <th>Edit</th>
                                     <th>Delete</th>
                                 </tr>
@@ -60,6 +63,15 @@
                                             <td>@product.Quantity</td>
                                             <td>
                                                 <img src="~/images/@product.Image" alt="Product Image" style="width: 100px; height: auto;" />
+                                            </td>
+                                            <td>
+                                                <a asp-controller="Size" asp-action="SizeProduct" asp-route-id="@product.idProduct" class="btn btn-info btn-sm">View Sizes</a>
+                                            </td>
+                                            <td>
+                                                <a asp-controller="Color" asp-action="ColorProduct" asp-route-id="@product.idProduct" class="btn btn-info btn-sm">View Colors</a>
+                                            </td>
+                                            <td>
+                                                <a  asp-controller="ImageProduct" asp-action="ImageProduct" asp-route-id="@product.idProduct" class="btn btn-info btn-sm">View Images</a>
                                             </td>
                                             <td>
                                                 <!-- Nút Edit -->

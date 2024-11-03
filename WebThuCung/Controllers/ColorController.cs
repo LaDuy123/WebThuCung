@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WebThuCung.Data;
 using WebThuCung.Dto;
@@ -22,6 +24,7 @@ namespace WebThuCung.Controllers
             // Truyền danh sách admin sang view
             return View(colors);
         }
+        [Authorize(Roles = "Admin,StaffProduct")]
         public IActionResult Create()
         {
             return View();
@@ -49,6 +52,7 @@ namespace WebThuCung.Controllers
             return View(colorDto);
         }
 
+        [Authorize(Roles = "Admin,StaffProduct")]
         // Hiển thị form Edit
         [HttpGet]
         public IActionResult Edit(string id)
@@ -96,7 +100,7 @@ namespace WebThuCung.Controllers
 
             return View(colorDto);
         }
-
+        [Authorize(Roles = "Admin,StaffProduct")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(string id)
@@ -117,22 +121,83 @@ namespace WebThuCung.Controllers
 
             return RedirectToAction("Index"); // Quay lại danh sách Color sau khi xóa
         }
-        public IActionResult ProductColor(string productid)
+        [Authorize(Roles = "Admin,StaffProduct")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteColorProduct(string idProduct, string idColor)
         {
-            var pcolors = _context.ProductColors
-                .Include(c => c.Color).Where(d => d.idProduct == productid).ToList();
+            // Kiểm tra nếu idProduct hoặc idColor null hoặc rỗng
+            if (string.IsNullOrEmpty(idProduct) || string.IsNullOrEmpty(idColor))
+            {
+                return NotFound();
+            }
 
-            // Truyền danh sách admin sang view
-            return View(pcolors);
+            // Tìm bản ghi ProductColor dựa trên idProduct và idColor
+            var productColor = _context.ProductColors
+                .FirstOrDefault(pc => pc.idProduct == idProduct && pc.idColor == idColor);
+
+            if (productColor == null)
+            {
+                return NotFound(); // Không tìm thấy bản ghi
+            }
+
+            // Xóa bản ghi
+            _context.ProductColors.Remove(productColor);
+            _context.SaveChanges();
+
+            // Quay lại danh sách sau khi xóa
+            return RedirectToAction("ColorProduct", new { id = productColor.idProduct });
         }
-        public IActionResult CreateProductColor()
+        [Authorize(Roles = "Admin,StaffProduct")]
+        public IActionResult ColorProduct(string id)
         {
-            var pcolors = _context.ProductColors
-                .Include(c => c.Color).ToList();
-
-            // Truyền danh sách admin sang view
-            return View(pcolors);
+            var colors = _context.ProductColors.Include(p => p.Product).Include(p => p.Color).Where(pc => pc.idProduct == id).ToList(); // Lấy danh sách color của sản phẩm
+            ViewBag.ProductId = id;
+            return View(colors); // Trả về view với danh sách color
+        }
+        [Authorize(Roles = "Admin,StaffProduct")]
+        public IActionResult CreateColorProduct(string id)
+        {
+            ViewBag.ProductId = id;
+            ViewBag.ColorList = _context.Colors.Select(s => new SelectListItem
+            {
+                Value = s.idColor.ToString(),
+                Text = s.nameColor
+            }).ToList(); // Sử dụng Select để tạo danh sách Color
+            return View();
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult CreateColorProduct(ProductColor productColor)
+        {
+            // Kiểm tra xem cặp khóa (idProduct, idColor) đã tồn tại chưa
+            var existingColorProduct = _context.ProductColors
+                .FirstOrDefault(ps => ps.idProduct == productColor.idProduct && ps.idColor == productColor.idColor);
+
+            if (existingColorProduct != null)
+            {
+                // Nếu đã tồn tại, thêm thông báo lỗi vào ModelState
+                ModelState.AddModelError(string.Empty, "Màu sắc này đã tồn tại cho sản phẩm này.");
+                TempData["error"] = "Kích thước này đã tồn tại cho sản phẩm này.";
+                return RedirectToAction("CreateColorProduct", new { id = productColor.idProduct });
+
+            }
+            _context.ProductColors.Add(productColor);
+            _context.SaveChanges();
+
+            // Chuyển hướng về danh sách kích thước của sản phẩm
+
+
+            // Nếu ModelState không hợp lệ, lấy lại danh sách Color
+            ViewBag.ColorList = _context.Colors.Select(s => new SelectListItem
+            {
+                Value = s.idColor.ToString(),
+                Text = s.nameColor
+            }).ToList();
+
+            // Trả về view với sản phẩm đã chọn
+            return RedirectToAction("ColorProduct", new { id = productColor.idProduct });
+        }
     }
 }

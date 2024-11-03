@@ -131,17 +131,27 @@
                             @await Component.InvokeAsync("Branch")
                         </ul>
                     </div>
-
                     <div class="widget-price-filter pt-3">
                         <h4 class="widget-title">Filter By Price</h4>
                         <ul class="product-tags sidebar-list list-unstyled">
-                            <li class="tags-item"><a href="#" class="nav-link">Less than $10</a></li>
-                            <li class="tags-item"><a href="#" class="nav-link">$10- $20</a></li>
-                            <li class="tags-item"><a href="#" class="nav-link">$20- $30</a></li>
-                            <li class="tags-item"><a href="#" class="nav-link">$30- $40</a></li>
-                            <li class="tags-item"><a href="#" class="nav-link">$40- $50</a></li>
+                            <li class="tags-item">
+                                <a href="#" class="nav-link filter-price" data-min="0" data-max="10000">Less than 10000Đ</a>
+                            </li>
+                            <li class="tags-item">
+                                <a href="#" class="nav-link filter-price" data-min="10000" data-max="50000">10000Đ - 20000Đ</a>
+                            </li>
+                            <li class="tags-item">
+                                <a href="#" class="nav-link filter-price" data-min="20000" data-max="100000">20000Đ - 100000Đ</a>
+                            </li>
+                            <li class="tags-item">
+                                <a href="#" class="nav-link filter-price" data-min="100000" data-max="300000">100000Đ - 300000Đ</a>
+                            </li>
+                            <li class="tags-item">
+                                <a href="#" class="nav-link filter-price" data-min="300000">Greater than 300000Đ</a>
+                            </li>
                         </ul>
                     </div>
+
                 </div>
             </aside>
         </div>
@@ -154,6 +164,8 @@
         let selectedCategoryId = "";
         let selectedBranchId = "";
         let selectedPetId = "";
+        let selectedMinPrice = null;
+        let selectedMaxPrice = null;
 
         // Xử lý nhấp vào danh mục
         $(document).on('click', '.filter-category', function (e) {
@@ -169,13 +181,22 @@
             searchProducts();
         });
 
-        // Xử lý nhấp vào thẻ
+        // Xử lý nhấp vào thú cưng
         $(document).on('click', '.filter-pet', function (e) {
             e.preventDefault();
             selectedPetId = $(this).data('id');
             searchProducts();
         });
 
+        // Xử lý nhấp vào lọc giá
+        $(document).on('click', '.filter-price', function (e) {
+            e.preventDefault();
+            selectedMinPrice = $(this).data('min') || null;
+            selectedMaxPrice = $(this).data('max') || null;
+            searchProducts();
+        });
+
+        // Hàm gọi Ajax để lọc sản phẩm
         function searchProducts() {
             $.ajax({
                 url: '@Url.Action("FilterProducts", "Product")',
@@ -183,7 +204,9 @@
                 data: {
                     categoryId: selectedCategoryId,
                     branchId: selectedBranchId,
-                    petId: selectedPetId
+                    petId: selectedPetId,
+                    minPrice: selectedMinPrice,
+                    maxPrice: selectedMaxPrice
                 },
                 success: function (result) {
                     $('#product-list').html(result); // Cập nhật danh sách sản phẩm
@@ -195,6 +218,7 @@
         }
     });
 </script>
+
 <script>
     $(document).ready(function () {
         $('.toggle').on('click', function (e) {

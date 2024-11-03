@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WebThuCung.Data;
@@ -30,7 +31,7 @@ namespace WebThuCung.Controllers
 
             return View(voteWarehouses);
         }
-
+        [Authorize(Roles = "Admin,StaffWareHouse")]
         // GET: VoteWarehouse/Create
         public IActionResult Create()
         {
@@ -82,7 +83,7 @@ namespace WebThuCung.Controllers
           
             return View(voteWarehouseDto);
         }
-
+        [Authorize(Roles = "Admin,StaffWareHouse")]
         // GET: VoteWarehouse/Edit/{id}
         public IActionResult Edit(string id)
         {
@@ -147,7 +148,7 @@ namespace WebThuCung.Controllers
 
             return View(voteWarehouseDto);
         }
-
+        [Authorize(Roles = "Admin,StaffWareHouse")]
         // POST: VoteWarehouse/Delete/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -193,7 +194,7 @@ namespace WebThuCung.Controllers
 
             return View(detailVoteWarehouses); // Trả về view detail cho DetailVoteWarehouses
         }
-
+        [Authorize(Roles = "Admin,StaffWareHouse")]
         // GET: DetailVoteWarehouse/Create/{voteWarehouseId}
         [HttpGet]
         public IActionResult CreateDetail(string voteWarehouseId)
@@ -250,7 +251,7 @@ namespace WebThuCung.Controllers
 
             return View(detailVoteWarehouseDto);
         }
-
+        [Authorize(Roles = "Admin,StaffWareHouse")]
         // GET: DetailVoteWarehouse/Edit/{voteWarehouseId}/{productId}
         [HttpGet]
         public IActionResult EditDetail(string voteWarehouseId, string productId)
@@ -318,7 +319,7 @@ namespace WebThuCung.Controllers
 
             return View(detailVoteWarehouseDto);
         }
-
+        [Authorize(Roles = "Admin,StaffWareHouse")]
         // POST: DetailVoteWarehouse/Delete/{voteWarehouseId}/{productId}
         [HttpPost]
         [ValidateAntiForgeryToken]

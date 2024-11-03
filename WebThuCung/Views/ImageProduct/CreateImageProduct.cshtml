@@ -27,7 +27,7 @@
                         <div asp-validation-summary="All" class="text-danger"></div>
 
                         <!-- Edit ImageProduct Form -->
-                        <form asp-action="Create" method="post" enctype="multipart/form-data">
+                        <form asp-action="CreateImageProduct" method="post" enctype="multipart/form-data">
                             <!-- ImageProduct ID (readonly) -->
                             <div class="row mb-3">
                                 <label asp-for="idImageProduct" class="col-sm-2 col-form-label">ImageProduct ID</label>
@@ -48,7 +48,7 @@
                                         <option value="">-- Select a Product --</option>
                                         @foreach (var product in ViewBag.Products as List<SelectListItem>)
                                         {
-                                            <option value="@product.Value" >@product.Text</option>
+                                            <option value="@product.Value">@product.Text</option>
                                         }
                                     </select>
                                 </div>

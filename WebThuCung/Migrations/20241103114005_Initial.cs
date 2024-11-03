@@ -12,24 +12,6 @@ namespace WebThuCung.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Admin",
-                columns: table => new
-                {
-                    idAdmin = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Phone = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
-                    userAdmin = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
-                    passwordAdmin = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    Avatar = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Admin", x => x.idAdmin);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Branch",
                 columns: table => new
                 {
@@ -79,15 +61,19 @@ namespace WebThuCung.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Mission",
+                name: "Payment",
                 columns: table => new
                 {
-                    idMission = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    nameMission = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    idTransaction = table.Column<int>(type: "int", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    QRCodeUrl = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Mission", x => x.idMission);
+                    table.PrimaryKey("PK_Payment", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -100,6 +86,19 @@ namespace WebThuCung.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Pet", x => x.idPet);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Role",
+                columns: table => new
+                {
+                    idRole = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Role", x => x.idRole);
                 });
 
             migrationBuilder.CreateTable(
@@ -150,31 +149,6 @@ namespace WebThuCung.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Role",
-                columns: table => new
-                {
-                    idAdmin = table.Column<int>(type: "int", nullable: false),
-                    idRole = table.Column<int>(type: "int", nullable: false),
-                    idMission = table.Column<string>(type: "nvarchar(100)", nullable: false),
-                    AdminidAdmin = table.Column<string>(type: "nvarchar(450)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Role", x => new { x.idAdmin, x.idRole });
-                    table.ForeignKey(
-                        name: "FK_Role_Admin_AdminidAdmin",
-                        column: x => x.AdminidAdmin,
-                        principalTable: "Admin",
-                        principalColumn: "idAdmin");
-                    table.ForeignKey(
-                        name: "FK_Role_Mission_idMission",
-                        column: x => x.idMission,
-                        principalTable: "Mission",
-                        principalColumn: "idMission",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Product",
                 columns: table => new
                 {
@@ -208,6 +182,31 @@ namespace WebThuCung.Migrations
                         column: x => x.idPet,
                         principalTable: "Pet",
                         principalColumn: "idPet",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Admin",
+                columns: table => new
+                {
+                    idAdmin = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Phone = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
+                    userAdmin = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                    passwordAdmin = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Avatar = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    idRole = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Admin", x => x.idAdmin);
+                    table.ForeignKey(
+                        name: "FK_Admin_Role_idRole",
+                        column: x => x.idRole,
+                        principalTable: "Role",
+                        principalColumn: "idRole",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -393,7 +392,7 @@ namespace WebThuCung.Migrations
                     Address = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     userCustomer = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     passwordCustomer = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     dateBirth = table.Column<DateTime>(type: "datetime2", nullable: true),
                     createdAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     idCountry = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -431,7 +430,7 @@ namespace WebThuCung.Migrations
                         column: x => x.idWard,
                         principalTable: "Ward",
                         principalColumn: "idWard");
-                   
+                       
                 });
 
             migrationBuilder.CreateTable(
@@ -458,9 +457,36 @@ namespace WebThuCung.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SaveProduct",
+                columns: table => new
+                {
+                    idProduct = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    idCustomer = table.Column<int>(type: "int", nullable: false),
+                    SavedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SaveProduct", x => new { x.idProduct, x.idCustomer });
+                    table.ForeignKey(
+                        name: "FK_SaveProduct_Customer_idCustomer",
+                        column: x => x.idCustomer,
+                        principalTable: "Customer",
+                        principalColumn: "idCustomer",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_SaveProduct_Product_idProduct",
+                        column: x => x.idProduct,
+                        principalTable: "Product",
+                        principalColumn: "idProduct",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DetailOrder",
                 columns: table => new
                 {
+                    IdDetailOrder = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     idOrder = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     idProduct = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
@@ -470,7 +496,7 @@ namespace WebThuCung.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DetailOrder", x => new { x.idOrder, x.idProduct });
+                    table.PrimaryKey("PK_DetailOrder", x => x.IdDetailOrder);
                     table.ForeignKey(
                         name: "FK_DetailOrder_Order_idOrder",
                         column: x => x.idOrder,
@@ -484,6 +510,45 @@ namespace WebThuCung.Migrations
                         principalColumn: "idProduct",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateTable(
+                name: "Transaction",
+                columns: table => new
+                {
+                    idTransaction = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    nameCustomer = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    shippingAddress = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    phoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    createdDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    cpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Note = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    idCustomer = table.Column<int>(type: "int", nullable: false),
+                    idOrder = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Transaction", x => x.idTransaction);
+                    table.ForeignKey(
+                        name: "FK_Transaction_Customer_idCustomer",
+                        column: x => x.idCustomer,
+                        principalTable: "Customer",
+                        principalColumn: "idCustomer",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Transaction_Order_idOrder",
+                        column: x => x.idOrder,
+                        principalTable: "Order",
+                        principalColumn: "idOrder");
+                        
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Admin_idRole",
+                table: "Admin",
+                column: "idRole");
 
             migrationBuilder.CreateIndex(
                 name: "IX_City_idCountry",
@@ -509,6 +574,11 @@ namespace WebThuCung.Migrations
                 name: "IX_Customer_idWard",
                 table: "Customer",
                 column: "idWard");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DetailOrder_idOrder",
+                table: "DetailOrder",
+                column: "idOrder");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DetailOrder_idProduct",
@@ -566,14 +636,19 @@ namespace WebThuCung.Migrations
                 column: "idProduct");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Role_AdminidAdmin",
-                table: "Role",
-                column: "AdminidAdmin");
+                name: "IX_SaveProduct_idCustomer",
+                table: "SaveProduct",
+                column: "idCustomer");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Role_idMission",
-                table: "Role",
-                column: "idMission");
+                name: "IX_Transaction_idCustomer",
+                table: "Transaction",
+                column: "idCustomer");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Transaction_idOrder",
+                table: "Transaction",
+                column: "idOrder");
 
             migrationBuilder.CreateIndex(
                 name: "IX_VoteWarehouse_idSupplier",
@@ -590,6 +665,9 @@ namespace WebThuCung.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Admin");
+
+            migrationBuilder.DropTable(
                 name: "DetailOrder");
 
             migrationBuilder.DropTable(
@@ -602,16 +680,22 @@ namespace WebThuCung.Migrations
                 name: "ImageProduct");
 
             migrationBuilder.DropTable(
+                name: "Payment");
+
+            migrationBuilder.DropTable(
                 name: "ProductColor");
 
             migrationBuilder.DropTable(
                 name: "ProductSIze");
 
             migrationBuilder.DropTable(
-                name: "Role");
+                name: "SaveProduct");
 
             migrationBuilder.DropTable(
-                name: "Order");
+                name: "Transaction");
+
+            migrationBuilder.DropTable(
+                name: "Role");
 
             migrationBuilder.DropTable(
                 name: "VoteWarehouse");
@@ -620,19 +704,13 @@ namespace WebThuCung.Migrations
                 name: "Color");
 
             migrationBuilder.DropTable(
-                name: "Product");
-
-            migrationBuilder.DropTable(
                 name: "Size");
 
             migrationBuilder.DropTable(
-                name: "Admin");
+                name: "Product");
 
             migrationBuilder.DropTable(
-                name: "Mission");
-
-            migrationBuilder.DropTable(
-                name: "Customer");
+                name: "Order");
 
             migrationBuilder.DropTable(
                 name: "Supplier");
@@ -645,6 +723,9 @@ namespace WebThuCung.Migrations
 
             migrationBuilder.DropTable(
                 name: "Pet");
+
+            migrationBuilder.DropTable(
+                name: "Customer");
 
             migrationBuilder.DropTable(
                 name: "Ward");

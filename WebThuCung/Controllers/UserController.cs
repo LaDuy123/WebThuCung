@@ -700,7 +700,14 @@ namespace WebThuCung.Controllers
                 // Đường dẫn lưu file
                 var filePath = Path.Combine(uploads, fileName);
 
-                // Lưu file vào thư mục "wwwroot/images/customer"
+                // Kiểm tra xem file đã tồn tại hay chưa
+                if (System.IO.File.Exists(filePath))
+                {
+                    // Nếu tệp tồn tại, xóa nó
+                    System.IO.File.Delete(filePath);
+                }
+
+                // Lưu file vào thư mục "wwwroot/admin/img"
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
                     avatar.CopyTo(fileStream);
@@ -727,15 +734,12 @@ namespace WebThuCung.Controllers
                 // Upload avatar nếu có file mới, nếu không giữ nguyên
                 if (customerDto.Image != null && customerDto.Image.Length > 0)
                 {
-                    var avatarPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/Customer", customerDto.Image.FileName);
-                    using (var stream = new FileStream(avatarPath, FileMode.Create))
-                    {
-                         customerDto.Image.CopyToAsync(stream);
-                    }
-                    existingCustomer.Image = customerDto.Image.FileName;
+                  
+
+                    existingCustomer.Image = customerDto.Image.FileName; // Cập nhật tên hình đại diện
                 }
 
-           
+
                 _context.Customers.Update(existingCustomer);
                 _context.SaveChangesAsync();
 

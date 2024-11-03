@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebThuCung.Data;
 using WebThuCung.Dto;
 using WebThuCung.Models;
@@ -21,6 +22,7 @@ namespace WebThuCung.Controllers
             // Truyền danh sách admin sang view
             return View(suppliers);
         }
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
@@ -67,7 +69,7 @@ namespace WebThuCung.Controllers
 
             return View(supplierDto);
         }
-
+        [Authorize(Roles = "Admin")]
         // GET: Supplier/Edit/{id}
         public IActionResult Edit(string id)
         {
@@ -124,7 +126,7 @@ namespace WebThuCung.Controllers
 
             return View(supplierDto);
         }
-
+        [Authorize(Roles = "Admin")]
         // GET: Supplier/Delete/{id}
         public IActionResult Delete(string id)
         {
@@ -136,7 +138,7 @@ namespace WebThuCung.Controllers
 
             return View(supplier);
         }
-
+        [Authorize(Roles = "Admin")]
         // POST: Supplier/Delete/{id}
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]

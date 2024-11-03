@@ -141,9 +141,7 @@
                                     <h3 class="secondary-font text-primary">@product.sellPrice.ToString("C")</h3>
 
                                     <div class="d-flex flex-wrap mt-3">
-                                        <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                                            <h5 class="text-uppercase m-0">Add to Cart</h5>
-                                        </a>
+                                       
                                         <a class="btn-wishlist px-4 pt-3 toggle">
                                             <iconify-icon icon="fluent:heart-28-filled" class="fs-5" style="color: @(isSaved ? "black" : "rgb(162, 162, 162)")"></iconify-icon>
                                         </a>
@@ -159,6 +157,28 @@
     </section>
 
 </div>
+<style>
+
+    .categories-item {
+        display: inline-block; /* Đảm bảo item có kích thước phù hợp */
+        transition: transform 0.3s ease; /* Hiệu ứng chuyển đổi mượt mà */
+    }
+
+        .categories-item:hover {
+            transform: scale(1.6);
+            z-index: 10;
+        }
+
+
+    .swiper-slide {
+        transition: transform 0.6s ease; /* Smooth transition for scaling */
+    }
+
+        .swiper-slide:hover {
+            transform: scale(1.11); /* Scale up to 105% */
+            z-index: 10; /* Bring the hovered item to the front */
+        }
+</style>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
   $(document).ready(function () {
@@ -209,63 +229,6 @@
     }
 
 </script>
-@* <script>
-    $(document).ready(function () {
-        // Hàm để gọi API lọc sản phẩm
-        function filterProducts() {
-            var petName = $('.categories-item.active').data('pet-name'); // Lấy tên thú cưng hiện tại (nếu có)
-            var categoryId = $('#categoryDropdown').val(); // Lấy giá trị danh mục hiện tại
-
-            $.ajax({
-                url: '@Url.Action("FilterProducts", "Product")',
-                type: 'GET',
-                data: { namePet: petName, idCategory: categoryId },
-                success: function (data) {
-                    $('#productResults').html(data); // Cập nhật nội dung sản phẩm
-                    var productCount = $('#productResults .swiper-slide').length;
-                    console.log("Number of products loaded: " + productCount);
-                    new Swiper('.products-carousel', {
-                        loop: true,
-                        slidesPerView: 4,
-                        spaceBetween: 30,
-                        autoplay: {
-                            delay: 2500,
-                            disableOnInteraction: false,
-                        },
-                        navigation: {
-                            nextEl: '.swiper-button-next',
-                            prevEl: '.swiper-button-prev',
-                        },
-                        pagination: {
-                            el: '.swiper-pagination',
-                            clickable: true,
-                        }
-                    });
-                },
-                error: function (xhr, status, error) {
-                    console.error(error);
-                }
-            });
-        }
-
-        // Xử lý sự kiện click trên các liên kết thú cưng
-        $('.categories-item').click(function (e) {
-            e.preventDefault(); // Ngăn chặn hành động mặc định của liên kết
-            $('.categories-item').removeClass('active'); // Xóa lớp active khỏi tất cả
-            $(this).addClass('active'); // Thêm lớp active vào phần tử hiện tại
-
-            // Gọi hàm để lọc sản phẩm
-            filterProducts(); // Gọi hàm để lọc sản phẩm
-        });
-
-        // Xử lý sự kiện thay đổi dropdown danh mục
-        $('#categoryDropdown').change(function () {
-            // Gọi hàm để lọc sản phẩm
-            filterProducts(); // Gọi hàm để lọc sản phẩm
-        });
-    });
-</script> *@
-
 
 
 <script>

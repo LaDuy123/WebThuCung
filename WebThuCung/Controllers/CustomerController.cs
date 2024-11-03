@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebThuCung.Data;
 using WebThuCung.Dto;
 using WebThuCung.Models;
@@ -21,6 +22,7 @@ namespace WebThuCung.Controllers
             // Truyền danh sách admin sang view
             return View(customers);
         }
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int id) // Thay đổi kiểu từ string sang int
@@ -60,6 +62,7 @@ namespace WebThuCung.Controllers
         {
             return BCrypt.Net.BCrypt.HashPassword(password);
         }
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public IActionResult Create()
         {

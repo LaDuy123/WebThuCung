@@ -52,6 +52,10 @@ namespace WebThuCung.Migrations
                         .HasMaxLength(11)
                         .HasColumnType("nvarchar(11)");
 
+                    b.Property<string>("idRole")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("passwordAdmin")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -63,6 +67,8 @@ namespace WebThuCung.Migrations
                         .HasColumnType("nvarchar(30)");
 
                     b.HasKey("idAdmin");
+
+                    b.HasIndex("idRole");
 
                     b.ToTable("Admin");
                 });
@@ -168,8 +174,7 @@ namespace WebThuCung.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
@@ -367,22 +372,6 @@ namespace WebThuCung.Migrations
                     b.ToTable("ImageProduct");
                 });
 
-            modelBuilder.Entity("WebThuCung.Models.Mission", b =>
-                {
-                    b.Property<string>("idMission")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("nameMission")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.HasKey("idMission");
-
-                    b.ToTable("Mission");
-                });
-
             modelBuilder.Entity("WebThuCung.Models.Order", b =>
                 {
                     b.Property<string>("idOrder")
@@ -538,26 +527,18 @@ namespace WebThuCung.Migrations
 
             modelBuilder.Entity("WebThuCung.Models.Role", b =>
                 {
-                    b.Property<int>("idAdmin")
-                        .HasColumnType("int")
-                        .HasColumnOrder(0);
-
-                    b.Property<int>("idRole")
-                        .HasColumnType("int")
-                        .HasColumnOrder(1);
-
-                    b.Property<string>("AdminidAdmin")
+                    b.Property<string>("idRole")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("idMission")
+                    b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("idAdmin", "idRole");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasIndex("AdminidAdmin");
-
-                    b.HasIndex("idMission");
+                    b.HasKey("idRole");
 
                     b.ToTable("Role");
                 });
@@ -726,6 +707,17 @@ namespace WebThuCung.Migrations
                     b.HasIndex("idDistrict");
 
                     b.ToTable("Ward");
+                });
+
+            modelBuilder.Entity("WebThuCung.Models.Admin", b =>
+                {
+                    b.HasOne("WebThuCung.Models.Role", "Role")
+                        .WithMany("Admins")
+                        .HasForeignKey("idRole")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("WebThuCung.Models.City", b =>
@@ -921,23 +913,6 @@ namespace WebThuCung.Migrations
                     b.Navigation("Size");
                 });
 
-            modelBuilder.Entity("WebThuCung.Models.Role", b =>
-                {
-                    b.HasOne("WebThuCung.Models.Admin", "Admin")
-                        .WithMany("Roles")
-                        .HasForeignKey("AdminidAdmin");
-
-                    b.HasOne("WebThuCung.Models.Mission", "Mission")
-                        .WithMany("Roles")
-                        .HasForeignKey("idMission")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Admin");
-
-                    b.Navigation("Mission");
-                });
-
             modelBuilder.Entity("WebThuCung.Models.SaveProduct", b =>
                 {
                     b.HasOne("WebThuCung.Models.Customer", "Customer")
@@ -998,11 +973,6 @@ namespace WebThuCung.Migrations
                     b.Navigation("District");
                 });
 
-            modelBuilder.Entity("WebThuCung.Models.Admin", b =>
-                {
-                    b.Navigation("Roles");
-                });
-
             modelBuilder.Entity("WebThuCung.Models.Branch", b =>
                 {
                     b.Navigation("Products");
@@ -1048,11 +1018,6 @@ namespace WebThuCung.Migrations
                     b.Navigation("Wards");
                 });
 
-            modelBuilder.Entity("WebThuCung.Models.Mission", b =>
-                {
-                    b.Navigation("Roles");
-                });
-
             modelBuilder.Entity("WebThuCung.Models.Order", b =>
                 {
                     b.Navigation("DetailOrders");
@@ -1080,6 +1045,11 @@ namespace WebThuCung.Migrations
                     b.Navigation("ProductSizes");
 
                     b.Navigation("SaveProducts");
+                });
+
+            modelBuilder.Entity("WebThuCung.Models.Role", b =>
+                {
+                    b.Navigation("Admins");
                 });
 
             modelBuilder.Entity("WebThuCung.Models.Size", b =>
