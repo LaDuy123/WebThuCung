@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WebThuCung.Data;
@@ -20,7 +21,7 @@ namespace WebThuCung.Controllers
             var cities = _context.Cities.Include(c => c.Country).ToList();
             return View(cities);
         }
-
+        [Authorize(Roles = "Admin,StaffOrder")]
         // GET: City/Create
         public IActionResult Create()
         {
@@ -73,7 +74,7 @@ namespace WebThuCung.Controllers
 
             return View(model);
         }
-
+        [Authorize(Roles = "Admin,StaffOrder")]
         // GET: City/Edit/5
         public IActionResult Edit(string id)
         {
@@ -138,7 +139,7 @@ namespace WebThuCung.Controllers
 
             return View(model);
         }
-
+        [Authorize(Roles = "Admin,StaffOrder")]
         // POST: City/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]

@@ -90,7 +90,7 @@
                                         </h3>
 
                                         <div class="d-flex flex-wrap mt-3">
-                                            <a class="btn-wishlist px-4 pt-3 toggle">
+                                            <a class="btn-wishlist px-4 pt-3 toggle-clothing">
                                                 <iconify-icon icon="fluent:heart-28-filled" class="fs-5" style="color: @(isSaved ? "black" : "rgb(162, 162, 162)")"></iconify-icon>
                                             </a>
                                         </div>
@@ -127,6 +127,7 @@
 
                 @foreach (var product in Model.Take(8))
                 {
+
                     bool isSaved = ViewBag.SavedProductIds != null &&
                     ViewBag.SavedProductIds.Contains(product.idProduct);
 
@@ -146,8 +147,8 @@
                                     <h3 class="secondary-font text-primary">@product.sellPrice.ToString("C")</h3>
 
                                     <div class="d-flex flex-wrap mt-3">
-                                       
-                                        <a class="btn-wishlist px-4 pt-3 toggle">
+
+                                        <a class="btn-wishlist px-4 pt-3 toggle-foodies">
                                             <iconify-icon icon="fluent:heart-28-filled" class="fs-5" style="color: @(isSaved ? "black" : "rgb(162, 162, 162)")"></iconify-icon>
                                         </a>
                                     </div>
@@ -237,42 +238,81 @@
 
 <script>
     $(document).ready(function () {
-        $('.toggle').on('click', function (e) {
-            e.preventDefault(); // Ngăn trang tải lại
+        // Sự kiện cho Top Selling
+        $('.toggle-clothing').on('click', function (e) {
+            e.preventDefault();
 
-            var $this = $(this); // Phần tử được nhấn
-            var icon = $this.find('iconify-icon'); // Tìm phần tử icon bên trong .toggle
-            var idproduct = $this.closest('.swiper-slide').data('productid'); // Lấy ID sản phẩm
+            var $this = $(this);
+            var icon = $this.find('iconify-icon');
+            var idproduct = $this.closest('.swiper-slide').data('productid'); // Lấy ID sản phẩm trong Top Selling
 
-            $.ajax({
-                url: '/Product/SaveProduct', // Đường dẫn đến action lưu sản phẩm
-                type: 'POST',
-                data: { idproduct: idproduct },
-                success: function (response) {
-                    if (response.success) {
-                        alert(response.message); // Hiển thị thông báo từ phản hồi
-
-                        // Thay đổi màu sắc dựa trên trạng thái sản phẩm
-                        if (icon.css('color') === 'rgb(162, 162, 162)') {
-                            icon.css('color', 'black'); // Đổi màu sang đen nếu sản phẩm được lưu
+            // Kiểm tra và gọi ajax cho Top Selling
+            if (idproduct) {
+                $.ajax({
+                    url: '/Product/SaveProduct',
+                    type: 'POST',
+                    data: { idproduct: idproduct },
+                    success: function (response) {
+                        if (response.success) {
+                            alert(response.message);
+                            if (icon.css('color') === 'rgb(162, 162, 162)') {
+                                icon.css('color', 'black');
+                            } else {
+                                icon.css('color', 'rgb(162, 162, 162)');
+                            }
                         } else {
-                            icon.css('color', 'rgb(162, 162, 162)'); // Đổi màu xám nếu sản phẩm bị xóa
+                            if (response.message === "Please log in to save products.") {
+                                window.location.href = '/User/Login';
+                            } else {
+                                alert(response.message);
+                            }
                         }
-                    } else {
-                        if (response.message === "Please log in to save products.") {
-                            // Chuyển hướng nếu người dùng chưa đăng nhập
-                            window.location.href = '/User/Login';
-                        } else {
-                            alert(response.message); // Hiển thị thông báo lỗi khác
-                        }
+                    },
+                    error: function () {
+                        alert('An error occurred while saving the product.');
                     }
-                },
-                error: function () {
-                    alert('An error occurred while saving the product.');
-                }
-            });
+                });
+            }
+        });
+
+        // Sự kiện cho Pet Foodies
+        $('.toggle-foodies').on('click', function (e) {
+            e.preventDefault();
+
+            var $this = $(this);
+            var icon = $this.find('iconify-icon');
+            var idproduct = $this.closest('.item').data('productid'); // Lấy ID sản phẩm trong Pet Foodies
+
+            // Kiểm tra và gọi ajax cho Pet Foodies
+            if (idproduct) {
+                $.ajax({
+                    url: '/Product/SaveProduct',
+                    type: 'POST',
+                    data: { idproduct: idproduct },
+                    success: function (response) {
+                        if (response.success) {
+                            alert(response.message);
+                            if (icon.css('color') === 'rgb(162, 162, 162)') {
+                                icon.css('color', 'black');
+                            } else {
+                                icon.css('color', 'rgb(162, 162, 162)');
+                            }
+                        } else {
+                            if (response.message === "Please log in to save products.") {
+                                window.location.href = '/User/Login';
+                            } else {
+                                alert(response.message);
+                            }
+                        }
+                    },
+                    error: function () {
+                        alert('An error occurred while saving the product.');
+                    }
+                });
+            }
         });
     });
+
     document.addEventListener('DOMContentLoaded', function () {
         const categoriesItems = document.querySelectorAll('.categories-item');
 

@@ -392,17 +392,30 @@
     </footer>
 
     <div class="chat-container">
+        <!-- Chat Button -->
         <button class="chat-button" onclick="toggleChat()">
             <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR1_X45p3L-DawmIXGT1N3KNSq1qwq4waLi5Zho8b_L3XXwxfUD9fE5CsJbBoYskWZ1IV8&usqp=CAU" alt="Chat Icon" class="chat-icon">
             <span class="notification-badge">!</span>
         </button>
+
+        <!-- Facebook Button -->
+        <button class="social-button" onclick="openFacebook()">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook Icon" class="facebook-icon">
+        </button>
+        <!-- Zalo Button -->
+        <button class="social-button" onclick="openZalo()">
+            <img src="/images/logo/zalo-icon.png" alt="Zalo Icon" class="zalo-icon">
+        </button>
+
+
+        <!-- Chat Window -->
         <div class="chat-window">
             <div class="chat-header">
                 <h5>Chat Shop</h5>
                 <button onclick="toggleChat()" class="close-button">x</button>
             </div>
             <div class="chat-body">
-                <div class="bot-message">Xin chào! Shop có thể hỗ trợ bạn gì hôm nay </div>
+                <div class="bot-message">Xin chào! Shop có thể hỗ trợ bạn gì hôm nay</div>
             </div>
             <div class="chat-input">
                 <input type="text" placeholder="Nhập tin nhắn của bạn..." id="userInput">
@@ -410,6 +423,7 @@
             </div>
         </div>
     </div>
+
 
     <div id="footer-bottom">
         <div class="container">
@@ -515,7 +529,7 @@
         function toggleChat() {
             const chatWindow = document.querySelector('.chat-window');
             const chatIcon = document.querySelector('.chat-icon');
-
+            chatWindow.style.display = chatWindow.style.display === 'block' ? 'none' : 'block';
             chatWindow.classList.toggle('show'); // Toggles visibility of chat window
 
             // Stop shaking icon if chat is open
@@ -524,6 +538,14 @@
             } else {
                 chatIcon.classList.add('shake');
             }
+        }
+  
+        function openZalo() {
+            window.open("https://zalo.me", "_blank");
+        }
+
+        function openFacebook() {
+            window.open("https://www.facebook.com", "_blank");
         }
 
 

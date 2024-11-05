@@ -34,14 +34,14 @@
     z-index: 1000;
 }
 
-.chat-button {
+.chat-button, .social-button {
     background-color: transparent;
     border: none;
     cursor: pointer;
     position: relative;
 }
 
-.chat-icon {
+.chat-icon, .facebook-icon, zalo-icon {
     width: 60px;
     height: 60px;
 }
