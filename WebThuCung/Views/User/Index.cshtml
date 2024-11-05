@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_LayoutUsers.cshtml";
+    var topSellingProducts = (List<WebThuCung.Dto.TopSellingProductDto>)ViewBag.TopSellingProducts;
 }
 <section id="categories">
     <div class="container my-3 py-5">
@@ -41,7 +42,7 @@
     <div class="container pb-5">
 
         <div class="section-header d-md-flex justify-content-between align-items-center mb-3">
-                <h2 class="display-3 fw-normal"> Pet discount</h2>
+                <h2 class="display-3 fw-normal">Top Selling</h2>
             <div>
                 <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">
                     shop now
@@ -53,35 +54,52 @@
         </div>
         <div class="products-carousel swiper">
             <div class="swiper-wrapper">
-                @foreach (var product in Model.Take(6))
-                {
-                    // Kiểm tra xem sản phẩm đã lưu hay chưa
-                    bool isSaved = ViewBag.SavedProductIds != null &&
-                    ViewBag.SavedProductIds.Contains(product.idProduct);
+                    @foreach (var product in topSellingProducts.Take(6))
+                    {
+                       
+                        bool isSaved = ViewBag.SavedProductIds != null &&
+                        ViewBag.SavedProductIds.Contains(product.ProductId);
 
-                    <div class="swiper-slide" data-productid="@product.idProduct">
-                        <div class="card position-relative">
-                            <a asp-controller="Product" asp-action="Detail" asp-route-id="@product.idProduct">
-                                <img src="@Url.Content("~/images/" + product.Image)" class="img-fluid rounded-4" alt="@product.nameProduct">
-                            </a>
-                            <div class="card-body p-0">
-                                <a href="@Url.Action("Details", "Product", new { id = product.idProduct })">
-                                    <h3 class="card-title pt-4 m-0">@product.nameProduct</h3>
+                        <div class="swiper-slide" data-productid="@product.ProductId">
+                            <div class="z-1 position-absolute rounded-3 m-3 px-3 border border-dark-subtle">
+                                @if (product.DiscountPercent > 0)
+                                {
+                                    <div style="color: red;">
+                                        @product.DiscountPercent% OFF
+                                    </div>
+                                }
+                                
+                            </div>
+                            <div class="card position-relative">
+                                <a asp-controller="Product" asp-action="Detail" asp-route-id="@product.ProductId">
+                                    <img src="@Url.Content("~/images/" + product.ImageUrl)" class="img-fluid rounded-4" alt="@product.ProductName">
                                 </a>
+                                <div class="card-body p-0">
+                                    <a href="@Url.Action("Details", "Product", new { id = product.ProductId })">
+                                        <h3 class="card-title pt-4 m-0">@product.ProductName</h3>
+                                    </a>
 
-                                <div class="card-text">
-                                    <h3 class="secondary-font text-primary">@product.sellPrice.ToString("C")</h3>
+                                    <div class="card-text">
+                                        <h3 class="secondary-font text-muted text-decoration-line-through">
+                                            @product.Price.ToString("C")
+                                        </h3>
 
-                                    <div class="d-flex flex-wrap mt-3">
-                                        <a class="btn-wishlist px-4 pt-3 toggle">
-                                            <iconify-icon icon="fluent:heart-28-filled" class="fs-5" style="color: @(isSaved ? "black" : "rgb(162, 162, 162)")"></iconify-icon>
-                                        </a>
+                                        <!-- Hiển thị giá đã giảm -->
+                                        <h3 class="secondary-font text-primary">
+                                            @product.DiscountedPrice.ToString("C")
+                                        </h3>
+
+                                        <div class="d-flex flex-wrap mt-3">
+                                            <a class="btn-wishlist px-4 pt-3 toggle">
+                                                <iconify-icon icon="fluent:heart-28-filled" class="fs-5" style="color: @(isSaved ? "black" : "rgb(162, 162, 162)")"></iconify-icon>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                }
+                    }
+
             </div>
         </div>
         <!-- / products-carousel -->
@@ -94,14 +112,7 @@
 
             <div class="section-header d-md-flex justify-content-between align-items-center">
                 <h2 class="display-3 fw-normal">Pet Foodies</h2>
-                <div class="mb-4 mb-md-0">
-                    <p class="m-0">
-                        <button class="filter-button me-4 active" data-filter="*">ALL</button>
-                        <button class="filter-button me-4" data-filter=".cat">CAT</button>
-                        <button class="filter-button me-4" data-filter=".dog">DOG</button>
-                        <button class="filter-button me-4" data-filter=".bird">BIRD</button>
-                    </p>
-                </div>
+               
                 <div>
                     <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">
                         shop now
@@ -130,13 +141,7 @@
                                 </a>
 
                                 <div class="card-text">
-                                    <span class="rating secondary-font">
-                                        @for (int i = 0; i < 5; i++)
-                                        {
-                                            <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                                        }
-                                        5.0
-                                    </span>
+                                   
 
                                     <h3 class="secondary-font text-primary">@product.sellPrice.ToString("C")</h3>
 
@@ -158,7 +163,6 @@
 
 </div>
 <style>
-
     .categories-item {
         display: inline-block; /* Đảm bảo item có kích thước phù hợp */
         transition: transform 0.3s ease; /* Hiệu ứng chuyển đổi mượt mà */

@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>Waggy - Free eCommerce Pet Shop HTML Website Template</title>
+    <title>Shop Pet</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,7 +13,7 @@
     <meta name="description" content="">
 
 
-@*     <link rel="stylesheet" href="~/css/swiper.css" />
+    @*     <link rel="stylesheet" href="~/css/swiper.css" />
     <link rel="stylesheet" href="~/css/bootstrap.css" /> *@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" />
@@ -23,6 +23,9 @@
 
     <link rel="stylesheet" type="text/css" href="~/css/vendor.css">
     <link rel="stylesheet" type="text/css" href="~/css/style.css">
+    <link rel="stylesheet" type="text/css" href="~/css/botchat.css">
+
+
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -103,10 +106,6 @@
         </defs>
     </svg>
 
-   @*  <div class="preloader-wrapper">
-        <div class="preloader">
-        </div>
-    </div> *@
 
     <div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="offcanvasCart" aria-labelledby="My Cart">
         <div class="offcanvas-header justify-content-center">
@@ -189,7 +188,7 @@
                         <div class="search-bar border rounded-2 border-dark-subtle">
                             <form id="search-form" class="text-center d-flex align-items-center"
                                   action="@Url.Action("SearchResults", "Product")" method="get">
-                               @*  @Html.AntiForgeryToken() *@
+                                @*  @Html.AntiForgeryToken() *@
                                 <input type="text" name="query" class="form-control border-0 bg-transparent" placeholder="Search Here" />
                                 <button type="submit" class="btn p-0">
                                     <iconify-icon icon="tabler:search" class="fs-4 me-3"></iconify-icon>
@@ -209,21 +208,10 @@
                             customer = Newtonsoft.Json.JsonConvert.DeserializeObject<Customer>(customerJson);
                         }
                     }
-
-                  @*   <div class="support-box text-end d-none d-xl-block">
-                        <span class="fs-6 secondary-font text-muted">Phone</span>
-                        <h5 class="mb-0">@customer?.Phone</h5> <!-- Sử dụng toán tử null-conditional để tránh lỗi null reference -->
-                    </div> *@
                     <div class="support-box text-end d-none d-xl-block">
                         <span class="fs-6 secondary-font text-muted">Email</span>
                         <h5 class="mb-0">@customer?.Email</h5> <!-- Sử dụng toán tử null-conditional để tránh lỗi null reference -->
                     </div>
-
-
-
-
-
-
 
                 </div>
             </div>
@@ -243,21 +231,7 @@
                                 <iconify-icon icon="healthicons:person" class="fs-4"></iconify-icon>
                             </a>
                         </li>
-                     @*    <li>
-                            <a href="wishlist.html" class="mx-3">
-                                <iconify-icon icon="mdi:heart" class="fs-4"></iconify-icon>
-                            </a>
-                        </li>
- *@
-                       @*  <li>
-                            <a href="#" class="mx-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCart"
-                               aria-controls="offcanvasCart">
-                                <iconify-icon icon="mdi:cart" class="fs-4 position-relative"></iconify-icon>
-                                <span class="position-absolute translate-middle badge rounded-circle bg-primary pt-2">
-                                    03
-                                </span>
-                            </a>
-                        </li> *@
+
 
                         <li>
                             <a href="#" class="mx-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSearch"
@@ -292,7 +266,7 @@
                             <li class="nav-item">
                                 <a asp-controller="User" asp-action="Index" class="nav-link active">Home</a>
                             </li>
-                            
+
                             <li class="nav-item">
                                 <a asp-controller="Product" asp-action="Shop" class="nav-link">Shop</a>
                             </li>
@@ -305,10 +279,9 @@
                             <li class="nav-item">
                                 <a href="#" class="nav-link">Others</a>
                             </li>
-                         
+
                         </ul>
-                      @*   <li class="wrap_login">
-                        <li id="btn-login" class="in_login"><a asp-action="Login" asp-controller="User" class="effect-3"><span>Login</span></a></li> *@
+
 
                         <div class="d-none d-lg-flex align-items-end">
                             <ul class="d-flex justify-content-end list-unstyled m-0">
@@ -321,7 +294,7 @@
                                 </li>
 
                                 <li class="">
-                                    <a asp-controller ="Product" asp-action="ViewCart" class="mx-3" >
+                                    <a asp-controller="Product" asp-action="ViewCart" class="mx-3">
                                         <iconify-icon icon="mdi:cart" class="fs-4 position-relative"></iconify-icon>
                                             @await Html.PartialAsync("_CartCount")
                                     </a>
@@ -377,7 +350,6 @@
                                         <iconify-icon class="social-icon" icon="ri:youtube-fill"></iconify-icon>
                                     </a>
                                 </li>
-
                             </ul>
                         </div>
                     </div>
@@ -386,45 +358,21 @@
                     <div class="footer-menu">
                         <h3>Quick Links</h3>
                         <ul class="menu-list list-unstyled">
-                            <li class="menu-item">
-                                <a href="#" class="nav-link">Home</a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#" class="nav-link">About us</a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#" class="nav-link">Offer </a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#" class="nav-link">Services</a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#" class="nav-link">Conatct Us</a>
-                            </li>
+                            <li class="menu-item"><a asp-controller="User" asp-action="Index" class="nav-link">Home</a></li>
+                            <li class="menu-item"><a asp-controller="User" asp-action="Contact" class="nav-link">Contact Us</a></li>
                         </ul>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="footer-menu">
-                        <h3>
-                            Help Center</h5>
-                            <ul class="menu-list list-unstyled">
-                                <li class="menu-item">
-                                    <a href="#" class="nav-link">FAQs</a>
-                                </li>
-                                <li class="menu-item">
-                                    <a href="#" class="nav-link">Payment</a>
-                                </li>
-                                <li class="menu-item">
-                                    <a href="#" class="nav-link">Returns & Refunds</a>
-                                </li>
-                                <li class="menu-item">
-                                    <a href="#" class="nav-link">Checkout</a>
-                                </li>
-                                <li class="menu-item">
-                                    <a href="#" class="nav-link">Delivery Information</a>
-                                </li>
-                            </ul>
+                        <h3>Help Center</h3>
+                        <ul class="menu-list list-unstyled">
+                            <li class="menu-item"><a href="#" class="nav-link">FAQs</a></li>
+                            <li class="menu-item"><a href="#" class="nav-link">Payment</a></li>
+                            <li class="menu-item"><a href="#" class="nav-link">Returns & Refunds</a></li>
+                            <li class="menu-item"><a href="#" class="nav-link">Checkout</a></li>
+                            <li class="menu-item"><a href="#" class="nav-link">Delivery Information</a></li>
+                        </ul>
                     </div>
                 </div>
                 <div class="col-md-3">
@@ -439,35 +387,42 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </footer>
+
+    <div class="chat-container">
+        <button class="chat-button" onclick="toggleChat()">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR1_X45p3L-DawmIXGT1N3KNSq1qwq4waLi5Zho8b_L3XXwxfUD9fE5CsJbBoYskWZ1IV8&usqp=CAU" alt="Chat Icon" class="chat-icon">
+            <span class="notification-badge">!</span>
+        </button>
+        <div class="chat-window">
+            <div class="chat-header">
+                <h5>Chat Shop</h5>
+                <button onclick="toggleChat()" class="close-button">x</button>
+            </div>
+            <div class="chat-body">
+                <div class="bot-message">Xin chào! Shop có thể hỗ trợ bạn gì hôm nay </div>
+            </div>
+            <div class="chat-input">
+                <input type="text" placeholder="Nhập tin nhắn của bạn..." id="userInput">
+                <button class="send-button" onclick="sendMessage()">Gửi</button>
+            </div>
+        </div>
+    </div>
 
     <div id="footer-bottom">
         <div class="container">
             <hr class="m-0">
             <div class="row mt-3">
                 <div class="col-md-6 copyright">
-                    <p class="secondary-font">© 2023 Waggy. All rights reserved.</p>
+                    <p class="secondary-font">© 2024 . Web Pet DA.</p>
                 </div>
-                <div class="col-md-6 text-md-end">
-                    <p class="secondary-font">
-                        Free HTML Template by <a href="https://templatesjungle.com/" target="_blank"
-                                                 class="text-decoration-underline fw-bold text-black-50"> TemplatesJungle</a>
-                    </p>
-                </div>
+
             </div>
         </div>
     </div>
-@* 
 
-    <script src="js/jquery-1.11.0.min.js"></script>
-    <script src="js/swiper.js"></script>
-    <script src="js/bootstrap.bundle.js"></script>
-    <script src="js/plugins.js"></script>
-    <script src="js/script.js"></script>
-    <script src="js/iconify.js"></script> *@
 
     <script src="~/js/jquery-1.11.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
@@ -484,11 +439,9 @@
         console.log("Phone:", phone);
         console.log("Email:", email);
     </script>
-
     <script type="text/javascript">
 
         $(document).ready(function () {
-            // Gọi đến API kiểm tra xác thực người dùng
             $.ajax({
                 url: '/User/CheckAuthentication',
                 success: function (response) {
@@ -497,24 +450,20 @@
                     if (response.isAuthenticated) {
                         const avatarUrl = "/images/customer/" + response.avatar;
 
-                        // Kiểm tra nếu nút đăng nhập tồn tại, sau đó xóa nó
-                        // var loginElement = document.querySelector('.in_login');
-                        // if (loginElement) {
-                        //     loginElement.remove();
-                        // }
+       
                         $('.in_login').remove();
                         if (response.iscustomer) {
-                         
-                            // Nếu người dùng là Candidate
+
+     
                             $('.wrap_login').html(`
-                                        <li class="has-children">
-                                            <img class="avatar_img" src="${avatarUrl}" alt="Candidate Avatar"></img>
-                                            <ul class="profileavatar">
-                                                <li><a href="/User/Profile">Profile</a></li>                                          
-                                                <li><a class="logout" href="#">Logout</a></li>
-                                            </ul>
-                                        </li>
-                                        `);
+                                            <li class="has-children">
+                                                <img class="avatar_img" src="${avatarUrl}" alt="Candidate Avatar"></img>
+                                                <ul class="profileavatar">
+                                                    <li><a href="/User/Profile">Profile</a></li>
+                                                    <li><a class="logout" href="#">Logout</a></li>
+                                                </ul>
+                                            </li>
+                                            `);
                         }
 
 
@@ -562,9 +511,77 @@
             var input = document.getElementById('fileselect');
             // Lấy tên file
             var fileName = input.files[0].name;
-            // Hiển thị tên file vào phần tử có id là "file-name"
-            document.getElementById('file-name').textContent = "File Selected: " + fileName;
         }
+        function toggleChat() {
+            const chatWindow = document.querySelector('.chat-window');
+            const chatIcon = document.querySelector('.chat-icon');
+
+            chatWindow.classList.toggle('show'); // Toggles visibility of chat window
+
+            // Stop shaking icon if chat is open
+            if (chatWindow.classList.contains('show')) {
+                chatIcon.classList.remove('shake');
+            } else {
+                chatIcon.classList.add('shake');
+            }
+        }
+
+
+        // Function to handle sending a message
+        function sendMessage() {
+            const inputField = document.querySelector('.chat-input input');
+            const message = inputField.value.trim();
+
+            if (message) {
+                addMessage("user-message", message); // Add user's message to the chat
+                botResponse(message); // Generate bot's response based on user's message
+                inputField.value = ""; // Clear input field after sending
+            }
+        }
+
+        // Event listener for the "Gửi" button
+        document.querySelector('.send-button').addEventListener('click', sendMessage);
+
+        // Event listener for the "Enter" key
+        document.querySelector('.chat-input input').addEventListener('keypress', function (event) {
+            if (event.key === "Enter") {
+                sendMessage(); // Trigger sendMessage function when Enter is pressed
+            }
+        });
+
+
+        function addMessage(className, text) {
+            const chatBody = document.querySelector(".chat-body");
+            const messageDiv = document.createElement("div");
+            messageDiv.className = className;
+            messageDiv.textContent = text;
+            chatBody.appendChild(messageDiv);
+            chatBody.scrollTop = chatBody.scrollHeight; // Scroll to the latest message
+        }
+
+        function botResponse(message) {
+            let response;
+
+            // Convert the message to lowercase to make keyword checks case-insensitive
+            const lowerMessage = message.toLowerCase();
+
+            // Check for keywords
+            if (lowerMessage.includes("chào") || lowerMessage.includes("xin chào") || lowerMessage.includes("helo") || lowerMessage.includes("helo shop ")) {
+                response = "Shop phụ kiện thú cưng hân hạnh chào bạn, mời bạn ghé thăm shop và lựa món đồ yêu thích ạ!";
+            } else if (lowerMessage.includes("còn") || lowerMessage.includes("ưu đãi")) {
+                response = "Xin đợi chờ trong giây lát, shop sẽ phản hồi lại trong giây lát.";
+            } else if (lowerMessage.includes("địa điểm")) {
+                response = "Shop ở Việt Nam.";
+            } else if (lowerMessage.includes("mua") || lowerMessage.includes("hàng")) {
+                response = "Bạn hãy vào shop lựa món đồ yêu thích và thanh toán trực tiếp hoặc gián tiếp.";
+            } else {
+                response = "Xin lỗi, tôi chưa hiểu câu hỏi của bạn. Bạn có thể hỏi về mặt hàng, địa điểm, hoặc cách mua hàng.";
+            }
+
+            addMessage("bot-message", response);
+        }
+
+
 
     </script>
 </body>

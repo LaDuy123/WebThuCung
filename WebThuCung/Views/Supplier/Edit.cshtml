@@ -10,8 +10,8 @@
         <h1>Edit Supplier</h1>
         <nav>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Supplier")">Home</a></li>
-                <li class="breadcrumb-item">Supplier</li>
+                <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Index">Home</a></li>
+                <li class="breadcrumb-item"><a asp-controller="Supplier" asp-action="Index">Supplier</a></li>
                 <li class="breadcrumb-item active">Edit</li>
             </ol>
         </nav>
@@ -19,7 +19,7 @@
 
     <section class="section">
         <div class="row">
-            <div class="col-lg-8">
+            <div class="col-lg-10">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Edit Supplier</h5>
@@ -89,14 +89,10 @@
                             <div class="row mb-3">
                                 <div class="col-sm-10 offset-sm-2">
                                     <button type="submit" class="btn btn-primary">Save Changes</button>
+                                    <a asp-action="Index" class="btn btn-secondary">Back</a>
                                 </div>
                             </div>
-                            <div class="row mb-3">
-                                <div class="col-sm-10 offset-sm-2">
-                            <a asp-action="Index"
-                               class="btn btn-primary">Back</a>
-                                </div>
-                            </div>
+                           
                         </form><!-- End Edit Supplier Form -->
                     </div>
                 </div>

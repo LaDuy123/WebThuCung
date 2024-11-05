@@ -20,6 +20,7 @@
 
         public string Logo { get; set; }
         public List<int> Discounts { get; set; }
+        public List<TopSellingProductDto> TopSellingProducts { get; set; }
 
     }
 }

@@ -10,8 +10,8 @@
         <h1>Create Detail Order</h1>
         <nav>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                <li class="breadcrumb-item">Detail Order</li>
+                <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Index">Home</a></li>
+                <li class="breadcrumb-item"><a asp-controller="Order" asp-action="Detail" asp-route-id="@Model.idOrder">Detail Order</a></li>
                 <li class="breadcrumb-item active">Create</li>
             </ol>
         </nav>
@@ -19,13 +19,13 @@
 
     <section class="section">
         <div class="row">
-            <div class="col-lg-8">
+            <div class="col-lg-10">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Create Detail Order</h5>
 
                         <!-- Validation Summary -->
-                        <div asp-validation-summary="All" class="text-danger"></div>
+                        @* <div asp-validation-summary="All" class="text-danger"></div> *@
 
                         <!-- Create Detail Order Form -->
                         <form asp-action="CreateDetail" method="post">
@@ -33,10 +33,10 @@
                             <div class="row mb-3">
                                 <label asp-for="idOrder" class="col-sm-2 col-form-label">Order ID</label>
                                 <div class="col-sm-10">
-                                    <input asp-for="idOrder" class="form-control" readonly value="@ViewBag.OrderId" />
+                                    <input asp-for="idOrder" class="form-control" readonly value="@Model.idOrder" />
                                     <span asp-validation-for="idOrder" class="text-danger"></span>
                                     <!-- Hidden field for ID -->
-                                    <input type="hidden" asp-for="idOrder" value="@ViewBag.OrderId" />
+                                    <input type="hidden" asp-for="idOrder" value="@Model.idOrder" />
                                 </div>
                             </div>
 
@@ -54,32 +54,36 @@
                                     <span asp-validation-for="idProduct" class="text-danger"></span>
                                 </div>
                             </div>
-                           @*  <div class="row mb-3">
-                                <label asp-for="idSize" class="col-sm-2 col-form-label">Color</label>
+                            <!-- Trường chọn Size -->
+                            <div class="row mb-3">
+                                <label asp-for="nameSize" class="col-sm-2 col-form-label">Size</label>
                                 <div class="col-sm-10">
-                                    <select asp-for="idSize" class="form-control" required>
+                                    <select asp-for="nameSize" class="form-control" required>
                                         <option value="">-- Select a Size --</option>
-                                        @foreach (var product in ViewBag.Sizes as List<SelectListItem>)
+                                        @foreach (var size in ViewBag.Sizes as List<SelectListItem>)
                                         {
-                                            <option value="@product.Value">@product.Text</option>
+                                            <option value="@size.Text">@size.Text</option> <!-- Sử dụng name thay vì id -->
                                         }
                                     </select>
-                                    <span asp-validation-for="idSize" class="text-danger"></span>
+                                    <span asp-validation-for="nameSize" class="text-danger"></span>
                                 </div>
                             </div>
+
+                            <!-- Trường chọn Color -->
                             <div class="row mb-3">
-                                <label asp-for="idColor" class="col-sm-2 col-form-label">Color</label>
+                                <label asp-for="nameColor" class="col-sm-2 col-form-label">Color</label>
                                 <div class="col-sm-10">
-                                    <select asp-for="idColor" class="form-control" required>
-                                        <option value="">-- Select a COlor --</option>
-                                        @foreach (var product in ViewBag.Colors as List<SelectListItem>)
+                                    <select asp-for="nameColor" class="form-control" required>
+                                        <option value="">-- Select a Color --</option>
+                                        @foreach (var color in ViewBag.Colors as List<SelectListItem>)
                                         {
-                                            <option value="@product.Value">@product.Text</option>
+                                            <option value="@color.Text">@color.Text</option> <!-- Sử dụng name thay vì id -->
                                         }
                                     </select>
-                                    <span asp-validation-for="idColor" class="text-danger"></span>
+                                    <span asp-validation-for="nameColor" class="text-danger"></span>
                                 </div>
-                            </div> *@
+                            </div>
+
                             <!-- Quantity -->
                             <div class="row mb-3">
                                 <label asp-for="Quantity" class="col-sm-2 col-form-label">Quantity</label>
@@ -97,7 +101,7 @@
                             </div>
                             <div class="row mb-3">
                                 <div class="col-sm-10 offset-sm-2">
-                                    <a asp-action="Detail" asp-route-orderId="@ViewBag.OrderId"
+                                    <a asp-action="Detail" asp-route-id="@Model.idOrder"
                                        class="btn btn-primary">Back</a>
                                 </div>
                             </div>

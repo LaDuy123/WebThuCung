@@ -2533,6 +2533,7 @@
 }
 
 .z-1 {
+    color: red;
   z-index: 1 !important;
 }
 

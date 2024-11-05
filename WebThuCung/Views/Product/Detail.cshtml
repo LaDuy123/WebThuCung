@@ -10,9 +10,8 @@
         <div class="hero-content py-5 my-3">
             <h2 class="display-1 mt-3 mb-0">Single <span class="text-primary">Product</span></h2>
             <nav class="breadcrumb">
-                <a class="breadcrumb-item nav-link" href="@Url.Action("Index", "Home")">Home</a>
-                <a class="breadcrumb-item nav-link" href="#">Pages</a>
-                <span class="breadcrumb-item active" aria-current="page">Single-Product</span>
+                <a class="breadcrumb-item nav-link" asp-controller="User" asp-action="Index">Home</a>
+                <span class="breadcrumb-item active" aria-current="page">Detail</span>
             </nav>
         </div>
     </div>
@@ -29,6 +28,7 @@
                             <div class="swiper-wrapper">
                                 <div class="swiper-slide">
                                     <img src="~/images/@Model.Image" class="img-fluid main-image" alt="@Model.nameProduct" />
+                                    @* <img src="~/images/@Model.Image" data-src="~/images/@Model.Image" class="img-fluid main-image lazyload" alt="@Model.nameProduct" loading="lazy"> *@
                                 </div>
                             </div>
                         </div>
@@ -64,15 +64,29 @@
                     <div class="element-header">
                         <h2 itemprop="name" class="display-6">@Model.nameProduct</h2>
                         <div class="rating-container d-flex gap-0 align-items-center">
-                            <span class="rating secondary-font">
-                                <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                                <!-- Hiển thị đánh giá từ dữ liệu -->
-                                5.0
-                            </span>
+                           
                         </div>
                     </div>
                     <div class="product-price pt-3 pb-3">
-                        <strong class="text-primary display-6 fw-bold">@Model.sellPrice.ToString("C")</strong>
+                     
+                        <!-- Giá đã giảm, nếu có -->
+                        @if (ViewData["DiscountedPrice"] is decimal discountedPrice && discountedPrice < Model.sellPrice)
+                        {
+                            <h3 class="text-muted text-decoration-line-through">
+                                @Model.sellPrice.ToString("C")
+                            </h3>
+
+                            <strong class="text-primary display-6 fw-bold">
+                                @discountedPrice.ToString("C")
+                            </strong>
+                        }
+                        else
+                        {
+                            <!-- Hiển thị giá gốc nếu không có giảm giá -->
+                            <strong class="text-primary display-6 fw-bold">
+                                @Model.sellPrice.ToString("C")
+                            </strong>
+                        }
                         @if (Model.Discounts.Any())
                         {
                             <!-- Hiển thị tối đa 3 khuyến mãi từ danh sách -->
@@ -198,9 +212,14 @@
         font-weight: bold; /* T?ng ?? ??m c?a ch? */
         background-color: #e9ecef; /* Màu n?n nh?t h?n */
     }
+
+    .size-selected {
+        border: 2px solid grey; /* ???ng vi?n màu xanh lam ??m */
+        font-weight: bold; /* T?ng ?? ??m c?a ch? */
+        background-color: #e9ecef; /* Màu n?n nh?t h?n */
+    }
 </style>
 <script>
-
     $(document).ready(function () {
         $('#colorList').on('click', '.color-item', function (e) {
             e.preventDefault();
@@ -220,31 +239,24 @@
 
         // Add event listener for thumbnail clicks
         $('.product-thumbnail-slider .thumbnail-image').on('click', function () {
-            // Get the source of the clicked thumbnail
             var newSrc = $(this).attr('src');
-
-            // Replace the main image source with the clicked thumbnail's source and ensure it keeps the same styling
             $('.product-large-slider .main-image').attr('src', newSrc).css({
-                'width': '100%',  // Ensures the image fills the parent container
-                'height': 'auto'  // Maintains aspect ratio
+                'width': '80%',
+                'height': 'auto'
             });
         });
 
         $('#btnAddToCart').on('click', function (e) {
             e.preventDefault();
             let productId = $(this).data('product-id');
-            let color = $(this).data('color');
-            let size = $(this).data('size');
+            let color = $(this).data('color') || "Màu sắc không có sẵn"; // Default message if color is not selected
+            let size = $(this).data('size') || "Kích thước không có sẵn"; // Default message if size is not selected
             let quantity = $('#quantity').val();
+
             console.log("ProductId:", productId);
             console.log("Color:", color);
             console.log("Size:", size);
             console.log("Quantity:", quantity);
-
-            if (!color || !size) {
-                alert("Please select color and size.");
-                return;
-            }
 
             $.ajax({
                 url: '/Product/AddToCart',
@@ -262,10 +274,9 @@
                 }),
                 success: function (response) {
                     if (response.success) {
-                        alert("Product added to cart successfully!");
+                        window.location.href = '/Product/ViewCart';
                     } else {
                         if (response.redirectUrl) {
-                            // Redirect to login page
                             window.location.href = response.redirectUrl;
                         } else {
                             alert("Error adding product to cart: " + response.message);
@@ -282,3 +293,4 @@
         });
     });
 </script>
+

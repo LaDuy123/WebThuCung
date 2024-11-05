@@ -11,8 +11,8 @@
         <h1>Detail Vote Warehouses for Vote: @ViewBag.VoteWarehouseId</h1>
         <nav>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                <li class="breadcrumb-item">Vote Warehouse</li>
+                <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Index">Home</a></li>
+                <li class="breadcrumb-item"><a asp-controller="VoteWarehouse" asp-action="Index">Vote Warehouse</a></li>
                 <li class="breadcrumb-item active">Detail Vote Warehouse</li>
             </ol>
         </nav>
@@ -58,7 +58,7 @@
                                         <td>
                                             <!-- Nút Delete truyền cả idVoteWarehouse và idProduct -->
                                             <form asp-action="DeleteDetail"
-                                                  asp-route-voteWarehouseId="@detail.idVotewarehouse"
+                                                  asp-route-id="@detail.idVotewarehouse"
                                                   asp-route-productId="@detail.idProduct"
                                                   method="post"
                                                   style="display:inline;">
@@ -73,7 +73,7 @@
                             </tbody>
                         </table>
 
-                        <a href="@Url.Action("CreateDetail", "VoteWarehouse", new { voteWarehouseId = ViewBag.VoteWarehouseId })"
+                        <a asp-controller="VoteWarehouse" asp-action="CreateDetail" asp-route-id="@ViewBag.VoteWarehouseId"
                            class="btn btn-primary">Add Detail Vote Warehouse</a>
                         <a asp-action="Index"
                            class="btn btn-primary">Back</a>

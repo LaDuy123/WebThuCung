@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 using NuGet.Configuration;
 using Microsoft.AspNetCore.Authorization;
+using System.Globalization;
+using System.Text;
 
 namespace WebThuCung.Controllers
 {
@@ -543,37 +545,6 @@ decimal totalRevenueLastMonth = ordersLastMonth
             return View();
         }
 
-        // POST: Xử lý đăng nhập
-        //[HttpPost]
-        //public IActionResult Login(LoginDto model)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        // Tìm kiếm admin trong cơ sở dữ liệu
-        //        var ad = _context.Admins.Include(a => a.Role).SingleOrDefault(n => n.userAdmin == model.userName && n.passwordAdmin == model.password);
-
-        //        if (ad != null)
-        //        {
-        //            TempData["success"] = "Đăng nhập thành công";
-        //            // Serialize thông tin khách hàng thành JSON và lưu vào Session
-        //            var settings = new JsonSerializerSettings
-        //            {
-        //                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-        //            };
-        //            var adminJson = Newtonsoft.Json.JsonConvert.SerializeObject(ad, settings);
-        //            HttpContext.Session.SetString("TaikhoanAdmin", adminJson);
-        //            HttpContext.Session.SetString("email", ad.Email);
-
-        //            return RedirectToAction("Index", "Admin");
-        //        }
-        //        else
-        //        {
-        //            ViewBag.Thongbao = "Tên đăng nhập hoặc mật khẩu không đúng";
-        //        }
-        //    }
-
-        //    return View(model);
-        //}
         [HttpPost]
         public async Task<IActionResult> Login(LoginDto model)
         {
@@ -782,10 +753,21 @@ decimal totalRevenueLastMonth = ordersLastMonth
 
             TempData["success"] = "Cập nhật thông tin thành công.";
 
-            return PartialView("ProfileOverview", admin); // Chuyển hướng đến phần thông tin hồ sơ sau khi cập nhật
+            var updatedAdminDto = new AdminDto
+            {          
+                Name = admin.Name,
+                Address = admin.Address,
+                Phone = admin.Phone,
+                Email = admin.Email
+            };
+
+            // Trả về `PartialView` với `AdminDto` sau khi cập nhật
+            return PartialView("ProfileEdit", updatedAdminDto);
         }
 
+       
 
+       
 
     }
 }

@@ -17,6 +17,7 @@
     height: 45px; /* ??t chi?u cao c?a avatar */
     border-radius: 50%; /* T?o hình tròn cho avatar */
     object-fit: cover; /* ??m b?o ?nh không b? méo */
+    margin-right: 50px;
 }
 .profileavataradmin {
     display: none;

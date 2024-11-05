@@ -20,9 +20,15 @@ namespace WebThuCung.Controllers
         }
         public IActionResult Index(string idCategory)
         {
+            // Mặc định nếu không truyền vào ngày bắt đầu và ngày kết thúc, lấy dữ liệu 30 ngày gần nhất
+      
+            DateTime startDate = DateTime.Today.AddDays(-30);
+
+            DateTime endDate = DateTime.Today;
+
             var customerId = GetCustomerIdFromSession();
 
-            // Bắt đầu truy vấn
+            // Truy vấn sản phẩm
             var productsQuery = _context.Products
                 .Include(sp => sp.Branch)  // Bao gồm thông tin thương hiệu
                 .Include(sp => sp.Category) // Bao gồm thông tin loại
@@ -44,14 +50,13 @@ namespace WebThuCung.Controllers
                     Image = sp.Image,
                     idBranch = sp.idBranch,
                     idCategori = sp.idCategory,
-                    nameBranch = sp.Branch.nameBranch, // Lấy tên thương hiệu từ đối tượng liên quan
-                    nameCategory = sp.Category.nameCategory, // Lấy tên loại từ đối tượng liên quan
+                    nameBranch = sp.Branch.nameBranch,
+                    nameCategory = sp.Category.nameCategory,
                     Quantity = sp.Quantity,
-                    Description = sp.Description, // Lấy tên màu sắc từ đối tượng liên quan
-                    Logo = sp.Branch.Logo // Lấy logo từ đối tượng liên quan
+                    Description = sp.Description,
+                    Logo = sp.Branch.Logo
                 })
                 .OrderBy(p => p.idProduct)
-             // Lấy ra 6 sản phẩm
                 .ToList();
 
             // Lấy danh sách ID sản phẩm đã lưu
@@ -60,13 +65,41 @@ namespace WebThuCung.Controllers
                 .Select(s => s.idProduct)
                 .ToList();
 
-            // Gán danh sách cho ViewBag để sử dụng trong View
+            // Gán danh sách sản phẩm đã lưu vào ViewBag
             ViewBag.SavedProductIds = savedProductIds;
 
-     
+            // Truy vấn sản phẩm bán chạy nhất
+            var topSellingProducts = _context.Orders
+                .Where(o => o.dateFrom.Date >= startDate && o.dateFrom.Date <= endDate)
+                .SelectMany(o => o.DetailOrders)
+                .GroupBy(d => new { d.idProduct, d.Product.nameProduct, d.Product.sellPrice, d.Product.Image })
+                .Select(g => new TopSellingProductDto
+                {
+                    ProductId = g.Key.idProduct,
+                    ProductName = g.Key.nameProduct,
+                    Price = g.Key.sellPrice,
+                    DiscountedPrice = g.Key.sellPrice - (g.Key.sellPrice * (_context.Discounts
+                .Where(d => d.idProduct == g.Key.idProduct)
+                .Select(d => d.discountPercent)
+                .FirstOrDefault() / 100m)),
+                    Sold = g.Sum(d => d.Quantity),
+                    Revenue = g.Sum(d => d.Product.sellPrice * d.Quantity),
+                    ImageUrl = g.Key.Image,
+                    DiscountPercent = _context.Discounts
+                .Where(d => d.idProduct == g.Key.idProduct)
+                .Select(d => d.discountPercent)
+                .FirstOrDefault()
+                })
+                .OrderByDescending(p => p.Sold)
+                .Take(5) // Lấy 5 sản phẩm bán chạy nhất
+                .ToList();
+
+            // Gán danh sách sản phẩm bán chạy nhất vào ViewBag để sử dụng trong View
+            ViewBag.TopSellingProducts = topSellingProducts;
 
             return View(allProducts);
         }
+
 
         private int GetCustomerIdFromSession()
         {

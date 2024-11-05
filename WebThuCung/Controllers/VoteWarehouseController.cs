@@ -170,9 +170,9 @@ namespace WebThuCung.Controllers
 
             return RedirectToAction(nameof(Index)); // Quay lại trang danh sách
         }
-        public IActionResult Detail(string voteWarehouseId)
+        public IActionResult Detail(string id)
         {
-            if (string.IsNullOrEmpty(voteWarehouseId))
+            if (string.IsNullOrEmpty(id))
             {
                 return NotFound();
             }
@@ -180,7 +180,7 @@ namespace WebThuCung.Controllers
             // Lấy danh sách các DetailVoteWarehouses cho một phiếu kho cụ thể và bao gồm thông tin sản phẩm liên quan
             var detailVoteWarehouses = _context.DetailVoteWarehouses
                 .Include(d => d.Product)
-                .Where(d => d.idVotewarehouse == voteWarehouseId)
+                .Where(d => d.idVotewarehouse == id)
                 .ToList();
 
             // Tính tổng giá cho mỗi DetailVoteWarehouse
@@ -189,23 +189,23 @@ namespace WebThuCung.Controllers
                 detailVoteWarehouse.totalPrice = detailVoteWarehouse.CalculateTotalPriceWare();
             }
 
-            // Truyền voteWarehouseId vào view để liên kết trở lại phiếu kho
-            ViewBag.VoteWarehouseId = voteWarehouseId;
+            // Truyền id vào view để liên kết trở lại phiếu kho
+            ViewBag.VoteWarehouseId = id;
 
             return View(detailVoteWarehouses); // Trả về view detail cho DetailVoteWarehouses
         }
         [Authorize(Roles = "Admin,StaffWareHouse")]
         // GET: DetailVoteWarehouse/Create/{voteWarehouseId}
         [HttpGet]
-        public IActionResult CreateDetail(string voteWarehouseId)
+        public IActionResult CreateDetail(string id)
         {
-            if (string.IsNullOrEmpty(voteWarehouseId))
+            if (string.IsNullOrEmpty(id))
             {
                 return NotFound();
             }
 
             // Truyền voteWarehouseId sang view
-            ViewBag.VoteWarehouseId = voteWarehouseId;
+            ViewBag.VoteWarehouseId = id;
 
             // Truyền danh sách sản phẩm để chọn lựa
             ViewBag.Products = _context.Products.Select(p => new SelectListItem
@@ -213,8 +213,12 @@ namespace WebThuCung.Controllers
                 Value = p.idProduct.ToString(),
                 Text = p.nameProduct
             }).ToList();
+            var model = new DetailVoteWarehouseDto
+            {
+                idVoteWarehouse = id// Hoặc gán giá trị hợp lệ cho idOrder
+            };
 
-            return View();
+            return View(model);
         }
 
         // POST: DetailVoteWarehouse/Create
@@ -238,7 +242,7 @@ namespace WebThuCung.Controllers
                 _context.SaveChanges();
 
                 // Chuyển hướng về danh sách DetailVoteWarehouse của phiếu kho cụ thể
-                return RedirectToAction("Detail", new { voteWarehouseId = detailVoteWarehouse.idVotewarehouse });
+                return RedirectToAction("Detail", new { id = detailVoteWarehouse.idVotewarehouse });
             }
 
             // Nếu không hợp lệ, tải lại form
@@ -308,7 +312,7 @@ namespace WebThuCung.Controllers
 
                 _context.SaveChanges();
 
-                return RedirectToAction("Detail", new { voteWarehouseId = detailVoteWarehouse.idVotewarehouse });
+                return RedirectToAction("Detail", new { id = detailVoteWarehouse.idVotewarehouse });
             }
 
             ViewBag.Products = _context.Products.Select(p => new SelectListItem
@@ -323,16 +327,16 @@ namespace WebThuCung.Controllers
         // POST: DetailVoteWarehouse/Delete/{voteWarehouseId}/{productId}
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteDetail(string voteWarehouseId, string productId)
+        public IActionResult DeleteDetail(string id, string productId)
         {
-            if (string.IsNullOrEmpty(voteWarehouseId) || string.IsNullOrEmpty(productId))
+            if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(productId))
             {
                 return NotFound();
             }
 
             // Fetch the detail vote warehouse to delete
             var detailVoteWarehouse = _context.DetailVoteWarehouses
-                .FirstOrDefault(d => d.idVotewarehouse == voteWarehouseId && d.idProduct == productId);
+                .FirstOrDefault(d => d.idVotewarehouse == id && d.idProduct == productId);
 
             if (detailVoteWarehouse == null)
             {
@@ -342,7 +346,7 @@ namespace WebThuCung.Controllers
             _context.DetailVoteWarehouses.Remove(detailVoteWarehouse);
             _context.SaveChanges();
 
-            return RedirectToAction("Detail", new { voteWarehouseId });
+            return RedirectToAction("Detail", new { id });
         }
     }
 }

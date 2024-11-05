@@ -11,8 +11,8 @@
         <h1>Detail Orders for Order: @ViewBag.OrderId</h1>
         <nav>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                <li class="breadcrumb-item">Order</li>
+                <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Index">Home</a></li>
+                <li class="breadcrumb-item"><a asp-controller="Order" asp-action="Index">Order</a></li>
                 <li class="breadcrumb-item active">Detail Order</li>
             </ol>
         </nav>
@@ -56,15 +56,13 @@
                                         <td>
                                             <!-- Nút Edit truyền cả idOrder và idProduct -->
                                             <a asp-action="EditDetail"
-                                               asp-route-orderId="@detail.idOrder"
-                                               asp-route-productId="@detail.idProduct"
+                                              asp-route-id="@detail.IdDetailOrder"
                                                class="btn btn-warning btn-sm">Edit</a>
                                         </td>
                                         <td>
                                             <!-- Nút Delete truyền cả idOrder và idProduct -->
                                             <form asp-action="DeleteDetail"
-                                                  asp-route-orderId="@detail.idOrder"
-                                                  asp-route-productId="@detail.idProduct"
+                                                  asp-route-id="@detail.IdDetailOrder"
                                                   method="post"
                                                   style="display:inline;">
                                                 <button type="submit" class="btn btn-danger btn-sm"
@@ -78,7 +76,7 @@
                             </tbody>
                         </table>
 
-                        <a href="@Url.Action("CreateDetail", "Order", new { orderId = ViewBag.OrderId })"
+                        <a asp-controller="Order" asp-action="CreateDetail" asp-route-id="@ViewBag.OrderId"
                            class="btn btn-primary">Add Detail Order</a>
                         <a asp-action="Index"
                            class="btn btn-primary">Back</a>

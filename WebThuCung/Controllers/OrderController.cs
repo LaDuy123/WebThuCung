@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Mail;
+using System.Net;
 using WebThuCung.Data;
 using WebThuCung.Dto;
 using WebThuCung.Models;
@@ -33,6 +35,102 @@ namespace WebThuCung.Controllers
             // Truyền danh sách đơn hàng sang view
             return View(orders);
         }
+        public IActionResult Accept()
+        {
+            // Lấy danh sách các đơn hàng từ cơ sở dữ liệu
+            var orders = _context.Orders.Include(p => p.Customer).Include(o => o.DetailOrders)
+                .ThenInclude(p => p.Product).ToList(); // Lấy tất cả các Order mà không cần Include Transactions
+
+            // Tạo một danh sách để chứa các order kèm thông tin về transactions và payments
+            var orderViewModels = new List<OrderViewDto>();
+
+            foreach (var order in orders)
+            {
+                // Tính toán tổng giá trị cho mỗi đơn hàng
+                order.CalculateTotalOrder(); // Tính tổng giá trị đơn hàng dựa trên DetailOrders
+
+                // Tìm các Transaction liên quan đến order
+                var transactions = _context.Transactions
+                    .Where(t => t.idOrder == order.idOrder)
+                    .ToList();
+
+                // Kiểm tra nếu Transaction nào nằm trong Payment
+                foreach (var transaction in transactions)
+                {
+                    var paymentExists = _context.Payments.Any(p => p.idTransaction == transaction.idTransaction);
+                    orderViewModels.Add(new OrderViewDto
+                    {
+                        Order = order,
+                        Transaction = transaction,
+                        PaymentExists = paymentExists,
+                        totalOrder = order.totalOrder // Thêm tổng giá trị đơn hàng vào model
+                    });
+                }
+            }
+
+            // Truyền danh sách orderViewModels sang view
+            return View(orderViewModels);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Accept(string idOrder)
+        {
+            // Kiểm tra xem order có tồn tại hay không
+            var order = _context.Orders.Include(o => o.Customer).FirstOrDefault(o => o.idOrder == idOrder);
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            // Cập nhật trạng thái của order và payment
+            order.statusOrder = OrderStatus.Accepted; // Cập nhật trạng thái đơn hàng thành "Accept"
+            order.statusPay = PaymentStatus.Paid; // Cập nhật trạng thái thanh toán thành "Paid"
+            TempData["success"] = "Đã xác nhận thanh toán";
+            // Lưu thay đổi vào cơ sở dữ liệu
+            _context.SaveChanges();
+
+            // Gửi email xác nhận thanh toán
+            SendOrderConfirmationEmail(order.Customer.Email, order.idOrder);
+
+            // Chuyển hướng về danh sách đơn hàng
+            return RedirectToAction("Accept");
+        }
+        private void SendOrderConfirmationEmail(string email, string orderId)
+        {
+            using (var client = new SmtpClient("smtp.gmail.com"))
+            {
+                client.Port = 587; // Port cho TLS
+                client.EnableSsl = true; // Bật SSL
+                client.Credentials = new NetworkCredential(
+                    Environment.GetEnvironmentVariable("EMAIL_USERNAME"),
+                    Environment.GetEnvironmentVariable("EMAIL_PASSWORD")
+                );
+
+                var mailMessage = new MailMessage
+                {
+                    From = new MailAddress(Environment.GetEnvironmentVariable("EMAIL_USERNAME")),
+                    Subject = "Xác Nhận Thanh Toán Đơn Hàng",
+                    Body = $"<h1>Xác Nhận Thanh Toán Đơn Hàng</h1>" +
+                           $"<p>Đơn hàng của bạn với ID: <strong>{orderId}</strong> đã được xác nhận thanh toán.</p>",
+                    IsBodyHtml = true,
+                };
+
+                mailMessage.To.Add(email);
+
+                try
+                {
+                    client.Send(mailMessage);
+                }
+                catch (SmtpException ex)
+                {
+                    Console.WriteLine($"Error sending email: {ex.Message}");
+                }
+            }
+        }
+
+
+
         [Authorize(Roles = "Admin,StaffOrder")]
         // GET: Order/Edit/{id}
         [HttpGet]
@@ -118,20 +216,32 @@ namespace WebThuCung.Controllers
                 return NotFound();
             }
 
-            var order = _context.Orders.Find(id);
+            // Tìm đơn hàng và các giao dịch liên quan
+            var order = _context.Orders
+                .Include(o => o.Transactions) // Bao gồm các giao dịch liên quan
+                .FirstOrDefault(o => o.idOrder == id);
+
             if (order == null)
             {
                 return NotFound();
             }
 
+            // Xóa tất cả giao dịch liên quan trước khi xóa đơn hàng
+            foreach (var transaction in order.Transactions)
+            {
+                _context.Transactions.Remove(transaction);
+            }
+
+            // Xóa đơn hàng
             _context.Orders.Remove(order);
             _context.SaveChanges();
 
             return RedirectToAction("Index"); // Quay lại danh sách đơn hàng sau khi xóa
         }
-        public IActionResult Detail(string orderId)
+
+        public IActionResult Detail(string id)
         {
-            if (string.IsNullOrEmpty(orderId))
+            if (string.IsNullOrEmpty(id))
             {
                 return NotFound();
             }
@@ -139,7 +249,7 @@ namespace WebThuCung.Controllers
             // Lấy danh sách các DetailOrders cho một đơn hàng cụ thể và bao gồm thông tin sản phẩm liên quan
             var detailOrders = _context.DetailOrders
                 .Include(d => d.Product)
-                .Where(d => d.idOrder == orderId)
+                .Where(d => d.idOrder == id)
                 .ToList();
 
             // Tính tổng giá cho mỗi DetailOrder
@@ -149,20 +259,20 @@ namespace WebThuCung.Controllers
             }
 
             // Truyền orderId vào view để liên kết trở lại đơn hàng
-            ViewBag.OrderId = orderId;
+            ViewBag.OrderId = id;
 
             return View(detailOrders); // Trả về view detail cho DetailOrders
         }
         [HttpGet]
-        public IActionResult CreateDetail(string orderId)
+        public IActionResult CreateDetail(string Id)
         {
-            if (string.IsNullOrEmpty(orderId))
+            if (string.IsNullOrEmpty(Id))
             {
                 return NotFound();
             }
 
             // Truyền orderId sang view
-            ViewBag.OrderId = orderId;
+            ViewBag.OrderId = Id;
 
             // Truyền danh sách sản phẩm để chọn lựa
             ViewBag.Products = _context.Products.Select(p => new SelectListItem
@@ -172,16 +282,21 @@ namespace WebThuCung.Controllers
             }).ToList();
             ViewBag.Sizes = _context.Sizes.Select(s => new SelectListItem
             {
-                Value = s.idSize.ToString(),
+                Value = s.nameSize, // Sử dụng nameSize làm giá trị
                 Text = s.nameSize
             }).ToList();
+
             ViewBag.Colors = _context.Colors.Select(c => new SelectListItem
             {
-                Value = c.idColor.ToString(),
+                Value = c.nameColor, // Sử dụng nameColor làm giá trị
                 Text = c.nameColor
             }).ToList();
+            var model = new DetailOrderDto
+            {
+                idOrder = Id  // Hoặc gán giá trị hợp lệ cho idOrder
+            };
 
-            return View();
+            return View(model);
         }
 
         [HttpPost]
@@ -195,12 +310,13 @@ namespace WebThuCung.Controllers
             }).ToList();
             ViewBag.Sizes = _context.Sizes.Select(s => new SelectListItem
             {
-                Value = s.idSize.ToString(),
+                Value = s.nameSize, // Sử dụng nameSize làm giá trị
                 Text = s.nameSize
             }).ToList();
+
             ViewBag.Colors = _context.Colors.Select(c => new SelectListItem
             {
-                Value = c.idColor.ToString(),
+                Value = c.nameColor, // Sử dụng nameColor làm giá trị
                 Text = c.nameColor
             }).ToList();
             if (ModelState.IsValid)
@@ -223,8 +339,8 @@ namespace WebThuCung.Controllers
                     {
                         idOrder = detailOrderDto.idOrder,
                         idProduct = detailOrderDto.idProduct,
-                        //idColor = detailOrderDto.idColor,
-                        //idSize = detailOrderDto.idSize,
+                        nameColor = detailOrderDto.nameColor,    
+                        nameSize = detailOrderDto.nameSize,
                         Quantity = detailOrderDto.Quantity,
                         totalPrice = detailOrderDto.Quantity * product.sellPrice // Tính tổng giá
                     };
@@ -233,7 +349,7 @@ namespace WebThuCung.Controllers
                     _context.SaveChanges();
 
                     // Chuyển hướng về danh sách DetailOrder của đơn hàng cụ thể
-                    return RedirectToAction("Detail", new { orderId = detailOrder.idOrder });
+                    return RedirectToAction("Detail", new { id = detailOrder.idOrder });
                 }
             }
 
@@ -248,47 +364,50 @@ namespace WebThuCung.Controllers
 
         // GET: DetailOrder/Edit/{orderId}/{productId}
         [HttpGet]
-        public IActionResult EditDetail(string orderId, string productId)
+        public IActionResult EditDetail(int id)
         {
-            if (string.IsNullOrEmpty(orderId) || string.IsNullOrEmpty(productId))
-            {
-                return NotFound();
-            }
-
+            // Tìm chi tiết đơn hàng theo idDetailOrder
             var detailOrder = _context.DetailOrders
-                .FirstOrDefault(d => d.idOrder == orderId && d.idProduct == productId);
+                .FirstOrDefault(d => d.IdDetailOrder == id);
 
             if (detailOrder == null)
             {
                 return NotFound();
             }
-            //var product = _context.Products.FirstOrDefault(p => p.idProduct == detailOrderDto.idProduct);
+
+            // Chuyển đổi dữ liệu từ model sang DTO
             var detailOrderDto = new DetailOrderDto
             {
+                idDetailOrder = detailOrder.IdDetailOrder,
                 idOrder = detailOrder.idOrder,
                 idProduct = detailOrder.idProduct,
-                Quantity = detailOrder.Quantity,          
-                totalPrice = detailOrder.CalculateTotalPrice()
+                nameColor = detailOrder.nameColor,
+                nameSize = detailOrder.nameSize,
+                Quantity = detailOrder.Quantity
             };
 
+            // Truyền dữ liệu danh sách sản phẩm, màu sắc và kích thước vào ViewBag
             ViewBag.Products = _context.Products.Select(p => new SelectListItem
             {
                 Value = p.idProduct.ToString(),
                 Text = p.nameProduct
             }).ToList();
+
             ViewBag.Sizes = _context.Sizes.Select(s => new SelectListItem
             {
-                Value = s.idSize.ToString(),
+                Value = s.nameSize,
                 Text = s.nameSize
             }).ToList();
+
             ViewBag.Colors = _context.Colors.Select(c => new SelectListItem
             {
-                Value = c.idColor.ToString(),
+                Value = c.nameColor,
                 Text = c.nameColor
             }).ToList();
 
-            return View(detailOrderDto);
+            return View(detailOrderDto); // Truyền DTO vào view
         }
+
 
         // POST: DetailOrder/Edit
         [HttpPost]
@@ -297,64 +416,93 @@ namespace WebThuCung.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Sử dụng idDetailOrder thay vì idOrder để tìm chi tiết đơn hàng
                 var detailOrder = _context.DetailOrders
-                    .FirstOrDefault(d => d.idOrder == detailOrderDto.idOrder && d.idProduct == detailOrderDto.idProduct);
+                    .FirstOrDefault(d => d.IdDetailOrder == detailOrderDto.idDetailOrder);
 
                 if (detailOrder == null)
                 {
                     return NotFound();
                 }
+
+                // Tìm sản phẩm theo idProduct để tính tổng giá
                 var product = _context.Products.FirstOrDefault(p => p.idProduct == detailOrderDto.idProduct);
+
+                if (product == null)
+                {
+                    ModelState.AddModelError("", "Sản phẩm không tồn tại.");
+                    return View(detailOrderDto);
+                }
+
+                // Cập nhật các thuộc tính của detailOrder từ detailOrderDto
+                detailOrder.nameColor = detailOrderDto.nameColor;
+                detailOrder.idProduct = detailOrderDto.idProduct;
+                detailOrder.nameSize = detailOrderDto.nameSize;
                 detailOrder.Quantity = detailOrderDto.Quantity;
                 detailOrder.totalPrice = detailOrderDto.Quantity * product.sellPrice;
 
+                // Lưu thay đổi vào cơ sở dữ liệu
                 _context.SaveChanges();
 
-                return RedirectToAction("Detail", new { orderId = detailOrder.idOrder });
+                // Điều hướng về trang chi tiết đơn hàng
+                return RedirectToAction("Detail", new { id = detailOrder.idOrder });
             }
 
+            // Nếu ModelState không hợp lệ, tải lại danh sách Products, Sizes và Colors vào ViewBag
             ViewBag.Products = _context.Products.Select(p => new SelectListItem
             {
                 Value = p.idProduct.ToString(),
                 Text = p.nameProduct
             }).ToList();
+
             ViewBag.Sizes = _context.Sizes.Select(s => new SelectListItem
             {
-                Value = s.idSize.ToString(),
+                Value = s.nameSize,
                 Text = s.nameSize
             }).ToList();
+
             ViewBag.Colors = _context.Colors.Select(c => new SelectListItem
             {
-                Value = c.idColor.ToString(),
+                Value = c.nameColor,
                 Text = c.nameColor
             }).ToList();
 
+            // Trả về view với dữ liệu hiện tại để người dùng chỉnh sửa
             return View(detailOrderDto);
         }
+
         // POST: DetailOrder/Delete/{orderId}/{productId}
+        // POST: DetailOrder/Delete/{idDetailOrder}
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteDetail(string orderId, string productId)
+        public IActionResult DeleteDetail(int id)
         {
-            if (string.IsNullOrEmpty(orderId) || string.IsNullOrEmpty(productId))
+            // Kiểm tra xem idDetailOrder có hợp lệ không
+            if (id == null)
             {
-                return NotFound();
+                return BadRequest("Detail Order ID is missing.");
             }
 
-            // Fetch the detail order to delete
+            // Lấy chi tiết đơn hàng cần xóa dựa trên idDetailOrder
             var detailOrder = _context.DetailOrders
-                .FirstOrDefault(d => d.idOrder == orderId && d.idProduct == productId);
+                .FirstOrDefault(d => d.IdDetailOrder == id); // Sử dụng IdDetailOrder
 
             if (detailOrder == null)
             {
-                return NotFound();
+                return NotFound("Detail order not found.");
             }
 
+            // Xóa chi tiết đơn hàng
             _context.DetailOrders.Remove(detailOrder);
             _context.SaveChanges();
 
-            return RedirectToAction("Detail", new { orderId });
+            // Thông báo thành công (nếu cần thiết)
+            TempData["SuccessMessage"] = "Detail order deleted successfully.";
+
+            // Chuyển hướng về trang chi tiết đơn hàng, có thể truyền orderId nếu cần
+            return RedirectToAction("Detail", new { Id = detailOrder.idOrder });
         }
+
 
     }
 }

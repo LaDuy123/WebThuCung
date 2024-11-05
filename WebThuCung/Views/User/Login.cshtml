@@ -27,8 +27,7 @@
         <div class="hero-content py-5 my-3">
             <h2 class="display-1 mt-3 mb-0">Account</h2>
             <nav class="breadcrumb">
-                <a class="breadcrumb-item nav-link" href="#">Home</a>
-                <a class="breadcrumb-item nav-link" href="#">Pages</a>
+                <a class="breadcrumb-item nav-link" asp-controller="User" asp-action="Index">Home</a>
                 <span class="breadcrumb-item active" aria-current="page">Account</span>
             </nav>
         </div>
@@ -88,14 +87,14 @@
                                     <!-- Username or Email -->
                                     <div class="form-input col-lg-12 my-4">
                                         <label asp-for="userName" class="col-form-label"></label>
-                                        <input asp-for="userName" class="form-control mb-3 p-4" placeholder="Enter username or email address" />
+                                        <input asp-for="userName" class="form-control mb-3 p-4" placeholder="Enter username or email address" style="text-transform: none;" />
                                         <span asp-validation-for="userName" class="text-danger"></span>
                                     </div>
 
                                     <!-- Password -->
                                     <div class="form-input col-lg-12 my-4">
                                         <label asp-for="password" class="col-form-label"></label>
-                                        <input asp-for="password" type="password" class="form-control mb-3 p-4" placeholder="Enter password" />
+                                        <input asp-for="password" type="password" class="form-control mb-3 p-4" placeholder="Enter password" style="text-transform: none;" />
                                         <span asp-validation-for="password" class="text-danger"></span>
                                     </div>
 

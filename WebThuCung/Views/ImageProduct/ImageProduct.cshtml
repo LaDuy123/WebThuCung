@@ -11,8 +11,8 @@
         <h1>Images for Product</h1>
         <nav>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                <li class="breadcrumb-item">Product</li>
+                <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Index">Home</a></li>
+                <li class="breadcrumb-item"><a asp-controller="Product" asp-action="Index">Product</a></li>
                 <li class="breadcrumb-item active">Images</li>
             </ol>
         </nav>
@@ -74,7 +74,10 @@
                             </tbody>
                         </table>
                         <!-- End Table with stripped rows -->
+                     
 
+                         <a asp-controller="Product" asp-action="Index" class="btn btn-secondary">Back</a>
+                           
                     </div>
                 </div>
 

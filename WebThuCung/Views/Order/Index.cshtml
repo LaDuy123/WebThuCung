@@ -10,9 +10,8 @@
         <h1>Order List</h1>
         <nav>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Index">Home</a></li>
                 <li class="breadcrumb-item">Order</li>
-                <li class="breadcrumb-item active">List</li>
             </ol>
         </nav>
     </div><!-- End Page Title -->
@@ -24,7 +23,8 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Order List</h5>
-
+                        <a asp-controller="Order" asp-action="Accept" 
+                           class="btn btn-primary">Accept Order</a>
 
                         <!-- Table with stripped rows -->
                         <table class="table datatable">
@@ -48,7 +48,7 @@
                                     {
                                         <tr>
                                             <td>
-                                                <a asp-action="Detail" asp-route-orderId="@order.idOrder">
+                                                <a asp-action="Detail" asp-route-id="@order.idOrder">
                                                     @order.idOrder
                                                 </a>
                                             </td>

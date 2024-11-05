@@ -4,13 +4,13 @@
     Layout = "~/Views/Shared/_LayoutUsers.cshtml";
 }
 
+
 <section id="banner" class="py-3" style="background: #F9F3EC;">
     <div class="container">
         <div class="hero-content py-5 my-3">
             <h2 class="display-1 mt-3 mb-0">Order</h2>
             <nav class="breadcrumb">
-                <a class="breadcrumb-item nav-link" href="#">Home</a>
-                <a class="breadcrumb-item nav-link" href="#">Pages</a>
+                <a class="breadcrumb-item nav-link" asp-controller="User" asp-action="Index">Home</a>
                 <span class="breadcrumb-item active" aria-current="page">MyOrder</span>
             </nav>
         </div>
@@ -20,10 +20,10 @@
     <div class="container">
         <ul class="nav nav-pills mb-4">
             <li class="nav-item">
-                <a class="nav-link"  asp-action="ViewCart">View Cart</a>
+                <a class="nav-link" asp-action="ViewCart">View Cart</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link active"  asp-action="MyOrder">Transactions</a>
+                <a class="nav-link active" asp-action="MyOrder">Transactions</a>
             </li>
         </ul>
     </div>
@@ -58,12 +58,23 @@
                     </div>
                     <div class="info-item">
                         <h4>Đơn hàng #: @transaction.Order.idOrder</h4> <!-- ID đơn hàng -->
-                    </div><!-- Thay đổi IdOrder cho đúng với thuộc tính của bạn -->
-                    <div class="info-item text-end">
-                        <button type="button" class="btn btn-primary" onclick="processOnlinePayment(@transaction.idTransaction)">
-                            Thanh toán online
-                        </button>
                     </div>
+
+                    @if (transaction.Order.statusPay == PaymentStatus.Paid) // Kiểm tra trạng thái thanh toán
+                    {
+                        <div class="info-item">
+                            <p>Trạng thái thanh toán: <strong>Đã thanh toán</strong></p> <!-- Hiển thị thông báo đã thanh toán -->
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="info-item text-end">
+                            <button type="button" class="btn btn-primary" onclick="processOnlinePayment(@transaction.idTransaction)">
+                                Thanh toán online
+                            </button>
+                        </div>
+                    }
+
                     @if (transaction.Order != null)
                     {
                         <table class="table">
@@ -136,6 +147,7 @@
     </div>
 </section>
 
+
 <style>
     #navigation {
         background-color: #f8f9fa; /* Màu nền */
@@ -176,7 +188,7 @@
                 type: 'POST',
                 data: { id: id }, // Đảm bảo id không null
                 success: function (result) {
-                    alert('Sản phẩm đã được hủy.');
+                  
                     location.reload(); // Tải lại trang
                 },
                 error: function (xhr, status, error) {

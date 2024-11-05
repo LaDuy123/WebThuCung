@@ -9,8 +9,7 @@
         <div class="hero-content py-5 my-3">
             <h2 class="display-1 mt-3 mb-0">Cart</h2>
             <nav class="breadcrumb">
-                <a class="breadcrumb-item nav-link" href="#">Home</a>
-                <a class="breadcrumb-item nav-link" href="#">Pages</a>
+                <a class="breadcrumb-item nav-link" asp-controller="User" asp-action="Index">Home</a>
                 <span class="breadcrumb-item active" aria-current="page">Cart</span>
             </nav>
         </div>
@@ -205,7 +204,7 @@
                 type: 'POST',
                 data: { id: id }, // Đảm bảo id không null
                 success: function (result) {
-                    alert('Sản phẩm đã được xóa.');
+                  
                     location.reload(); // Tải lại trang
                 },
                 error: function (xhr, status, error) {

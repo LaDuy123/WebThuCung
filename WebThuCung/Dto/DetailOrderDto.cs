@@ -4,6 +4,7 @@ namespace WebThuCung.Dto
 {
     public class DetailOrderDto
     {
+        public int idDetailOrder { get; set; }
         public string idOrder { get; set; }
 
         public string idProduct { get; set; }

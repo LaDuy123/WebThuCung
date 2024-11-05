@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
+using System.Text;
 using WebThuCung.Data;
 using WebThuCung.Dto;
 using WebThuCung.Models;
@@ -123,6 +125,48 @@ namespace WebThuCung.Controllers
             // Trả về view với dữ liệu của model khi có lỗi
             return View(model);
         }
+        public string RemoveDiacritics(string text)
+        {
+            var normalizedString = text.Normalize(NormalizationForm.FormD);
+            var stringBuilder = new StringBuilder();
+
+            foreach (var c in normalizedString)
+            {
+                var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+                if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+                {
+                    stringBuilder.Append(c);
+                }
+            }
+
+            return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
+        }
+        [HttpPost]
+        public IActionResult Search(int? IdCustomer, string NameCustomer)
+        {
+            // Tạo truy vấn cơ sở dữ liệu
+            var query = _context.Customers.AsQueryable();
+
+            // Nếu IdCustomer có giá trị, thêm điều kiện vào truy vấn
+            if (IdCustomer.HasValue)
+            {
+                query = query.Where(c => c.idCustomer == IdCustomer.Value);
+            }
+
+            // Nếu NameCustomer không rỗng, thêm điều kiện tìm kiếm tên
+            if (!string.IsNullOrEmpty(NameCustomer))
+            {
+                query = query.Where(c => c.nameCustomer.Contains(NameCustomer));
+            }
+
+            // Thực hiện truy vấn và lấy danh sách khách hàng
+            var customers = query.ToList();
+
+            // Trả về view với danh sách khách hàng tìm được
+            return View("Index", customers);
+        }
+
+
 
     }
 }

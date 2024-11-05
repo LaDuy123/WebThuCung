@@ -10,7 +10,7 @@
         <h1>Vote Warehouse</h1>
         <nav>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Home</a></li>
+                <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Index">Home</a></li>
                 <li class="breadcrumb-item active">Vote Warehouse</li>
             </ol>
         </nav>
@@ -44,7 +44,7 @@
                                 {
                                     <tr>
                                         <td>
-                                            <a asp-action="Detail" asp-route-voteWarehouseId="@item.idVotewarehouse">@item.idVotewarehouse</a>
+                                            <a asp-action="Detail" asp-route-id="@item.idVotewarehouse">@item.idVotewarehouse</a>
                                              </td>
                                         <td>@item.dateEntry.ToString("yyyy-MM-dd")</td>
                                         <td>@item.idSupplier</td>

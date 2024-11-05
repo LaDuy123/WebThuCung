@@ -9,8 +9,7 @@
         <div class="hero-content py-5 my-3">
             <h2 class="display-1 mt-3 mb-0">Account</h2>
             <nav class="breadcrumb">
-                <a class="breadcrumb-item nav-link" href="#">Home</a>
-                <a class="breadcrumb-item nav-link" href="#">Pages</a>
+                <a class="breadcrumb-item nav-link" asp-controller="User" asp-action="Index">Home</a>
                 <span class="breadcrumb-item active" aria-current="page">Account</span>
             </nav>
         </div>
@@ -38,24 +37,7 @@
                         <div class="col-lg-8 offset-lg-2 mt-5">
                             <p class="mb-0">Sign-up With Social</p>
                             <hr class="my-1">
-                            <div class="row mt-4 mb-5">
-                                <div class="d-grid col-md-6 my-2">
-                                    <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1 ">
-                                        <div class="d-flex flex-wrap justify-content-center">
-                                            <iconify-icon icon="ion:logo-google" class="signup-social-icon me-2"></iconify-icon>
-                                            <p class="mb-0">Google</p>
-                                        </div>
-                                    </a>
-                                </div>
-                                <div class="d-grid col-md-6 my-2">
-                                    <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1 ">
-                                        <div class="d-flex flex-wrap justify-content-center">
-                                            <iconify-icon icon="ion:logo-facebook" class="signup-social-icon me-2"></iconify-icon>
-                                            <p class="mb-0">Facebook</p>
-                                        </div>
-                                    </a>
-                                </div>
-                            </div>
+                          
 
                             <p class="mb-0">Or Sign-Up With Email</p>
                             <hr class="my-1">
@@ -69,35 +51,35 @@
                                 <!-- Username -->
                                 <div class="form-input col-lg-12 my-4">
                                     <label asp-for="userCustomer" class="col-form-label">Username</label>
-                                    <input asp-for="userCustomer" class="form-control mb-3 p-4" placeholder="Nhập tên đăng nhập" />
+                                    <input asp-for="userCustomer" class="form-control mb-3 p-4" placeholder="Nhập tên đăng nhập" style="text-transform: none;" />
                                     <span asp-validation-for="userCustomer" class="text-danger"></span>
                                 </div>
 
                                 <!-- Email -->
                                 <div class="form-input col-lg-12 my-4">
                                     <label asp-for="Email" class="col-form-label">Email</label>
-                                    <input asp-for="Email" class="form-control mb-3 p-4" placeholder="Nhập địa chỉ email của bạn" />
+                                    <input asp-for="Email" class="form-control mb-3 p-4" placeholder="Nhập địa chỉ email của bạn" style="text-transform: none;" />
                                     <span asp-validation-for="Email" class="text-danger"></span>
                                 </div>
 
                                 <!-- Password -->
                                 <div class="form-input col-lg-12 my-4">
                                     <label asp-for="paswordCusstomer" class="col-form-label">Password</label>
-                                    <input asp-for="paswordCusstomer" type="password" class="form-control mb-3 p-4" placeholder="Tạo mật khẩu" />
+                                    <input asp-for="paswordCusstomer" type="password" class="form-control mb-3 p-4" placeholder="Tạo mật khẩu" style="text-transform: none;" />
                                     <span asp-validation-for="paswordCusstomer" class="text-danger"></span>
                                 </div>
 
                                 <!-- Confirm Password -->
                                 <div class="form-input col-lg-12 my-4">
                                     <label asp-for="confirmPassword" class="col-form-label">Confirm Password</label>
-                                    <input asp-for="confirmPassword" type="password" class="form-control mb-3 p-4" placeholder="Nhập lại mật khẩu" />
+                                    <input asp-for="confirmPassword" type="password" class="form-control mb-3 p-4" placeholder="Nhập lại mật khẩu" style="text-transform: none;" />
                                     <span asp-validation-for="confirmPassword" class="text-danger"></span>
                                 </div>
 
                                 <!-- Full Name -->
                                 <div class="form-input col-lg-12 my-4">
                                     <label asp-for="Name" class="col-form-label">Full Name</label>
-                                    <input asp-for="Name" class="form-control mb-3 p-4" placeholder="Nhập họ tên" />
+                                    <input asp-for="Name" class="form-control mb-3 p-4" placeholder="Nhập họ tên" style="text-transform: none;" />
                                     <span asp-validation-for="Name" class="text-danger"></span>
                                 </div>
 

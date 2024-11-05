@@ -8,5 +8,7 @@
         public int Sold { get; set; }
         public decimal Revenue { get; set; }
         public string ImageUrl { get; set; }
+        public decimal DiscountedPrice { get; set; }
+        public int DiscountPercent {  get; set; }
     }
 }

@@ -10,7 +10,8 @@
         <h1>Create Vote Warehouse</h1>
         <nav>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="@Url.Action("Index", "VoteWarehouse")">Home</a></li>
+                <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Index">Home</a></li>
+                <li class="breadcrumb-item active"><a asp-controller="VoteWarehouse" asp-action="Index">VoteWareHouse</a></li>
                 <li class="breadcrumb-item active">Create</li>
             </ol>
         </nav>
@@ -18,7 +19,7 @@
 
     <section class="section">
         <div class="row">
-            <div class="col-lg-8">
+            <div class="col-lg-10">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Create Vote Warehouse</h5>
@@ -63,6 +64,7 @@
                             <div class="row mb-3">
                                 <div class="col-sm-10 offset-sm-2">
                                     <button type="submit" class="btn btn-primary">Create Vote Warehouse</button>
+                                    <a asp-action="Index" class="btn btn-secondary">Back</a>
                                 </div>
                             </div>
                         </form><!-- End Create Vote Warehouse Form -->

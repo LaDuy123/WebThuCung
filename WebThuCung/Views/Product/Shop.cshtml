@@ -1,6 +1,5 @@
 ﻿@model IEnumerable<WebThuCung.Dto.ProductViewDto>
 
-
 @{
     ViewData["Title"] = "Shop";
     Layout = "~/Views/Shared/_LayoutUsers.cshtml";
@@ -11,8 +10,7 @@
         <div class="hero-content py-5 my-3">
             <h2 class="display-1 mt-3 mb-0">Shop</h2>
             <nav class="breadcrumb">
-                <a class="breadcrumb-item nav-link" href="#">Home</a>
-                <a class="breadcrumb-item nav-link" href="#">Pages</a>
+                <a class="breadcrumb-item nav-link" asp-controller="User" asp-action="Index">Home</a>
                 <span class="breadcrumb-item active" aria-current="page">Shop</span>
             </nav>
         </div>
@@ -23,24 +21,6 @@
     <div class="container py-5 my-5">
         <div class="row flex-md-row-reverse g-md-5 mb-5">
             <main class="col-md-9">
-                <div class="filter-shop d-md-flex justify-content-between align-items-center">
-                    <div class="showing-product">
-                        <p class="m-0">Showing 1–9 of @Model.Count() results</p>
-                    </div>
-                    <div class="sort-by">
-                        <select class="filter-categories border-0 m-0">
-                            <option value="">Default sorting</option>
-                            <option value="">Name (A - Z)</option>
-                            <option value="">Name (Z - A)</option>
-                            <option value="">Price (Low-High)</option>
-                            <option value="">Price (High-Low)</option>
-                            <option value="">Rating (Highest)</option>
-                            <option value="">Rating (Lowest)</option>
-                            <option value="">Model (A - Z)</option>
-                            <option value="">Model (Z - A)</option>
-                        </select>
-                    </div>
-                </div>
                 <div id="product-list" class="product-grid row ">
                     @foreach (var product in Model)
                     {
@@ -48,7 +28,9 @@
                         ViewBag.SavedProductIds.Contains(product.idProduct);
                         <div class="col-md-4 my-4" data-productid="@product.idProduct">
                             <div class="card position-relative">
-                                <a asp-controller="Product" asp-action="Detail" asp-route-id="@product.idProduct"><img src="~/images/@product.Image" class="img-fluid rounded-4" alt="image"></a>
+                                <a asp-controller="Product" asp-action="Detail" asp-route-id="@product.idProduct">
+                                    <img src="~/images/@product.Image" class="img-fluid rounded-4" alt="image">
+                                </a>
                                 <div class="card-body p-0">
                                     <a href="single-product.html">
                                         <h3 class="card-title pt-4 m-0">@product.nameProduct</h3>
@@ -77,21 +59,8 @@
                     }
                 </div>
 
-                <!-- / product-grid -->
-
-                <nav class="navigation paging-navigation text-center mt-5" role="navigation">
-                    <div class="pagination loop-pagination d-flex justify-content-center align-items-center">
-                        <a href="#" class="pagination-arrow d-flex align-items-center mx-3">
-                            <iconify-icon icon="ic:baseline-keyboard-arrow-left" class="pagination-arrow fs-1"></iconify-icon>
-                        </a>
-                        <span aria-current="page" class="page-numbers mt-2 fs-3 mx-3 current">1</span>
-                        <a class="page-numbers mt-2 fs-3 mx-3" href="#">2</a>
-                        <a class="page-numbers mt-2 fs-3 mx-3" href="#">3</a>
-                        <a href="#" class="pagination-arrow d-flex align-items-center mx-3">
-                            <iconify-icon icon="ic:baseline-keyboard-arrow-right" class="pagination-arrow fs-1"></iconify-icon>
-                        </a>
-                    </div>
-                </nav>
+                <!-- Phân trang -->
+               
             </main>
 
             <aside class="col-md-3 mt-5">
@@ -99,13 +68,7 @@
                     <div class="widget-menu">
                         <div class="widget-search-bar">
                             <div class="search-bar border rounded-2 border-dark-subtle pe-3">
-                                <form id="search-form" class="text-center d-flex align-items-center" action="" method="">
-                                    <input type="text" class="form-control border-0 bg-transparent" placeholder="Search for products" />
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                                        <path fill="currentColor"
-                                              d="M21.71 20.29L18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a1 1 0 0 0 1.42 0a1 1 0 0 0 0-1.39ZM11 18a7 7 0 1 1 7-7a7 7 0 0 1-7 7Z" />
-                                    </svg>
-                                </form>
+                            
                             </div>
                         </div>
                     </div>
@@ -138,7 +101,7 @@
                                 <a href="#" class="nav-link filter-price" data-min="0" data-max="10000">Less than 10000Đ</a>
                             </li>
                             <li class="tags-item">
-                                <a href="#" class="nav-link filter-price" data-min="10000" data-max="50000">10000Đ - 20000Đ</a>
+                                <a href="#" class="nav-link filter-price" data-min="10000" data-max="20000">10000Đ - 20000Đ</a>
                             </li>
                             <li class="tags-item">
                                 <a href="#" class="nav-link filter-price" data-min="20000" data-max="100000">20000Đ - 100000Đ</a>
@@ -158,6 +121,23 @@
     </div>
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<style>
+    .pagination .current {
+        font-weight: bold; /* Chữ đậm hơn */
+        color: #ffffff; /* Màu chữ */
+        background-color: #007bff; /* Màu nền nổi bật */
+        border-radius: 4px; /* Bo góc */
+    }
+
+    .pagination a {
+        color: #007bff; /* Màu chữ mặc định */
+        text-decoration: none; /* Bỏ gạch chân */
+    }
+
+        .pagination a:hover {
+            text-decoration: underline; /* Gạch chân khi hover */
+        }
+</style>
 
 <script>
     $(document).ready(function () {
@@ -166,38 +146,10 @@
         let selectedPetId = "";
         let selectedMinPrice = null;
         let selectedMaxPrice = null;
-
-        // Xử lý nhấp vào danh mục
-        $(document).on('click', '.filter-category', function (e) {
-            e.preventDefault();
-            selectedCategoryId = $(this).data('id');
-            searchProducts();
-        });
-
-        // Xử lý nhấp vào thương hiệu
-        $(document).on('click', '.filter-branch', function (e) {
-            e.preventDefault();
-            selectedBranchId = $(this).data('id');
-            searchProducts();
-        });
-
-        // Xử lý nhấp vào thú cưng
-        $(document).on('click', '.filter-pet', function (e) {
-            e.preventDefault();
-            selectedPetId = $(this).data('id');
-            searchProducts();
-        });
-
-        // Xử lý nhấp vào lọc giá
-        $(document).on('click', '.filter-price', function (e) {
-            e.preventDefault();
-            selectedMinPrice = $(this).data('min') || null;
-            selectedMaxPrice = $(this).data('max') || null;
-            searchProducts();
-        });
+        let currentPage = 1; // Khởi tạo trang hiện tại
 
         // Hàm gọi Ajax để lọc sản phẩm
-        function searchProducts() {
+        function searchProducts(page = 1) {
             $.ajax({
                 url: '@Url.Action("FilterProducts", "Product")',
                 type: 'GET',
@@ -206,27 +158,71 @@
                     branchId: selectedBranchId,
                     petId: selectedPetId,
                     minPrice: selectedMinPrice,
-                    maxPrice: selectedMaxPrice
+                    maxPrice: selectedMaxPrice,
+                    page: page // Gửi số trang hiện tại
                 },
                 success: function (result) {
                     $('#product-list').html(result); // Cập nhật danh sách sản phẩm
+                    updatePagination(page); // Cập nhật phân trang
                 },
                 error: function (xhr, status, error) {
                     console.error(xhr.responseText);
                 }
             });
         }
-    });
-</script>
 
-<script>
-    $(document).ready(function () {
-        $('.toggle').on('click', function (e) {
+        // Cập nhật phân trang
+      
+
+        // Xử lý nhấp vào danh mục
+        $(document).on('click', '.filter-category', function (e) {
+            e.preventDefault();
+            selectedCategoryId = $(this).data('id');
+            searchProducts(); // Tìm kiếm sản phẩm khi thay đổi danh mục
+        });
+
+        // Xử lý nhấp vào thương hiệu
+        $(document).on('click', '.filter-branch', function (e) {
+            e.preventDefault();
+            selectedBranchId = $(this).data('id');
+            searchProducts(); // Tìm kiếm sản phẩm khi thay đổi thương hiệu
+        });
+
+        // Xử lý nhấp vào thú cưng
+        $(document).on('click', '.filter-pet', function (e) {
+            e.preventDefault();
+            selectedPetId = $(this).data('id');
+            searchProducts(); // Tìm kiếm sản phẩm khi thay đổi thú cưng
+        });
+
+        // Xử lý nhấp vào lọc giá
+        $(document).on('click', '.filter-price', function (e) {
+            e.preventDefault();
+            selectedMinPrice = $(this).data('min') || null;
+            selectedMaxPrice = $(this).data('max') || null;
+            searchProducts(); // Tìm kiếm sản phẩm khi thay đổi giá
+        });
+        function updatePagination(page) {
+            $('.pagination-arrow[data-page="' + (page - 1) + '"]').toggle(page > 1); // Ẩn hiện nút quay lại
+            $('.pagination-arrow[data-page="' + (page + 1) + '"]').toggle(page < @ViewBag.TotalPages); // Ẩn hiện nút tiếp theo
+            $('.page-numbers').removeClass('current'); // Xóa lớp current
+            $('.page-numbers[data-page="' + page + '"]').addClass('current'); // Thêm lớp current cho trang hiện tại
+        }
+        // Xử lý phân trang
+        $(document).on('click', '.pagination-arrow, .page-numbers', function (e) {
+            e.preventDefault();
+            let page = $(this).data('page'); // Lấy số trang từ thuộc tính data-page
+            currentPage = page; // Cập nhật trang hiện tại
+            searchProducts(currentPage); // Tìm kiếm sản phẩm theo trang
+        });
+
+
+        $(document).on('click', '.toggle', function (e) {
             e.preventDefault(); // Ngăn trang tải lại
 
             var $this = $(this); // Phần tử được nhấn
             var icon = $this.find('iconify-icon'); // Tìm phần tử icon bên trong .toggle
-            var idproduct = $this.closest('.swiper-slide').data('productid'); // Lấy ID sản phẩm
+            var idproduct = $this.closest('[data-productid]').data('productid'); // Lấy ID sản phẩm
 
             $.ajax({
                 url: '/Product/SaveProduct', // Đường dẫn đến action lưu sản phẩm
@@ -237,11 +233,7 @@
                         alert(response.message); // Hiển thị thông báo từ phản hồi
 
                         // Thay đổi màu sắc dựa trên trạng thái sản phẩm
-                        if (icon.css('color') === 'rgb(162, 162, 162)') {
-                            icon.css('color', 'black'); // Đổi màu sang đen nếu sản phẩm được lưu
-                        } else {
-                            icon.css('color', 'rgb(162, 162, 162)'); // Đổi màu xám nếu sản phẩm bị xóa
-                        }
+                        icon.css('color', icon.css('color') === 'rgb(162, 162, 162)' ? 'black' : 'rgb(162, 162, 162)');
                     } else {
                         if (response.message === "Please log in to save products.") {
                             // Chuyển hướng nếu người dùng chưa đăng nhập
@@ -256,7 +248,8 @@
                 }
             });
         });
+
+        // Tìm kiếm sản phẩm khi trang được tải
+        searchProducts(currentPage);
     });
-
-
 </script>
