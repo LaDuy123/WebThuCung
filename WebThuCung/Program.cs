@@ -26,7 +26,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
                 // Đặt mã trạng thái và trả về thông báo lỗi
                 context.Response.StatusCode = StatusCodes.Status403Forbidden;
                 context.Response.ContentType = "application/json";
-                return context.Response.WriteAsync("{\"error\":\"Bạn không có quyền truy cập.\"}");
+                return context.Response.WriteAsync("Bạn không có quyền truy cập vào trang này , mọi thắc mắc xin liên hệ Admin để giải quyết .");
             }
         };
     });

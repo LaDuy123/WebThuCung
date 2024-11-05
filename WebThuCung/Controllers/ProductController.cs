@@ -580,10 +580,11 @@ namespace WebThuCung.Controllers
 
             return View(productDto);
         }
-        [Authorize(Roles = "Admin,StaffProduct")]
+       
         // POST: Product/Delete/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,StaffProduct")]
         public IActionResult Delete(string id)
         {
             if (string.IsNullOrEmpty(id))
