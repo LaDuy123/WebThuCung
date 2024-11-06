@@ -23,9 +23,32 @@ namespace WebThuCung.Controllers
         {
             // Lấy danh sách các admin từ cơ sở dữ liệu
             var products = _context.Products
-                            .Include(sp => sp.Branch)  // Bao gồm thông tin thương hiệu
-                            .Include(sp => sp.Category)        // Bao gồm thông tin loại
-                            .ToList();
+                                  .Include(p => p.Pet)
+                                  .Include(p => p.Branch)
+                                  .Include(p => p.Category)
+                                  .Select(sp => new ProductViewDto
+                                  {
+                                      idProduct = sp.idProduct,
+                                      nameProduct = sp.nameProduct,
+                                      sellPrice = sp.sellPrice,
+                                      Image = sp.Image,
+                                      idBranch = sp.idBranch,
+                                      idCategori = sp.idCategory,
+                                      nameBranch = sp.Branch.nameBranch,       // Lấy tên thương hiệu từ đối tượng liên quan
+                                      nameCategory = sp.Category.nameCategory, // Lấy tên loại từ đối tượng liên quan
+                                      Quantity = sp.Quantity,
+                                      Description = sp.Description,
+                                      Logo = sp.Branch.Logo,
+                                      DiscountedPrice = sp.sellPrice - (sp.sellPrice * (_context.Discounts
+               .Where(d => d.idProduct == sp.idProduct)
+               .Select(d => d.discountPercent)
+               .FirstOrDefault() / 100m)),
+                                      DiscountPercent = _context.Discounts
+               .Where(d => d.idProduct == sp.idProduct)
+               .Select(d => d.discountPercent)
+               .FirstOrDefault()// Lấy logo từ đối tượng liên quan
+                                  })
+                                  .ToList();
 
             // Truyền danh sách admin sang viewsds
             return View(products);
@@ -56,7 +79,15 @@ namespace WebThuCung.Controllers
                                        nameCategory = sp.Category.nameCategory, // Lấy tên loại từ đối tượng liên quan
                                        Quantity = sp.Quantity,
                                        Description = sp.Description,
-                                       Logo = sp.Branch.Logo                    // Lấy logo từ đối tượng liên quan
+                                       Logo = sp.Branch.Logo,
+                                       DiscountedPrice = sp.sellPrice - (sp.sellPrice * (_context.Discounts
+                .Where(d => d.idProduct == sp.idProduct)
+                .Select(d => d.discountPercent)
+                .FirstOrDefault() / 100m)),
+                                       DiscountPercent = _context.Discounts
+                .Where(d => d.idProduct == sp.idProduct)
+                .Select(d => d.discountPercent)
+                .FirstOrDefault()// Lấy logo từ đối tượng liên quan
                                    })
                                    .ToList();
             var savedProductIds = _context.SaveProducts
@@ -176,7 +207,15 @@ namespace WebThuCung.Controllers
                     nameCategory = p.Category.nameCategory,
                     Quantity = p.Quantity,
                     Description = p.Description,
-                    Logo = p.Branch.Logo
+                    Logo = p.Branch.Logo,
+                    DiscountedPrice = p.sellPrice - (p.sellPrice * (_context.Discounts
+                .Where(d => d.idProduct == p.idProduct)
+                .Select(d => d.discountPercent)
+                .FirstOrDefault() / 100m)),
+                    DiscountPercent = _context.Discounts
+                .Where(d => d.idProduct == p.idProduct)
+                .Select(d => d.discountPercent)
+                .FirstOrDefault()
                 })
                 .ToList();
 
@@ -334,25 +373,35 @@ namespace WebThuCung.Controllers
 
             // Lấy tất cả các sản phẩm trước, sau đó xử lý tìm kiếm trong bộ nhớ
             var products = _context.Products
-                .Include(p => p.Branch)
-                .Include(p => p.Category)
-                .AsEnumerable()  // Chuyển sang client-side evaluation
-                .Where(p => RemoveDiacritics(p.nameProduct.ToLower()).Contains(normalizedQuery))
-                .Select(p => new ProductViewDto
-                {
-                    idProduct = p.idProduct,
-                    nameProduct = p.nameProduct,
-                    sellPrice = p.sellPrice,
-                    Image = p.Image,
-                    idBranch = p.idBranch,
-                    idCategori = p.idCategory,
-                    nameBranch = p.Branch.nameBranch,
-                    nameCategory = p.Category.nameCategory,
-                    Quantity = p.Quantity,
-                    Description = p.Description,
-                    Logo = p.Branch.Logo
-                })
-                .ToList();
+         .Include(p => p.Branch)
+         .Include(p => p.Category)
+         .Select(p => new
+         {
+             Product = p,
+             DiscountPercent = _context.Discounts
+                 .Where(d => d.idProduct == p.idProduct)
+                 .Select(d => d.discountPercent)
+                 .FirstOrDefault()
+         })
+         .AsEnumerable() // Chuyển đổi sang client-side evaluation sau khi lấy dữ liệu cần thiết
+         .Where(p => RemoveDiacritics(p.Product.nameProduct.ToLower()).Contains(normalizedQuery))
+         .Select(p => new ProductViewDto
+         {
+             idProduct = p.Product.idProduct,
+             nameProduct = p.Product.nameProduct,
+             sellPrice = p.Product.sellPrice,
+             Image = p.Product.Image,
+             idBranch = p.Product.idBranch,
+             idCategori = p.Product.idCategory,
+             nameBranch = p.Product.Branch.nameBranch,
+             nameCategory = p.Product.Category.nameCategory,
+             Quantity = p.Product.Quantity,
+             Description = p.Product.Description,
+             Logo = p.Product.Branch.Logo,
+             DiscountedPrice = p.Product.sellPrice - (p.Product.sellPrice * (p.DiscountPercent / 100m)),
+             DiscountPercent = p.DiscountPercent
+         })
+         .ToList();
             var topSellingProducts = _context.Orders
                  .Where(o => o.dateFrom.Date >= startDate && o.dateFrom.Date <= endDate)
                  .SelectMany(o => o.DetailOrders)
@@ -695,7 +744,20 @@ namespace WebThuCung.Controllers
                 {
                     return Json(new { success = false, redirectUrl = Url.Action("Login", "User") });
                 }
-                var product = _context.Products.FirstOrDefault(p => p.idProduct == model.ProductId);
+
+                var product = _context.Products
+                    .Include(p => p.Discounts) // Bao gồm Discounts để truy xuất chiết khấu
+                    .FirstOrDefault(p => p.idProduct == model.ProductId);
+
+                if (product == null)
+                {
+                    return Json(new { success = false, message = "Product not found." });
+                }
+
+                // Lấy chiết khấu (nếu có) từ bảng Discounts
+                decimal discountPercent = product.Discounts?.FirstOrDefault()?.discountPercent ?? 0;
+                decimal discountedPrice = product.sellPrice - (product.sellPrice * discountPercent / 100);
+
                 // Kiểm tra đơn hàng hiện tại
                 var order = _context.Orders.FirstOrDefault(o => o.idCustomer == idCustomer && o.statusOrder == OrderStatus.InCart);
 
@@ -723,7 +785,7 @@ namespace WebThuCung.Controllers
                 {
                     // Nếu sản phẩm đã tồn tại với màu sắc và kích thước giống nhau, cập nhật số lượng
                     existingOrderDetail.Quantity += model.Quantity;
-                    existingOrderDetail.totalPrice = existingOrderDetail.Quantity * product.sellPrice;  // Cập nhật tổng giá
+                    existingOrderDetail.totalPrice = existingOrderDetail.Quantity * discountedPrice; // Cập nhật tổng giá với giá sau chiết khấu
                     _context.DetailOrders.Update(existingOrderDetail);
                 }
                 else
@@ -736,11 +798,12 @@ namespace WebThuCung.Controllers
                         nameColor = model.Color,
                         nameSize = model.Size,
                         Quantity = model.Quantity,
-                        totalPrice = model.Quantity * product.sellPrice // Tính tổng giá
+                        totalPrice = model.Quantity * discountedPrice // Tính tổng giá với giá sau chiết khấu
                     };
 
                     _context.DetailOrders.Add(newOrderDetail);
                 }
+
                 TempData["success"] = "Thêm giỏ hàng thành công";
                 _context.SaveChanges(); // Lưu các thay đổi vào database
 
@@ -752,6 +815,7 @@ namespace WebThuCung.Controllers
                 return Json(new { success = false, message = ex.Message + " Inner Exception: " + innerException });
             }
         }
+
 
         public IActionResult ViewCart()
         {
@@ -1118,33 +1182,56 @@ namespace WebThuCung.Controllers
 
         public IActionResult SavedProduct()
         {
-            // Lấy customerId từ session (giả sử bạn đã lưu customerId trong session khi người dùng đăng nhập)
+            // Lấy customerId từ session
             var customerId = GetCustomerIdFromSession();
 
             // Kiểm tra xem customerId có hợp lệ không
             if (customerId == 0)
             {
-                // Nếu không có customerId trong session, chuyển hướng đến trang đăng nhập hoặc xử lý lỗi
                 return RedirectToAction("Login", "User");
             }
 
-            // Lấy danh sách công việc đã lưu cho customer cụ thể
-            var saveProduct = _context.SaveProducts
-                .Where(s => s.idCustomer == customerId)  // Lọc theo customerId
+            // Lấy các sản phẩm đã lưu cho customerId từ cơ sở dữ liệu
+            var saveProducts = _context.SaveProducts
+                .Where(s => s.idCustomer == customerId)
                 .Include(s => s.Product)
+                .ThenInclude(p => p.Discounts)
                 .ToList();
 
-            // Nếu không có công việc nào được lưu
-            if (!saveProduct.Any())
+            if (!saveProducts.Any())
             {
-                // Có thể trả về một view khác hoặc hiển thị thông báo không có công việc đã lưu
-                ViewBag.Message = "Bạn chưa lưu sản phẩm nào nào.";
-                return View(new List<SaveProduct>());
+                ViewBag.Message = "Bạn chưa lưu sản phẩm nào.";
+                return View(new List<SaveProductDto>());
             }
 
-            // Trả về view với danh sách công việc đã lưu
-            return View(saveProduct);
+            // Chuyển đổi các sản phẩm đã lưu thành SaveProductDto và tính giá chiết khấu
+            var saveProductDtos = saveProducts.Select(saveProduct =>
+            {
+                var product = saveProduct.Product;
+
+                // Lấy chiết khấu đầu tiên nếu có
+                decimal discountPercent = product.Discounts?.FirstOrDefault()?.discountPercent ?? 0;
+
+                // Tính giá sau chiết khấu
+                decimal discountedPrice = product.sellPrice - (product.sellPrice * discountPercent / 100);
+
+                // Trả về DTO chứa thông tin sản phẩm và giá đã chiết khấu
+                return new SaveProductDto
+                {
+                    idProduct = product.idProduct,
+                    nameProduct = product.nameProduct,
+                    SellPrice = product.sellPrice,
+                    DiscountedPrice = discountedPrice,
+                    Image = product.Image, // Cập nhật đường dẫn hình ảnh
+                    Quantity = product.Quantity
+
+                };
+            }).ToList();
+
+            return View(saveProductDtos);
         }
+
+
 
 
 
@@ -1208,7 +1295,8 @@ namespace WebThuCung.Controllers
             {
                 _context.SaveProducts.Remove(saveProduct);
                 _context.SaveChanges();
-                return Json(new { success = true, message = "Product has been deleted successfully!" });
+                TempData["success"] = "Product has been deleted successfully!";
+                return Json(new { success = true });
             }
 
             return Json(new { success = false, message = "Saved product not found!" });

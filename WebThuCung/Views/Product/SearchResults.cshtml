@@ -125,6 +125,12 @@
                 ViewBag.SavedProductIds.Contains(product.idProduct);
 
                 <div class="item col-md-4 col-lg-3 my-4" data-productid="@product.idProduct">
+                    @if (product.DiscountPercent > 0)
+                    {
+                        <div style="color: red;">
+                            @product.DiscountPercent% OFF
+                        </div>
+                    }
                     <div class="card position-relative">
                         <a href="@Url.Action("Detail", "Product", new { id = product.idProduct })">
                             <img src="@Url.Content("~/images/" + product.Image)" class="img-fluid rounded-4" alt="@product.nameProduct">
@@ -135,9 +141,16 @@
                             </a>
 
                             <div class="card-text">
-                              
 
-                                <h3 class="secondary-font text-primary">@product.sellPrice.ToString("C")</h3>
+
+                                <h3 class="secondary-font text-muted text-decoration-line-through">
+                                    @product.sellPrice.ToString("C")
+                                </h3>
+
+                                <!-- Hiển thị giá đã giảm -->
+                                <h3 class="secondary-font text-primary">
+                                    @product.DiscountedPrice.ToString("C")
+                                </h3>
 
                                 <div class="d-flex flex-wrap mt-3">
 
@@ -154,3 +167,85 @@
 
     </div>
 </section>
+<script>
+    $(document).ready(function () {
+        // Sự kiện cho Top Selling
+        $('.toggle-clothing').on('click', function (e) {
+            e.preventDefault();
+
+            var $this = $(this);
+            var icon = $this.find('iconify-icon');
+            var idproduct = $this.closest('.swiper-slide').data('productid'); // Lấy ID sản phẩm trong Top Selling
+
+            // Kiểm tra và gọi ajax cho Top Selling
+            if (idproduct) {
+                $.ajax({
+                    url: '/Product/SaveProduct',
+                    type: 'POST',
+                    data: { idproduct: idproduct },
+                    success: function (response) {
+                        if (response.success) {
+                            alert(response.message);
+                            toggleIconColor(icon, idproduct);
+                        }
+                    },
+                    error: function () {
+                        alert('An error occurred while saving the product.');
+                    }
+                });
+            }
+        });
+
+        // Sự kiện cho Pet Foodies
+        $('.toggle-foodies').on('click', function (e) {
+            e.preventDefault();
+
+            var $this = $(this);
+            var icon = $this.find('iconify-icon');
+            var idproduct = $this.closest('.item').data('productid'); // Lấy ID sản phẩm trong Pet Foodies
+
+            // Kiểm tra và gọi ajax cho Pet Foodies
+            if (idproduct) {
+                $.ajax({
+                    url: '/Product/SaveProduct',
+                    type: 'POST',
+                    data: { idproduct: idproduct },
+                    success: function (response) {
+                        if (response.success) {
+                            alert(response.message);
+                            toggleIconColor(icon, idproduct);
+                        }
+                    },
+                    error: function () {
+                        alert('An error occurred while saving the product.');
+                    }
+                });
+            }
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const categoriesItems = document.querySelectorAll('.categories-item');
+
+        categoriesItems.forEach(item => {
+            item.addEventListener('click', function () {
+                const petName = item.getAttribute('data-pet-name');
+                window.location.href = `/Product/SearchByPet?petId=${petName}`;
+            });
+        });
+    });
+    function toggleIconColor(icon, idproduct) {
+        // Kiểm tra trạng thái của icon, nếu là màu xám thì đổi thành đen, ngược lại thì đổi thành xám
+        var currentColor = icon.css('color');
+        if (currentColor === 'rgb(162, 162, 162)') {
+            icon.css('color', 'black'); // Đã lưu
+        } else {
+            icon.css('color', 'rgb(162, 162, 162)'); // Chưa lưu
+        }
+
+        // Đồng bộ hóa trạng thái cho cả 2 phần "foreach"
+        $('.item[data-productid="' + idproduct + '"] .toggle-foodies iconify-icon').css('color', icon.css('color'));
+        $('.swiper-slide[data-productid="' + idproduct + '"] .toggle-clothing iconify-icon').css('color', icon.css('color'));
+    }
+
+</script>

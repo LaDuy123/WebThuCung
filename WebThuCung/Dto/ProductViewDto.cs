@@ -17,6 +17,8 @@
         public List<string> Colors{ get; set; }
         public List<string> Sizes { get; set; }
         public List<string>  ImageProducts {  get; set; }
+        public decimal DiscountedPrice { get; set; }
+        public int DiscountPercent { get; set; }
 
         public string Logo { get; set; }
         public List<int> Discounts { get; set; }

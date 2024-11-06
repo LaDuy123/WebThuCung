@@ -8,6 +8,7 @@ namespace WebThuCung.Dto
         public Transaction Transaction { get; set; }
         public bool PaymentExists { get; set; }
         public decimal? totalOrder { get; set; }
+        public int DiscountPercent { get; set; }
 
     }
 }

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<WebThuCung.Models.Product>
+﻿@model IEnumerable<WebThuCung.Dto.ProductViewDto>
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
@@ -56,9 +56,9 @@
                                         <tr>
                                             <td>@product.idProduct</td>
                                             <td>@product.nameProduct</td>
-                                            <td>@product.sellPrice</td>
-                                            <td>@product.Branch.nameBranch</td>
-                                            <td>@product.Category.nameCategory</td>
+                                            <td>@product.DiscountedPrice</td>
+                                            <td>@product.nameBranch</td>
+                                            <td>@product.nameCategory</td>
                                             <td>@product.Quantity</td>
                                             <td>
                                                 <img src="~/images/@product.Image" alt="Product Image" style="width: 100px; height: auto;" />

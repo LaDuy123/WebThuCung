@@ -26,14 +26,22 @@ namespace WebThuCung.Models
         public Product Product { get; set; }
         public decimal CalculateTotalPrice()
         {
-            // Kiểm tra xem Product có khác null không trước khi truy cập Price
+            // Kiểm tra nếu Product không bị null
             if (Product != null)
             {
-                return Quantity * Product.sellPrice; // Sử dụng giá từ Product
+                // Kiểm tra nếu Product có giảm giá và giá trị giảm giá không bị null
+                var discountPercent = Product.Discounts?.FirstOrDefault()?.discountPercent ?? 0;
+
+                // Tính toán giá sau khi áp dụng giảm giá (nếu có)
+                var discountedPrice = Product.sellPrice - (Product.sellPrice * discountPercent / 100);
+
+                return Quantity * discountedPrice;
             }
 
-            return 0; // Nếu Product là null, trả về 0
+            return 0; // Trả về 0 nếu Product là null
         }
+
+
     }
 
 }

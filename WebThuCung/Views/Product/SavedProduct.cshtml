@@ -1,4 +1,4 @@
-﻿@model List<WebThuCung.Models.SaveProduct>
+﻿@model List<WebThuCung.Dto.SaveProductDto>
 @{
     ViewData["Title"] = "Saved Product";
     Layout = "~/Views/Shared/_LayoutUsers.cshtml";
@@ -42,13 +42,13 @@
                                 <div class="cart-info d-flex flex-wrap align-items-center">
                                     <div class="col-lg-3">
                                         <div class="card-image">
-                                            <img src="@Url.Content("~/images/" + item.Product.Image)" alt="@item.Product.nameProduct" class="img-fluid">
+                                            <img src="@Url.Content("~/images/" + item.Image)" alt="@item.nameProduct" class="img-fluid">
                                         </div>
                                     </div>
                                     <div class="col-lg-9">
                                         <div class="card-detail ps-3">
                                             <h5 class="card-title">
-                                                <a href="@Url.Action("Detail", "Product", new { id = item.Product.idProduct })" class="text-decoration-none">@item.Product.nameProduct</a>
+                                                <a href="@Url.Action("Detail", "Product", new { id = item.idProduct })" class="text-decoration-none">@item.nameProduct</a>
                                             </h5>
                                         </div>
                                     </div>
@@ -56,17 +56,18 @@
                             </td>
                             <td class="py-4 align-middle">
                                 <div class="total-price">
-                                    <span class="secondary-font fw-medium">@item.Product.sellPrice.ToString("C")</span>
+                                    <span class="secondary-font fw-medium">
+                                        @item.DiscountedPrice.ToString("C") <!-- Hiển thị giá đã chiết khấu -->
+                                    </span>
                                 </div>
                             </td>
                             <td class="py-4 align-middle">
                                 <div class="total-price">
-                                    <span class="secondary-font fw-medium">@((item.Product.Quantity > 0) ? "In Stock" : "Out of Stock")</span>
+                                    <span class="secondary-font fw-medium">@((item.Quantity > 0) ? "In Stock" : "Out of Stock")</span>
                                 </div>
                             </td>
                             <td class="py-4 align-middle">
                                 <div class="d-flex align-items-center">
-                                   
                                     <div class="cart-remove">
                                         <a class="delete-saved-product" data-productid="@item.idProduct">
                                             <svg width="24" height="24">
@@ -83,6 +84,7 @@
         }
     </div>
 </section>
+
 <script>
     $(document).ready(function () {
         // Khi người dùng nhấn vào nút "Delete"
@@ -98,7 +100,7 @@
                     data: { productId: productId }, // Truyền jobId đến controller
                     success: function (response) {
                         if (response.success) {
-                            alert(response.message); // Hiển thị thông báo thành công
+                           
                             location.reload(); // Tải lại trang để cập nhật danh sách
                         } else {
                             alert(response.message); // Hiển thị thông báo lỗi

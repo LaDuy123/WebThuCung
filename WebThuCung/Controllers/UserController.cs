@@ -54,7 +54,15 @@ namespace WebThuCung.Controllers
                     nameCategory = sp.Category.nameCategory,
                     Quantity = sp.Quantity,
                     Description = sp.Description,
-                    Logo = sp.Branch.Logo
+                    Logo = sp.Branch.Logo,
+                    DiscountedPrice = sp.sellPrice - (sp.sellPrice * (_context.Discounts
+                .Where(d => d.idProduct == sp.idProduct)
+                .Select(d => d.discountPercent)
+                .FirstOrDefault() / 100m)),
+                    DiscountPercent = _context.Discounts
+                .Where(d => d.idProduct == sp.idProduct)
+                .Select(d => d.discountPercent)
+                .FirstOrDefault()
                 })
                 .OrderBy(p => p.idProduct)
                 .ToList();
