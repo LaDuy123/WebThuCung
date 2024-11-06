@@ -88,6 +88,8 @@
             }
         }
 
+@await Html.PartialAsync("_Notification")
+
 <script>
     function deleteDetailOrder(id) {
         if (confirm('Bạn có chắc chắn muốn xóa sản phẩm khỏi đơn hàng này không không?')) {

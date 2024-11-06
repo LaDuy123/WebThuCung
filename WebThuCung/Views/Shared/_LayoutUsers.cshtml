@@ -399,11 +399,11 @@
         </button>
 
         <!-- Facebook Button -->
-        <button class="social-button" onclick="openFacebook()">
+        <button class="social-button shake" onclick="openFacebook()">
             <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook Icon" class="facebook-icon">
         </button>
         <!-- Zalo Button -->
-        <button class="social-button" onclick="openZalo()">
+        <button class="social-button shake" onclick="openZalo()">
             <img src="/images/logo/zalo-icon.png" alt="Zalo Icon" class="zalo-icon">
         </button>
 
@@ -529,6 +529,8 @@
         function toggleChat() {
             const chatWindow = document.querySelector('.chat-window');
             const chatIcon = document.querySelector('.chat-icon');
+            const facebookIcon = document.querySelector('.facebook-icon');
+            const zaloIcon = document.querySelector('.zalo-icon');
             chatWindow.style.display = chatWindow.style.display === 'block' ? 'none' : 'block';
             chatWindow.classList.toggle('show'); // Toggles visibility of chat window
 
@@ -537,9 +539,14 @@
                 chatIcon.classList.remove('shake');
             } else {
                 chatIcon.classList.add('shake');
+                facebookIcon.classList.add('shake');
+                zaloIcon.classList.add('shake');
             }
         }
-  
+        document.addEventListener('DOMContentLoaded', () => {
+            const icons = document.querySelectorAll(' .facebook-icon, .zalo-icon');
+            icons.forEach(icon => icon.classList.add('shake'));
+        });
         function openZalo() {
             window.open("https://zalo.me", "_blank");
         }

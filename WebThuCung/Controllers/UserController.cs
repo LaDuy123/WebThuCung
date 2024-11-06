@@ -657,8 +657,8 @@ namespace WebThuCung.Controllers
             // Kiểm tra nếu không có giao dịch nào
             if (transactions == null || !transactions.Any())
             {
-                ViewBag.Message = "Bạn chưa có giao dịch nào.";
-                return View();
+                TempData["success"] = "Bạn chưa có đơn hàng nào";
+                return View("_Order", transactions);
             }
 
             return View("_Order", transactions);
