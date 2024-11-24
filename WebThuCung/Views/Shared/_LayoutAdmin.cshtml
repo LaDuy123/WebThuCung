@@ -249,7 +249,7 @@
                             // Nếu người dùng là Candidate
                             $('.wrap_login').html(`
                                                 <li class="has-children">
-                                                    <img class="avatar_imgadmin" src="${avatarUrl}" alt="Candidate Avatar"></img>
+                                                    <img class="avatar_imgadmin" src="${avatarUrl}" alt="Admin Avatar"></img>
                                                     <ul class="profileavataradmin">
                                                         <li><a href="/Admin/Profile">Profile</a></li>
 
@@ -257,7 +257,18 @@
                                                     </ul>
                                                 </li>
                                                 `);
-                        }
+                        }else if (response.isShipper) {
+                    // Nếu người dùng là Shipper
+                    $('.wrap_login').html(`
+                        <li class="has-children">
+                            <img class="avatar_imgadmin" src="${avatarUrl}" alt="Shipper Avatar"></img>
+                            <ul class="profileavataradmin">
+                                <li><a href="/Admin/Profile">Profile</a></li>
+                                <li><a class="logout1" href="#">Logout</a></li>
+                            </ul>
+                        </li>
+                    `);
+                }
 
 
                         // Bắt sự kiện logout

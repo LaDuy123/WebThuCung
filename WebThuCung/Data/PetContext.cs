@@ -33,6 +33,8 @@ namespace WebThuCung.Data
         public DbSet<SaveProduct> SaveProducts { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Payment> Payments { get; set; }
+        public DbSet<Shipper> Shippers { get; set; }
+        public DbSet<ShipperOrder> ShipperOrders { get; set; }
 
 
 

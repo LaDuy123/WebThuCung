@@ -23,9 +23,18 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Order List</h5>
-                        <a asp-controller="Order" asp-action="Accept" 
-                           class="btn btn-primary">Accept Order</a>
-
+                        <a asp-controller="Order" asp-action="Pending" 
+                           class="btn btn-primary">Order pending</a>
+                        <a asp-controller="Order" asp-action="Accepted"
+                           class="btn btn-primary">Order Accepted</a>
+                        <a asp-controller="Order" asp-action="Completed"
+                           class="btn btn-primary">Order Completed</a>
+                        <a asp-controller="Order" asp-action="Refund"
+                           class="btn btn-primary">Order is returned</a>
+                        <a asp-controller="Order" asp-action="Deliveried"
+                           class="btn btn-primary">Shipper Delivered</a>
+                        <a asp-controller="Order" asp-action="UpdateShippingStatus"
+                           class="btn btn-primary">UpdateShippingStatus</a>
                         <!-- Table with stripped rows -->
                         <table class="table datatable">
                             <thead>
@@ -36,6 +45,7 @@
                                     <th>Date To</th>
                                     <th>Status Order</th>
                                     <th>Status Pay</th>
+                                    <th>Shipping Status</th>
                                     <th>Total Order</th>
                                     <th>Edit</th>
                                     <th>Delete</th>
@@ -57,6 +67,17 @@
                                             <td>@(order.dateTo.HasValue ? order.dateTo.Value.ToString("yyyy-MM-dd HH:mm") : "N/A")</td>
                                             <td>@order.statusOrder</td> <!-- Hiển thị trực tiếp enum OrderStatus -->
                                             <td>@order.statusPay</td>
+                                            <td>
+                                                @if (order.ShipperOrders != null && order.ShipperOrders.Any())
+                                                {
+                                                    var shipperOrder = order.ShipperOrders.FirstOrDefault();  // Lấy trạng thái của đơn hàng (giả sử 1 shipper duy nhất)
+                                                    @shipperOrder?.ShippingStatus
+                                                }
+                                                else
+                                                {
+                                                    @:N/A
+                                                }
+                                            </td>
                                             <td>@order.totalOrder?.ToString("C")</td>
                                             <td>
                                                 <a asp-action="Edit" asp-route-id="@order.idOrder" class="btn btn-warning btn-sm">Edit</a>

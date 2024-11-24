@@ -45,6 +45,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("RequireOrderRole", policy => policy.RequireRole("StaffOrder"));
     options.AddPolicy("RequireProductRole", policy => policy.RequireRole("StaffProduct"));
     options.AddPolicy("RequireWarehouseRole", policy => policy.RequireRole("StaffWareHouse"));
+    options.AddPolicy("RequireShipperRole", policy => policy.RequireRole("Shipper"));
 });
 
 

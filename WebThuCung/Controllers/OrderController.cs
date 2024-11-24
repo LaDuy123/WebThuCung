@@ -8,6 +8,7 @@ using WebThuCung.Data;
 using WebThuCung.Dto;
 using WebThuCung.Models;
 
+
 namespace WebThuCung.Controllers
 {
     public class OrderController : Controller
@@ -24,6 +25,7 @@ namespace WebThuCung.Controllers
             var orders = _context.Orders
                 .Include(o => o.DetailOrders)
                 .ThenInclude(p => p.Product)
+                .Include(o => o.ShipperOrders)
                 .ToList();
 
             // Tính toán tổng giá trị cho mỗi đơn hàng
@@ -32,14 +34,115 @@ namespace WebThuCung.Controllers
                 order.CalculateTotalOrder(); // Calculate total order based on DetailOrders
             }
 
-            // Truyền danh sách đơn hàng sang view
+            // Truyền danh sách đơn hàng sang 
             return View(orders);
         }
-        public IActionResult Accept()
+        public IActionResult Pending()
         {
             // Lấy danh sách các đơn hàng từ cơ sở dữ liệu
-            var orders = _context.Orders.Include(p => p.Customer).Include(o => o.DetailOrders)
-                .ThenInclude(p => p.Product).ToList(); // Lấy tất cả các Order mà không cần Include Transactions
+            var orders = _context.Orders
+        .Include(p => p.Customer)
+        .Include(o => o.DetailOrders)
+            .ThenInclude(p => p.Product)
+        .Include(o => o.ShipperOrders)
+            .ThenInclude(so => so.Shipper)
+        .Where(o => o.statusOrder == OrderStatus.Pending) // Lọc chỉ các đơn hàng Pending
+        .ToList();
+
+            // Tạo một danh sách để chứa các order kèm thông tin về transactions và payments
+            var orderViewModels = new List<OrderViewDto>();
+
+            foreach (var order in orders)
+            {
+                // Tính toán tổng giá trị cho mỗi đơn hàng
+                order.CalculateTotalOrder(); // Tính tổng giá trị đơn hàng dựa trên DetailOrders
+
+                // Tìm các Transaction liên quan đến order
+                var transactions = _context.Transactions
+                    .Where(t => t.idOrder == order.idOrder)
+                    .ToList();
+
+                // Kiểm tra nếu Transaction nào nằm trong Payment
+                foreach (var transaction in transactions)
+                {
+                    var paymentExists = _context.Payments.Any(p => p.idTransaction == transaction.idTransaction);
+                    var shipperOrder = order.ShipperOrders.FirstOrDefault();
+                    var shipper = shipperOrder?.Shipper; // Đảm bảo không null khi lấy ShipperOrder và Shipper
+                    orderViewModels.Add(new OrderViewDto
+                    {
+                        Order = order,
+                        Transaction = transaction,
+                        PaymentExists = paymentExists,
+                        totalOrder = order.totalOrder,
+                        Shipper = shipper,
+                        ShipperOrder = shipperOrder // Thêm ShipperOrder vào DTO
+                    });
+
+                }
+            }
+            var shippers = _context.Shippers.ToList();
+            ViewBag.Shippers = shippers;
+            // Truyền danh sách orderViewModels sang view
+            return View(orderViewModels);
+        }
+
+        public IActionResult Accepted()
+        {
+            // Lấy danh sách các đơn hàng từ cơ sở dữ liệu
+            var orders = _context.Orders
+        .Include(p => p.Customer)
+        .Include(o => o.DetailOrders)
+            .ThenInclude(p => p.Product)
+        .Include(o => o.ShipperOrders)
+            .ThenInclude(so => so.Shipper)
+        .Where(o => o.statusOrder == OrderStatus.Accepted) // Lọc chỉ các đơn hàng Pending
+        .ToList();
+
+            // Tạo một danh sách để chứa các order kèm thông tin về transactions và payments
+            var orderViewModels = new List<OrderViewDto>();
+
+            foreach (var order in orders)
+            {
+                // Tính toán tổng giá trị cho mỗi đơn hàng
+                order.CalculateTotalOrder(); // Tính tổng giá trị đơn hàng dựa trên DetailOrders
+
+                // Tìm các Transaction liên quan đến order
+                var transactions = _context.Transactions
+                    .Where(t => t.idOrder == order.idOrder)
+                    .ToList();
+
+                // Kiểm tra nếu Transaction nào nằm trong Payment
+                foreach (var transaction in transactions)
+                {
+                    var paymentExists = _context.Payments.Any(p => p.idTransaction == transaction.idTransaction);
+                    var shipperOrder = order.ShipperOrders.FirstOrDefault();
+                    var shipper = shipperOrder?.Shipper; // Đảm bảo không null khi lấy ShipperOrder và Shipper
+                    orderViewModels.Add(new OrderViewDto
+                    {
+                        Order = order,
+                        Transaction = transaction,
+                        PaymentExists = paymentExists,
+                        totalOrder = order.totalOrder,
+                        Shipper = shipper,
+                        ShipperOrder = shipperOrder // Thêm ShipperOrder vào DTO
+                    });
+
+                }
+            }
+            var shippers = _context.Shippers.ToList();
+            ViewBag.Shippers = shippers;
+            // Truyền danh sách orderViewModels sang view
+            return View(orderViewModels);
+        }
+        public IActionResult Completed()
+        {
+            // Lấy danh sách các đơn hàng từ cơ sở dữ liệu
+            var orders = _context.Orders
+        .Include(p => p.Customer)
+        .Include(o => o.DetailOrders)
+            .ThenInclude(p => p.Product)
+        .Where(o => o.statusOrder == OrderStatus.Complete) // Lọc chỉ các đơn hàng Pending
+        .ToList();
 
             // Tạo một danh sách để chứa các order kèm thông tin về transactions và payments
             var orderViewModels = new List<OrderViewDto>();
@@ -72,9 +175,251 @@ namespace WebThuCung.Controllers
             return View(orderViewModels);
         }
 
+        public IActionResult Refund()
+        {
+            // Lấy danh sách các đơn hàng từ cơ sở dữ liệu
+            var orders = _context.Orders
+        .Include(p => p.Customer)
+        .Include(o => o.DetailOrders)
+            .ThenInclude(p => p.Product)
+        .Include(o => o.ShipperOrders)
+            .ThenInclude(so => so.Shipper)
+        .Where(o => o.statusPay == PaymentStatus.Refunded) // Lọc chỉ các đơn hàng Pending
+        .ToList();
+
+            // Tạo một danh sách để chứa các order kèm thông tin về transactions và payments
+            var orderViewModels = new List<OrderViewDto>();
+
+            foreach (var order in orders)
+            {
+                // Tính toán tổng giá trị cho mỗi đơn hàng
+                order.CalculateTotalOrder(); // Tính tổng giá trị đơn hàng dựa trên DetailOrders
+
+                // Tìm các Transaction liên quan đến order
+                var transactions = _context.Transactions
+                    .Where(t => t.idOrder == order.idOrder)
+                    .ToList();
+
+                // Kiểm tra nếu Transaction nào nằm trong Payment
+                foreach (var transaction in transactions)
+                {
+                    var paymentExists = _context.Payments.Any(p => p.idTransaction == transaction.idTransaction);
+                    var shipperOrder = order.ShipperOrders.FirstOrDefault();
+                    var shipper = shipperOrder?.Shipper; // Đảm bảo không null khi lấy ShipperOrder và Shipper
+                    orderViewModels.Add(new OrderViewDto
+                    {
+                        Order = order,
+                        Transaction = transaction,
+                        PaymentExists = paymentExists,
+                        totalOrder = order.totalOrder,
+                        Shipper = shipper,
+                        ShipperOrder = shipperOrder // Thêm ShipperOrder vào DTO
+                    });
+
+                }
+            }
+            var shippers = _context.Shippers.ToList();
+            ViewBag.Shippers = shippers;
+            // Truyền danh sách orderViewModels sang view
+            return View(orderViewModels);
+        }
+        public IActionResult Deliveried()
+        {
+            // Lấy danh sách các đơn hàng từ cơ sở dữ liệu
+            var orders = _context.Orders
+     .Include(p => p.Customer)
+     .Include(o => o.DetailOrders)
+         .ThenInclude(p => p.Product)
+     .Include(o => o.ShipperOrders)
+         .ThenInclude(so => so.Shipper)
+     .Where(o => o.ShipperOrders.Any(so => so.ShippingStatus == ShippingStatus.Delivered)) // Lọc chỉ các đơn hàng Pending
+     .ToList();
+
+            // Tạo một danh sách để chứa các order kèm thông tin về transactions và payments
+            var orderViewModels = new List<OrderViewDto>();
+
+            foreach (var order in orders)
+            {
+                // Tính toán tổng giá trị cho mỗi đơn hàng
+                order.CalculateTotalOrder(); // Tính tổng giá trị đơn hàng dựa trên DetailOrders
+
+                // Tìm các Transaction liên quan đến order
+                var transactions = _context.Transactions
+                    .Where(t => t.idOrder == order.idOrder)
+                    .ToList();
+
+                // Kiểm tra nếu Transaction nào nằm trong Payment
+                foreach (var transaction in transactions)
+                {
+                    var paymentExists = _context.Payments.Any(p => p.idTransaction == transaction.idTransaction);
+                    var shipperOrder = order.ShipperOrders.FirstOrDefault();
+                    var shipper = shipperOrder?.Shipper; // Đảm bảo không null khi lấy ShipperOrder và Shipper
+                    orderViewModels.Add(new OrderViewDto
+                    {
+                        Order = order,
+                        Transaction = transaction,
+                        PaymentExists = paymentExists,
+                        totalOrder = order.totalOrder,
+                        Shipper = shipper,
+                        ShipperOrder = shipperOrder // Thêm ShipperOrder vào DTO
+                    });
+
+                }
+            }
+
+            // Truyền danh sách orderViewModels sang view
+            return View(orderViewModels);
+        }
+
+        [Authorize(Roles = "Admin,StaffOrder")]
+        [HttpPost]
+        public IActionResult AssignShipper(string idOrder, string idShipper)
+        {
+            if (string.IsNullOrEmpty(idOrder) || string.IsNullOrEmpty(idShipper))
+            {
+                return Json(new { success = false, message = "Order ID or Shipper ID is missing." });
+            }
+
+            // Kiểm tra xem đơn hàng và shipper có tồn tại không
+            var order = _context.Orders.FirstOrDefault(o => o.idOrder == idOrder);
+            var shipper = _context.Shippers.FirstOrDefault(s => s.idShipper == idShipper);
+
+            if (order == null || shipper == null)
+            {
+                return Json(new { success = false, message = "Invalid Order or Shipper." });
+            }
+            var existingShipperOrder = _context.ShipperOrders.FirstOrDefault(so => so.idOrder == idOrder);
+            if (existingShipperOrder != null)
+            {
+                TempData["success"] = "Shipper assigned successfully.";
+                return Json(new { success = false, message = "This order has already been assigned to a shipper." });
+            }
+
+            // Thêm dữ liệu vào bảng ShipperOrder
+            var shipperOrder = new ShipperOrder
+            {
+                idOrder = idOrder,
+                idShipper = idShipper,
+                AssignedDate = DateTime.Now,
+                ShippingStatus = ShippingStatus.Pending
+            };
+
+            _context.ShipperOrders.Add(shipperOrder);
+            _context.SaveChanges();
+
+            TempData["success"] = "Shipper assigned successfully.";
+
+            return Json(new { success = true, message = "Shipper assigned successfully." });
+        }
+        [Authorize(Roles = "Admin,StaffOrder")]
+        [HttpPost]
+		public IActionResult EditShipper(int idShipperOrder, string idShipper)
+		{
+			// Lấy ShipperOrder dựa trên idShipperOrder
+			var shipperOrder = _context.ShipperOrders.FirstOrDefault(so => so.idShipperOrder == idShipperOrder);
+
+			if (shipperOrder == null)
+			{
+				return Json(new { success = false, message = "ShipperOrder not found." });
+			}
+
+			// Kiểm tra shipper mới có tồn tại hay không
+			var shipper = _context.Shippers.FirstOrDefault(s => s.idShipper == idShipper);
+
+			if (shipper == null)
+			{
+				return Json(new { success = false, message = "Shipper not found." });
+			}
+
+			// Cập nhật idShipper
+			shipperOrder.idShipper = idShipper;
+
+			// Lưu thay đổi vào cơ sở dữ liệu
+			_context.SaveChanges();
+            TempData["success"] = "Shipper successfully edited";
+            return Json(new { success = true, message = "Shipper updated successfully." });
+
+           
+		}
+
+        [Authorize(Roles = "Admin,StaffOrder")]
+        [HttpPost]
+        public IActionResult DeleteShipperOrder(string idOrder, string idShipper)
+        {
+            // Tìm mối quan hệ ShipperOrder giữa Order và Shipper
+            var shipperOrder = _context.ShipperOrders
+                .FirstOrDefault(so => so.idOrder == idOrder && so.idShipper == idShipper);
+
+            if (shipperOrder == null)
+            {
+                return Json(new { success = false, message = "Shipper order not found." });
+            }
+
+            // Xóa mối quan hệ ShipperOrder
+            _context.ShipperOrders.Remove(shipperOrder);
+            _context.SaveChanges(); // Lưu thay đổi vào cơ sở dữ liệu
+
+            return Json(new { success = true });
+        }
+
+
+        [Authorize(Roles = "Admin,StaffOrder")]
+        [HttpPost]
+        public IActionResult AcceptOrder(string idOrder)
+        {
+            if (string.IsNullOrEmpty(idOrder))
+            {
+                return Json(new { success = false, message = "Order ID is missing." });
+            }
+
+            // Tìm đơn hàng trong database
+            var order = _context.Orders.FirstOrDefault(o => o.idOrder == idOrder);
+
+            if (order == null)
+            {
+                return Json(new { success = false, message = "Order not found." });
+            }
+
+            // Kiểm tra trạng thái đơn hàng
+            if (order.statusOrder != OrderStatus.Pending)
+            {
+                return Json(new { success = false, message = "Order is not in Pending state." });
+            }
+
+            // Cập nhật trạng thái đơn hàng
+            order.statusOrder = OrderStatus.Accepted;
+            _context.SaveChanges();
+            TempData["success"] = "Order received";
+            return Json(new { success = true });
+        }
+        [HttpPost]
+        public IActionResult AcceptCompleteOrder(string idOrder)
+        {
+            if (string.IsNullOrEmpty(idOrder))
+            {
+                return Json(new { success = false, message = "Order ID is missing." });
+            }
+
+            // Tìm đơn hàng trong database
+            var order = _context.Orders.FirstOrDefault(o => o.idOrder == idOrder);
+
+            if (order == null)
+            {
+                return Json(new { success = false, message = "Order not found." });
+            }
+
+      
+
+            // Cập nhật trạng thái đơn hàng
+            order.statusOrder = OrderStatus.Complete;
+            _context.SaveChanges();
+            TempData["success"] = "Order completeed";
+            return Json(new { success = true });
+        }
+        [Authorize(Roles = "Admin,StaffOrder")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Accept(string idOrder)
+        public IActionResult ConfirmPayment(string idOrder)
         {
             // Kiểm tra xem order có tồn tại hay không
             var order = _context.Orders.Include(o => o.Customer).FirstOrDefault(o => o.idOrder == idOrder);
@@ -83,8 +428,7 @@ namespace WebThuCung.Controllers
                 return NotFound();
             }
 
-            // Cập nhật trạng thái của order và payment
-            order.statusOrder = OrderStatus.Accepted; // Cập nhật trạng thái đơn hàng thành "Accept"
+          
             order.statusPay = PaymentStatus.Paid; // Cập nhật trạng thái thanh toán thành "Paid"
             TempData["success"] = "Đã xác nhận thanh toán";
             // Lưu thay đổi vào cơ sở dữ liệu
@@ -94,7 +438,7 @@ namespace WebThuCung.Controllers
             SendOrderConfirmationEmail(order.Customer.Email, order.idOrder);
 
             // Chuyển hướng về danh sách đơn hàng
-            return RedirectToAction("Accept");
+            return Redirect(Request.Headers["Referer"].ToString());
         }
         private void SendOrderConfirmationEmail(string email, string orderId)
         {
@@ -497,10 +841,39 @@ namespace WebThuCung.Controllers
             _context.SaveChanges();
 
             // Thông báo thành công (nếu cần thiết)
-            TempData["SuccessMessage"] = "Detail order deleted successfully.";
+            TempData["success"] = "Detail order deleted successfully.";
 
             // Chuyển hướng về trang chi tiết đơn hàng, có thể truyền orderId nếu cần
             return RedirectToAction("Detail", new { Id = detailOrder.idOrder });
+        }
+        public void UpdateFailedOrders()
+        {
+            // Lấy ngày hiện tại và trừ đi 3 ngày
+            var currentDate = DateTime.Now;
+            var thresholdDate = currentDate.AddDays(-3);
+
+            // Lấy tất cả các đơn hàng có dateTo không null, dateTo < thresholdDate, chưa giao (shippingStatus != 'Fail' và shippingStatus != 'Delivered')
+            var failedOrders = _context.ShipperOrders
+                .Where(so => so.Order.dateTo.HasValue && // Kiểm tra nếu dateTo có giá trị
+                             so.Order.dateTo.Value < thresholdDate // Kiểm tra nếu dateTo nhỏ hơn ngưỡng 3 ngày trước
+                             && so.ShippingStatus != ShippingStatus.Failed // Kiểm tra chưa có trạng thái Fail
+                             && so.ShippingStatus != ShippingStatus.Delivered) // Kiểm tra chưa có trạng thái Delivered
+                .ToList();
+
+            foreach (var shipperOrder in failedOrders)
+            {
+                // Cập nhật trạng thái ShippingStatus thành 'Fail'
+                shipperOrder.ShippingStatus = ShippingStatus.Failed;
+            }
+
+            // Lưu thay đổi vào cơ sở dữ liệu
+            _context.SaveChanges();
+        }
+        public IActionResult UpdateShippingStatus()
+        {
+            UpdateFailedOrders(); // Gọi phương thức tự động cập nhật trạng thái giao thất bại
+            TempData["success"] = "Shipping statuses updated.";
+            return RedirectToAction("Index");
         }
 
 

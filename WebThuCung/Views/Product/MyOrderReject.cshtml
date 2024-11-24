@@ -20,11 +20,21 @@
     <div class="container">
         <ul class="nav nav-pills mb-4">
             <li class="nav-item">
-                <a class="nav-link" asp-action="ViewCart">View Cart</a>
+                <a class="nav-link active" asp-action="ViewCart">View Cart</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link active" asp-action="MyOrder">Transactions</a>
+                <a class="nav-link " asp-action="MyOrderPending">Order Pending</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link " asp-action="MyOrderAccept">Order Accepted</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link " asp-action="MyOrderComplete">Order Completed</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link " asp-action="MyOrderRefun">Order Refuned</a>
+            </li>
+           
         </ul>
     </div>
 </section>
@@ -54,7 +64,7 @@
                     </div>
                     <div class="info-item">
                         <p>Ngày tạo: <strong>@transaction.createdDate.ToString("dd/MM/yyyy")</strong></p>
-                        <p>Trạng thái: <strong>@transaction.Order.statusOrder</strong></p>
+                        <p>Trạng thái đơn hàng: <strong>@transaction.Order.statusOrder</strong></p>
                     </div>
                     <div class="info-item">
                         <h4>Đơn hàng #: @transaction.Order.idOrder</h4> <!-- ID đơn hàng -->
@@ -188,7 +198,7 @@
                 type: 'POST',
                 data: { id: id }, // Đảm bảo id không null
                 success: function (result) {
-                  
+
                     location.reload(); // Tải lại trang
                 },
                 error: function (xhr, status, error) {

@@ -563,6 +563,88 @@ namespace WebThuCung.Migrations
                     b.ToTable("SaveProduct");
                 });
 
+            modelBuilder.Entity("WebThuCung.Models.Shipper", b =>
+                {
+                    b.Property<string>("idShipper")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Avatar")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(11)
+                        .HasColumnType("nvarchar(11)");
+
+                    b.Property<string>("idRole")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("passwordShipper")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("userShipper")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.HasKey("idShipper");
+
+                    b.HasIndex("idRole");
+
+                    b.ToTable("Shipper");
+                });
+
+            modelBuilder.Entity("WebThuCung.Models.ShipperOrder", b =>
+                {
+                    b.Property<int>("idShipperOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("idShipperOrder"));
+
+                    b.Property<DateTime>("AssignedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ShippingStatus")
+                        .HasColumnType("int");
+
+                    b.Property<string>("idOrder")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("idShipper")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("idShipperOrder");
+
+                    b.HasIndex("idOrder");
+
+                    b.HasIndex("idShipper");
+
+                    b.ToTable("ShipperOrder");
+                });
+
             modelBuilder.Entity("WebThuCung.Models.Size", b =>
                 {
                     b.Property<string>("idSize")
@@ -932,6 +1014,36 @@ namespace WebThuCung.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("WebThuCung.Models.Shipper", b =>
+                {
+                    b.HasOne("WebThuCung.Models.Role", "Role")
+                        .WithMany()
+                        .HasForeignKey("idRole")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("WebThuCung.Models.ShipperOrder", b =>
+                {
+                    b.HasOne("WebThuCung.Models.Order", "Order")
+                        .WithMany("ShipperOrders")
+                        .HasForeignKey("idOrder")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebThuCung.Models.Shipper", "Shipper")
+                        .WithMany("ShipperOrders")
+                        .HasForeignKey("idShipper")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("Shipper");
+                });
+
             modelBuilder.Entity("WebThuCung.Models.Transaction", b =>
                 {
                     b.HasOne("WebThuCung.Models.Customer", "Customer")
@@ -1022,6 +1134,8 @@ namespace WebThuCung.Migrations
                 {
                     b.Navigation("DetailOrders");
 
+                    b.Navigation("ShipperOrders");
+
                     b.Navigation("Transactions");
                 });
 
@@ -1050,6 +1164,11 @@ namespace WebThuCung.Migrations
             modelBuilder.Entity("WebThuCung.Models.Role", b =>
                 {
                     b.Navigation("Admins");
+                });
+
+            modelBuilder.Entity("WebThuCung.Models.Shipper", b =>
+                {
+                    b.Navigation("ShipperOrders");
                 });
 
             modelBuilder.Entity("WebThuCung.Models.Size", b =>

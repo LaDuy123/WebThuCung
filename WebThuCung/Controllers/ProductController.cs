@@ -838,13 +838,24 @@ namespace WebThuCung.Controllers
                 ViewBag.Message = "Giỏ hàng của bạn đang trống.";
                 return View();
             }
-
+            var customer = _context.Customers.Include(c => c.City)
+                                             .Include(c => c.Country)
+                                             .Include(c => c.District)
+                                             .Include(c => c.Ward).FirstOrDefault(c => c.idCustomer == idCustomer);
+            if (customer != null)
+            {
+                ViewBag.CustomerAddress = $"{customer.Address}/{customer.Ward.nameWard}/{customer.District.nameDistrict}/{customer.City.nameCity}";
+            }
+            else
+            {
+                ViewBag.CustomerAddress = string.Empty; // Để trống nếu không tìm thấy
+            }
             // Tính toán tổng đơn hàng
             order.CalculateTotalOrder(); // Gọi phương thức tính tổng đơn hàng
 
             return View(order); // Truyền đơn hàng có trạng thái "InCart" vào View
         }
-        public IActionResult MyOrder()
+        public IActionResult MyOrderPending()
         {
             int idCustomer = GetCustomerIdFromSession();
             if (idCustomer == 0)
@@ -858,7 +869,7 @@ namespace WebThuCung.Controllers
                 .Include(t => t.Order)
                 .ThenInclude(o => o.DetailOrders)
                 .ThenInclude(d => d.Product)
-                .Where(t => t.idCustomer == idCustomer )
+                .Where(t => t.idCustomer == idCustomer && t.Order.statusOrder == OrderStatus.Pending)  // Thêm điều kiện lọc trạng thái đơn hàng
                 .ToList();
 
             // Kiểm tra nếu không có giao dịch nào
@@ -870,7 +881,110 @@ namespace WebThuCung.Controllers
 
             return View(transactions);
         }
+        public IActionResult MyOrderAccept()
+        {
+            int idCustomer = GetCustomerIdFromSession();
+            if (idCustomer == 0)
+            {
+                TempData["error"] = "Hãy đăng nhập.";
+                return RedirectToAction("Login", "User");
+            }
 
+            // Lấy tất cả các giao dịch của khách hàng cùng với đơn hàng tương ứng
+            var transactions = _context.Transactions
+                .Include(t => t.Order)
+                .ThenInclude(o => o.DetailOrders)
+                .ThenInclude(d => d.Product)
+                .Where(t => t.idCustomer == idCustomer && t.Order.statusOrder == OrderStatus.Accepted)  // Thêm điều kiện lọc trạng thái đơn hàng
+                .ToList();
+
+            // Kiểm tra nếu không có giao dịch nào
+            if (transactions == null || !transactions.Any())
+            {
+                ViewBag.Message = "Bạn chưa có giao dịch nào.";
+                return View();
+            }
+
+            return View(transactions);
+        }
+        public IActionResult MyOrderComplete()
+        {
+            int idCustomer = GetCustomerIdFromSession();
+            if (idCustomer == 0)
+            {
+                TempData["error"] = "Hãy đăng nhập.";
+                return RedirectToAction("Login", "User");
+            }
+
+            // Lấy tất cả các giao dịch của khách hàng cùng với đơn hàng tương ứng
+            var transactions = _context.Transactions
+                .Include(t => t.Order)
+                .ThenInclude(o => o.DetailOrders)
+                .ThenInclude(d => d.Product)
+                .Where(t => t.idCustomer == idCustomer && t.Order.statusOrder == OrderStatus.Complete)  // Thêm điều kiện lọc trạng thái đơn hàng
+                .ToList();
+
+            // Kiểm tra nếu không có giao dịch nào
+            if (transactions == null || !transactions.Any())
+            {
+                ViewBag.Message = "Bạn chưa có giao dịch nào.";
+                return View();
+            }
+
+            return View(transactions);
+        }
+        public IActionResult MyOrderReject()
+        {
+            int idCustomer = GetCustomerIdFromSession();
+            if (idCustomer == 0)
+            {
+                TempData["error"] = "Hãy đăng nhập.";
+                return RedirectToAction("Login", "User");
+            }
+
+            // Lấy tất cả các giao dịch của khách hàng cùng với đơn hàng tương ứng
+            var transactions = _context.Transactions
+                .Include(t => t.Order)
+                .ThenInclude(o => o.DetailOrders)
+                .ThenInclude(d => d.Product)
+                .Where(t => t.idCustomer == idCustomer && t.Order.statusOrder == OrderStatus.Rejected)  // Thêm điều kiện lọc trạng thái đơn hàng
+                .ToList();
+
+            // Kiểm tra nếu không có giao dịch nào
+            if (transactions == null || !transactions.Any())
+            {
+                ViewBag.Message = "Bạn chưa có giao dịch nào.";
+                return View();
+            }
+
+            return View(transactions);
+        }
+        public IActionResult MyOrderRefun()
+        {
+            int idCustomer = GetCustomerIdFromSession();
+            if (idCustomer == 0)
+            {
+                TempData["error"] = "Hãy đăng nhập.";
+                return RedirectToAction("Login", "User");
+            }
+
+            // Lấy tất cả các giao dịch của khách hàng cùng với đơn hàng tương ứng
+            var transactions = _context.Transactions
+                .Include(t => t.Order)
+                .ThenInclude(o => o.DetailOrders)
+                .ThenInclude(d => d.Product)
+                .Where(t => t.idCustomer == idCustomer && t.Order.statusPay == PaymentStatus.Refunded)  // Thêm điều kiện lọc trạng thái đơn hàng
+                .ToList();
+
+            // Kiểm tra nếu không có giao dịch nào
+            if (transactions == null || !transactions.Any())
+            {
+                ViewBag.Message = "Bạn chưa có giao dịch nào.";
+                return View();
+            }
+
+            return View(transactions);
+        }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Transaction(
@@ -974,7 +1088,7 @@ namespace WebThuCung.Controllers
                 _context.Payments.Add(payment);
                 _context.SaveChanges();
                 TempData["success"] = "Đặt hàng thành công! Bạn có thể thanh toán sau.";
-                return RedirectToAction("MyOrder");
+                return RedirectToAction("MyOrderPending");
             }
 
             return RedirectToAction("ViewCart");

@@ -27,6 +27,7 @@ namespace WebThuCung.Models
         public Customer Customer { get; set; }
         public ICollection<DetailOrder> DetailOrders { get; set; }
         public ICollection<Transaction> Transactions { get; set; }
+        public ICollection<ShipperOrder> ShipperOrders { get; set; }
         public void CalculateTotalOrder()
         {
             if (DetailOrders != null && DetailOrders.Any())

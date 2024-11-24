@@ -30,6 +30,12 @@ namespace WebThuCung.Controllers
             var admin = _context.Admins.FirstOrDefault(c => c.Email == adminEmail);
             return admin?.idAdmin; // Trả về idAdmin (string) hoặc null
         }
+        private string GetShipperIdFromSession()
+        {
+            var shipperEmail = HttpContext.Session.GetString("email");
+            var shipper = _context.Shippers.FirstOrDefault(c => c.Email == shipperEmail);
+            return shipper?.idShipper; // Trả về idAdmin (string) hoặc null
+        }
         public IActionResult AccessDenied()
         {
             TempData["error"] = "Bạn không có quyền truy cập "; 
@@ -43,8 +49,9 @@ namespace WebThuCung.Controllers
         public IActionResult Index(string period = "today")
         {
             var adminId = GetAdminIdFromSession();
+            var shipperId = GetShipperIdFromSession();
 
-            if (string.IsNullOrEmpty(adminId))
+            if (string.IsNullOrEmpty(adminId) && string.IsNullOrEmpty(shipperId))
             {
                 // Xử lý nếu không có idAdmin, ví dụ: chuyển hướng đến trang đăng nhập
                 return RedirectToAction("Login", "Admin");
@@ -596,6 +603,7 @@ decimal totalRevenueLastMonth = ordersLastMonth
 
             return View(model);
         }
+       
         [Authorize]
         public IActionResult Profilerole()
         {
@@ -646,7 +654,16 @@ decimal totalRevenueLastMonth = ordersLastMonth
                         avatar = admin.Avatar// Giả sử bạn có trường Avatar trong customer
                     });
                 }
-
+                var shipper = _context.Shippers.FirstOrDefault(c => c.Email == email);
+                if (shipper != null)
+                {
+                    return new JsonResult(new
+                    {
+                        isAuthenticated = true,
+                        isShipper = true,
+                        avatar = shipper.Avatar// Giả sử bạn có trường Avatar trong customer
+                    });
+                }
                 // Kiểm tra bảng Recruiter
 
             }

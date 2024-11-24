@@ -882,5 +882,45 @@ namespace WebThuCung.Controllers
         {
             return View();
         }
+
+        [HttpPost]
+        public IActionResult RefunOrder(string idOrder)
+        {
+            if (string.IsNullOrEmpty(idOrder))
+            {
+                return Json(new { success = false, message = "Order ID is missing." });
+            }
+
+            // Tìm đơn hàng trong database
+            var order = _context.Orders.FirstOrDefault(o => o.idOrder == idOrder);
+
+            if (order == null)
+            {
+                return Json(new { success = false, message = "Order not found." });
+            }
+
+     // Kiểm tra trạng thái đơn hàng
+            if (order.statusOrder != OrderStatus.Complete)
+            {
+                return Json(new { success = false, message = "Orders that have not been delivered to you cannot be refunded." });
+            }
+            if (order.statusPay != PaymentStatus.Paid)
+            {
+                return Json(new { success = false, message = "Your unpaid order is currently non-refundable." });
+            }
+
+            // Cập nhật trạng thái đơn hàng
+            order.statusPay = PaymentStatus.Refunded;
+            var shipperOrder = _context.ShipperOrders.FirstOrDefault(s => s.idOrder == idOrder);
+
+            if (shipperOrder != null)
+            {
+                // Đổi trạng thái giao hàng thành 'Pending'
+                shipperOrder.ShippingStatus = ShippingStatus.Pending;
+            }
+            _context.SaveChanges();
+            TempData["success"] = "Order refuned";
+            return Json(new { success = true });
+        }
     }
 }

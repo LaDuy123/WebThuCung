@@ -211,6 +211,31 @@ namespace WebThuCung.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Shipper",
+                columns: table => new
+                {
+                    idShipper = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Phone = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
+                    userShipper = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                    passwordShipper = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Avatar = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    idRole = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Shipper", x => x.idShipper);
+                    table.ForeignKey(
+                        name: "FK_Shipper_Role_idRole",
+                        column: x => x.idRole,
+                        principalTable: "Role",
+                        principalColumn: "idRole",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "VoteWarehouse",
                 columns: table => new
                 {
@@ -411,26 +436,23 @@ namespace WebThuCung.Migrations
                         name: "FK_Customer_City_idCity",
                         column: x => x.idCity,
                         principalTable: "City",
-                        principalColumn: "idCity");
-
+                        principalColumn: "idCity"
+                        );
                     table.ForeignKey(
                         name: "FK_Customer_Country_idCountry",
                         column: x => x.idCountry,
                         principalTable: "Country",
                         principalColumn: "idCountry");
-
                     table.ForeignKey(
                         name: "FK_Customer_District_idDistrict",
                         column: x => x.idDistrict,
                         principalTable: "District",
                         principalColumn: "idDistrict");
-
                     table.ForeignKey(
                         name: "FK_Customer_Ward_idWard",
                         column: x => x.idWard,
                         principalTable: "Ward",
                         principalColumn: "idWard");
-                       
                 });
 
             migrationBuilder.CreateTable(
@@ -452,8 +474,7 @@ namespace WebThuCung.Migrations
                         name: "FK_Order_Customer_idCustomer",
                         column: x => x.idCustomer,
                         principalTable: "Customer",
-                        principalColumn: "idCustomer",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "idCustomer");
                 });
 
             migrationBuilder.CreateTable(
@@ -512,6 +533,34 @@ namespace WebThuCung.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ShipperOrder",
+                columns: table => new
+                {
+                    idShipperOrder = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    idOrder = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    idShipper = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    AssignedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ShippingStatus = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ShipperOrder", x => x.idShipperOrder);
+                    table.ForeignKey(
+                        name: "FK_ShipperOrder_Order_idOrder",
+                        column: x => x.idOrder,
+                        principalTable: "Order",
+                        principalColumn: "idOrder",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ShipperOrder_Shipper_idShipper",
+                        column: x => x.idShipper,
+                        principalTable: "Shipper",
+                        principalColumn: "idShipper",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Transaction",
                 columns: table => new
                 {
@@ -541,8 +590,8 @@ namespace WebThuCung.Migrations
                         name: "FK_Transaction_Order_idOrder",
                         column: x => x.idOrder,
                         principalTable: "Order",
-                        principalColumn: "idOrder");
-                        
+                        principalColumn: "idOrder",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -641,6 +690,21 @@ namespace WebThuCung.Migrations
                 column: "idCustomer");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Shipper_idRole",
+                table: "Shipper",
+                column: "idRole");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ShipperOrder_idOrder",
+                table: "ShipperOrder",
+                column: "idOrder");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ShipperOrder_idShipper",
+                table: "ShipperOrder",
+                column: "idShipper");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Transaction_idCustomer",
                 table: "Transaction",
                 column: "idCustomer");
@@ -692,10 +756,10 @@ namespace WebThuCung.Migrations
                 name: "SaveProduct");
 
             migrationBuilder.DropTable(
-                name: "Transaction");
+                name: "ShipperOrder");
 
             migrationBuilder.DropTable(
-                name: "Role");
+                name: "Transaction");
 
             migrationBuilder.DropTable(
                 name: "VoteWarehouse");
@@ -708,6 +772,9 @@ namespace WebThuCung.Migrations
 
             migrationBuilder.DropTable(
                 name: "Product");
+
+            migrationBuilder.DropTable(
+                name: "Shipper");
 
             migrationBuilder.DropTable(
                 name: "Order");
@@ -723,6 +790,9 @@ namespace WebThuCung.Migrations
 
             migrationBuilder.DropTable(
                 name: "Pet");
+
+            migrationBuilder.DropTable(
+                name: "Role");
 
             migrationBuilder.DropTable(
                 name: "Customer");
