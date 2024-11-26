@@ -4,6 +4,7 @@
     Layout = "~/Views/Shared/_LayoutUsers.cshtml";
     var topSellingProducts = (List<WebThuCung.Dto.TopSellingProductDto>)ViewBag.TopSellingProducts;
 }
+<link rel="stylesheet" href="~/css/Search.css />
 <section id="categories">
     <div class="container my-3 py-5">
         <div class="row my-5">
@@ -38,25 +39,26 @@
 
 
 <div id="productResults">
-<section id="clothing" class="my-5 overflow-hidden">
-    <div class="container pb-5">
+    <section id="clothing" class="my-5 overflow-hidden">
+        <div class="container pb-5">
 
-        <div class="section-header d-md-flex justify-content-between align-items-center mb-3">
-                <h2 class="display-3 fw-normal">Top Selling</h2>
-            <div>
-                <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">
-                    shop now
-                    <svg width="24" height="24" viewBox="0 0 24 24" class="mb-1">
-                        <use xlink:href="#arrow-right"></use>
-                    </svg>
-                </a>
+            <div class="section-header d-md-flex justify-content-between align-items-center mb-3">
+                <h2 class="display-34 fw-normal" style="font-size:50px ; color: lawngreen">Top Selling</h2>
+
+                <div>
+                    <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">
+                        shop now
+                        <svg width="24" height="24" viewBox="0 0 24 24" class="mb-1">
+                            <use xlink:href="#arrow-right"></use>
+                        </svg>
+                    </a>
+                </div>
             </div>
-        </div>
-        <div class="products-carousel swiper">
-            <div class="swiper-wrapper">
+            <div class="products-carousel swiper">
+                <div class="swiper-wrapper">
                     @foreach (var product in topSellingProducts.Take(6))
                     {
-                       
+
                         bool isSaved = ViewBag.SavedProductIds != null &&
                         ViewBag.SavedProductIds.Contains(product.ProductId);
 
@@ -68,7 +70,7 @@
                                         @product.DiscountPercent% OFF
                                     </div>
                                 }
-                                
+
                             </div>
                             <div class="card position-relative">
                                 <a asp-controller="Product" asp-action="Detail" asp-route-id="@product.ProductId">
@@ -80,18 +82,19 @@
                                     </a>
 
                                     <div class="card-text">
-                                        <h3 class="secondary-font text-muted text-decoration-line-through">
-                                            @product.Price.ToString("C")
-                                        </h3>
+                                        <div class="price-container">
+                                            <h3 class="secondary-font text-muted text-decoration-line-through">
+                                                Price old: <span>@product.Price.ToString("C")</span>
+                                            </h3>
+                                            <h3 class="secondary-font text-primary">
+                                                Price sales: <span>@product.DiscountedPrice.ToString("C")</span>
+                                            </h3>
+                                        </div>
 
-                                        <!-- Hiển thị giá đã giảm -->
-                                        <h3 class="secondary-font text-primary">
-                                            @product.DiscountedPrice.ToString("C")
-                                        </h3>
 
                                         <div class="d-flex flex-wrap mt-3">
                                             <a class="btn-wishlist px-4 pt-3 toggle-clothing">
-                                                <iconify-icon icon="fluent:heart-28-filled" class="fs-5" style="color: @(isSaved ? "black" : "rgb(162, 162, 162)")"></iconify-icon>
+                                                <iconify-icon icon="fluent:heart-28-filled" class="fs-5" style="color: @(isSaved ? "red" : "rgb(162, 162, 162)")"></iconify-icon>
                                             </a>
                                         </div>
                                     </div>
@@ -100,19 +103,19 @@
                         </div>
                     }
 
+                </div>
             </div>
+            <!-- / products-carousel -->
+
+
         </div>
-        <!-- / products-carousel -->
-
-
-    </div>
-</section>
+    </section>
     <section id="foodies" class="my-5">
         <div class="container my-5 py-5">
 
             <div class="section-header d-md-flex justify-content-between align-items-center">
                 <h2 class="display-3 fw-normal">Pet Foodies</h2>
-               
+
                 <div>
                     <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">
                         shop now
@@ -154,18 +157,18 @@
 
 
                                     <h3 class="secondary-font text-muted text-decoration-line-through">
-                                        @product.sellPrice.ToString("C")
+                                        Price old: <span>@product.sellPrice.ToString("C")</span>
                                     </h3>
 
                                     <!-- Hiển thị giá đã giảm -->
                                     <h3 class="secondary-font text-primary">
-                                        @product.DiscountedPrice.ToString("C")
+                                        Price sales: <span> @product.DiscountedPrice.ToString("C")</span>
                                     </h3>
 
                                     <div class="d-flex flex-wrap mt-3">
 
                                         <a class="btn-wishlist px-4 pt-3 toggle-foodies">
-                                            <iconify-icon icon="fluent:heart-28-filled" class="fs-5" style="color: @(isSaved ? "black" : "rgb(162, 162, 162)")"></iconify-icon>
+                                            <iconify-icon icon="fluent:heart-28-filled" class="fs-5" style="color: @(isSaved ? "red" : "rgb(162, 162, 162)")"></iconify-icon>
                                         </a>
                                     </div>
                                 </div>
@@ -180,6 +183,8 @@
 
 </div>
 <style>
+
+
     .categories-item {
         display: inline-block; /* Đảm bảo item có kích thước phù hợp */
         transition: transform 0.3s ease; /* Hiệu ứng chuyển đổi mượt mà */
@@ -190,33 +195,121 @@
             z-index: 10;
         }
 
+    .price-container h3 {
+        display: inline; /* Đảm bảo h3 và nội dung bên trong hiển thị liền mạch */
+        margin: 0; /* Loại bỏ khoảng cách mặc định */
+        white-space: nowrap; /* Ngăn nội dung xuống dòng */
+    }
+
+    .price-container span {
+        margin-left: 5px; /* Khoảng cách nhỏ giữa text và số tiền */
+    }
 
     .swiper-slide {
         transition: transform 0.6s ease; /* Smooth transition for scaling */
+        margin: 0 10px; /* Khoảng cách ngang giữa các slide */
     }
 
         .swiper-slide:hover {
-            transform: scale(1.11); /* Scale up to 105% */
-            z-index: 10; /* Bring the hovered item to the front */
+            transform: scale(1.11);
+            z-index: 10;
         }
+
+    /* Nếu sử dụng flexbox hoặc grid cho container */
+    .swiper-wrapper {
+        text-align:center;
+        display: flex; /* Hoặc grid nếu cần */
+        gap: 10px; /* Tạo khoảng cách giữa các slide */
+    }
+
+
+    .item .card {
+        overflow: hidden;
+        border-radius: 8px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease; /* Hiệu ứng nổi và bóng */
+    }
+
+        .item .card img {
+            transition: transform 0.3s ease; /* Hiệu ứng phóng to ảnh */
+        }
+
+    /* Hiệu ứng hover */
+    .item:hover .card {
+        transform: translateY(-10px); /* Nổi lên */
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Đổ bóng */
+    }
+
+        .item:hover .card img {
+            transform: scale(1.1); /* Phóng to ảnh */
+        }
+
+    .isotope-container{
+        text-align:center;
+    }
+    .isotope-container .image-container {
+        text-align: center;
+        position: relative;
+        overflow: hidden; /* Đảm bảo ảnh không vượt ra ngoài */
+        border-radius: 8px; /* Bo tròn các góc nếu muốn */
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .isotope-container .image-container img {
+            display: block;
+            width: 100%;
+            height: auto;
+            transition: transform 0.3s ease; /* Hiệu ứng khi hover */
+        }
+
+        /* Hiệu ứng hover */
+        .isotope-container .image-container:hover {
+            transform: translateY(-10px); /* Nổi lên */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Đổ bóng */
+        }
+
+            .isotope-container .image-container:hover img {
+                transform: scale(1.1); /* Phóng to ảnh một chút */
+            }
+
+         #clothing {
+        position: relative;
+        background-image: url('https://thucungaz.com/wp-content/uploads/2019/04/cac-cua-hang-ban-thu-cung-o-bien-hoa-so-luong-lon-da-dang-chung-loai.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+          }
+
+        #clothing::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0));
+            z-index: -1;
+        }
+
+       
+}
 </style>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-  $(document).ready(function () {
-    $('.filter-categories').change(function () {
-        var idCategory = $(this).val();
+    $(document).ready(function () {
+        $('.filter-categories').change(function () {
+            var idCategory = $(this).val();
 
-        $.ajax({
-            url: '/Product/ProductByCategory',
-            type: 'GET',
-            data: { idCategory: idCategory },
-            success: function (result) {
-                // Đổ dữ liệu PartialView vào phần tử kết quả
-                $('#productResults').html(result);
-                
-                // Đếm số sản phẩm vừa được load lên và hiển thị trên console
-                var productCount = $('#productResults .swiper-slide').length;
-                console.log("Number of products loaded: " + productCount);
+            $.ajax({
+                url: '/Product/ProductByCategory',
+                type: 'GET',
+                data: { idCategory: idCategory },
+                success: function (result) {
+                    // Đổ dữ liệu PartialView vào phần tử kết quả
+                    $('#productResults').html(result);
+
+                    // Đếm số sản phẩm vừa được load lên và hiển thị trên console
+                    var productCount = $('#productResults .swiper-slide').length;
+                    console.log("Number of products loaded: " + productCount);
                     new Swiper('.products-carousel', {
                         loop: true,
                         slidesPerView: 4,
@@ -234,13 +327,13 @@
                             clickable: true,
                         }
                     });
-            },
-            error: function () {
-                alert("Failed to load products. Please try again.");
-            }
+                },
+                error: function () {
+                    alert("Failed to load products. Please try again.");
+                }
+            });
         });
     });
-});
 
 
     function filterByCategory() {
@@ -332,5 +425,5 @@
         $('.item[data-productid="' + idproduct + '"] .toggle-foodies iconify-icon').css('color', icon.css('color'));
         $('.swiper-slide[data-productid="' + idproduct + '"] .toggle-clothing iconify-icon').css('color', icon.css('color'));
     }
- 
+
 </script>

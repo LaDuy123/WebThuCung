@@ -5,15 +5,15 @@
     }
 
     25% {
-        transform: translate(-3px, 0);
+        transform: translate(-1px, 0);
     }
 
     50% {
-        transform: translate(3px, 0);
+        transform: translate(1px, 0);
     }
 
     75% {
-        transform: translate(-3px, 0);
+        transform: translate(-1px, 0);
     }
 
     100% {
@@ -22,11 +22,11 @@
 }
 
 .chat-icon.shake {
-    animation: shake 0.3s;
-    animation-iteration-count: infinite;
+    animation: shake 1s infinite;
+ 
 }
 .shake {
-    animation: shake 0.5s infinite;
+    animation: shake 0s infinite;
 }
 
 /* Chat container and button styling */
@@ -181,3 +181,28 @@
     .send-button:hover {
         background-color: #0056b3;
     }
+/* General styles for the buttons */
+.social-button {
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for hover effects */
+}
+
+/* Default size for icons */
+.facebook-icon, .zalo-icon {
+    width: 60px;
+    height: 60px;
+}
+
+/* Hover effect: "lift" the button and add shadow */
+.social-button:hover {
+    transform: translateY(-10px); /* Move the button upward by 10px */
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
+}
+
+/* Active effect: Slight downward press */
+.social-button:active {
+    transform: translateY(-5px); /* Move slightly less upward on click */
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15); /* Reduce shadow intensity */
+}

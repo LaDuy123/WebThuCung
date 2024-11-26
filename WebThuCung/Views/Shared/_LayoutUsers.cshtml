@@ -24,7 +24,7 @@
     <link rel="stylesheet" type="text/css" href="~/css/vendor.css">
     <link rel="stylesheet" type="text/css" href="~/css/style.css">
     <link rel="stylesheet" type="text/css" href="~/css/botchat.css">
-
+    <link rel="stylesheet" type="text/css" href="~/css/SeachForm.css">
 
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -163,7 +163,7 @@
                 </h4>
                 <div class="search-bar border rounded-2 border-dark-subtle">
                     <form id="search-form" class="text-center d-flex align-items-center" action="" method="">
-                        <input type="text" class="form-control border-0 bg-transparent" placeholder="Search Here" />
+                        <input type="text" name="query" class="form-control border-0 bg-transparent search-box" placeholder="Search Here" />
                         <iconify-icon icon="tabler:search" class="fs-4 me-3"></iconify-icon>
                     </form>
                 </div>
@@ -189,15 +189,49 @@
                             <form id="search-form" class="text-center d-flex align-items-center"
                                   action="@Url.Action("SearchResults", "Product")" method="get">
                                 @*  @Html.AntiForgeryToken() *@
-                                <input type="text" name="query" class="form-control border-0 bg-transparent" placeholder="Search Here" />
+                                <input type="text" name="query" class="form-control border-0 bg-transparent search-box" id="search-input" placeholder="Search Here" />
                                 <button type="submit" class="btn p-0">
                                     <iconify-icon icon="tabler:search" class="fs-4 me-3"></iconify-icon>
                                 </button>
                             </form>
                         </div>
+
                     </div>
                 </div>
+              <script>
+                    
+                    function typeText(element, text, interval, loop) {
+                        let index = 0;
 
+                        function typeNextChar() {
+                            
+                            element.setAttribute("placeholder", text.substring(0, index + 1));
+                            index++;
+
+                          
+                            if (index < text.length) {
+                                setTimeout(typeNextChar, interval);
+                            } else if (loop) {
+                               
+                                setTimeout(function () {
+                                    index = 0;
+                                    typeNextChar();
+                                }, 1000);  
+                            }
+                        }
+
+                        typeNextChar(); 
+                    }
+
+                    document.addEventListener("DOMContentLoaded", function () {
+                        const searchInput = document.getElementById("search-input");
+                        const textToType = "Search Here.....";
+                        const typingInterval = 150; 
+                        const loop = true;  
+                        typeText(searchInput, textToType, typingInterval, loop);
+                    });
+
+              </script>
                 <div class="col-sm-8 col-lg-4 d-flex justify-content-end gap-5 align-items-center mt-4 mt-sm-0 justify-content-center justify-content-sm-end">
                     @{
                         var customerJson = Context.Session.GetString("Taikhoan");
@@ -321,7 +355,7 @@
             <div class="row">
                 <div class="col-md-3">
                     <div class="footer-menu">
-                        <img src="~/images/logo.png" alt="logo">
+                        <img src="/images/logo/petshoplogo.png" alt="logo" class="img-fluid">
                         <p class="blog-paragraph fs-6 mt-3">Subscribe to our newsletter to get updates about our grand offers.</p>
                         <div class="social-links">
                             <ul class="d-flex list-unstyled gap-2">
@@ -394,7 +428,7 @@
     <div class="chat-container">
         <!-- Chat Button -->
         <button class="chat-button" onclick="toggleChat()">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR1_X45p3L-DawmIXGT1N3KNSq1qwq4waLi5Zho8b_L3XXwxfUD9fE5CsJbBoYskWZ1IV8&usqp=CAU" alt="Chat Icon" class="chat-icon">
+            <img src="~/images/botchat.png" alt="Chat Icon" class="chat-icon">
             <span class="notification-badge">!</span>
         </button>
 
@@ -609,9 +643,6 @@
 
             addMessage("bot-message", response);
         }
-
-
-
     </script>
 </body>
 
