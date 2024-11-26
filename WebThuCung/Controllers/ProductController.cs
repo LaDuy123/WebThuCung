@@ -1347,9 +1347,6 @@ namespace WebThuCung.Controllers
 
 
 
-
-
-
         [HttpPost]
         public async Task<IActionResult> SaveProduct(string idproduct)
         {
@@ -1357,9 +1354,10 @@ namespace WebThuCung.Controllers
             {
                 int customerid = GetCustomerIdFromSession();
 
+
                 if (customerid == 0)
                 {
-                    return Json(new { success = false, message = "Please log in to save products." });
+                    return Json(new { success = false, message = "Please log in first.", redirectToLogin = true });
                 }
 
                 var existingSaveProduct = await _context.SaveProducts

@@ -74,36 +74,35 @@
 
         <ul class="sidebar-nav" id="sidebar-nav">
             <li class="nav-item">
-                <a class="nav-link " asp-controller="Shipper" asp-action="OrderinPending">
-                    <i class="bi bi-circle"></i>
+                <a class="nav-link" asp-controller="Shipper" asp-action="OrderinPending">
+                    <i class="bi bi-circle @(ViewContext.RouteData.Values["action"]?.ToString() == "OrderinPending" ? "active-icon" : "")"></i>
                     <span>Order Pending</span>
                 </a>
-            </li><!-- End Dashboard Nav -->
+            </li>
             <li class="nav-item">
-                <a class="nav-link " asp-controller="Shipper" asp-action="OrderinTransit">
-                    <i class="bi bi-circle"></i>
+                <a class="nav-link" asp-controller="Shipper" asp-action="OrderinTransit">
+                    <i class="bi bi-circle @(ViewContext.RouteData.Values["action"]?.ToString() == "OrderinTransit" ? "active-icon" : "")"></i>
                     <span>Order in Transit</span>
                 </a>
-            </li><!-- End Dashboard Nav -->
+            </li>
             <li class="nav-item">
                 <a class="nav-link" asp-controller="Shipper" asp-action="OrderDelivered">
-                    <i class="bi bi-circle"></i> 
+                    <i class="bi bi-circle @(ViewContext.RouteData.Values["action"]?.ToString() == "OrderDelivered" ? "active-icon" : "")"></i>
                     <span>Order Delivered</span>
                 </a>
-            </li><!-- End Login Page Nav -->
-
+            </li>
             <li class="nav-item">
                 <a class="nav-link" asp-controller="Shipper" asp-action="OrderRefund">
-                    <i class="bi bi-circle"></i>
+                    <i class="bi bi-circle @(ViewContext.RouteData.Values["action"]?.ToString() == "OrderRefund" ? "active-icon" : "")"></i>
                     <span>Return Order</span>
                 </a>
-            </li><!-- End Login Page Nav -->
+            </li>
             <li class="nav-item">
                 <a class="nav-link" asp-controller="Shipper" asp-action="OrderFailed">
-                    <i class="bi bi-circle"></i>
+                    <i class="bi bi-circle @(ViewContext.RouteData.Values["action"]?.ToString() == "OrderFailed" ? "active-icon" : "")"></i>
                     <span>Order Delivery Failed</span>
                 </a>
-            </li><!-- End Login Page Nav -->
+            </li>
 
 
 

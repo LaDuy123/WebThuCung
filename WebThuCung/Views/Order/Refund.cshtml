@@ -26,14 +26,15 @@
                            class="btn btn-primary">Order pending</a>
                         <a asp-controller="Order" asp-action="Accepted"
                            class="btn btn-primary">Order Accepted</a>
+                        <a asp-controller="Order" asp-action="Deliveried"
+                           class="btn btn-primary">Shipper Delivered</a>
                         <a asp-controller="Order" asp-action="Completed"
                            class="btn btn-primary">Order Completed</a>
                         <a asp-controller="Order" asp-action="Refund"
-                           class="btn btn-primary">Order is returned</a>
-                        <a asp-controller="Order" asp-action="Deliveried"
-                           class="btn btn-primary">Shipper Delivered</a>
+                           class="btn btn-primary  active">Order is returned</a>
                         <a asp-controller="Order" asp-action="UpdateShippingStatus"
                            class="btn btn-primary">UpdateShippingStatus</a>
+                        
                         <!-- Table with stripped rows -->
                         <table class="table datatable">
                             <thead>
@@ -78,7 +79,7 @@
                                                     @:N/A
                                                 }
                                             </td>
-                                            <td>@orderView.Order.totalOrder?.ToString("C")</td>
+                                            <td>@orderView.totalOrder?.ToString("C")</td>
                                             <td>
                                                 @if (orderView.Shipper != null)
                                                 {
@@ -195,6 +196,16 @@
 </div>
 
 
+<style>
+    /* Thêm hiệu ứng đặc biệt cho nút active */
+    .btn.active {
+        border: 2px solid #ffc107; /* Viền màu vàng nhạt */
+        box-shadow: 0 0 10px rgba(255, 193, 7, 0.5); /* Hiệu ứng đổ bóng */
+        color: #fff !important; /* Đổi màu chữ thành trắng */
+        background-color: #ffc107 !important; /* Màu nền vàng */
+    }
+
+</style>
 <script>
     function confirmOrder() {
         return confirm("Are you sure you want to accept this order?");

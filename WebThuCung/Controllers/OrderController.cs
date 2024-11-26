@@ -24,19 +24,25 @@ namespace WebThuCung.Controllers
             // Lấy danh sách các đơn hàng từ cơ sở dữ liệu
             var orders = _context.Orders
                 .Include(o => o.DetailOrders)
-                .ThenInclude(p => p.Product)
+                    .ThenInclude(p => p.Product)
                 .Include(o => o.ShipperOrders)
                 .ToList();
 
-            // Tính toán tổng giá trị cho mỗi đơn hàng
+            // Gán tổng giá trị đơn hàng từ bảng Transaction
             foreach (var order in orders)
             {
-                order.CalculateTotalOrder(); // Calculate total order based on DetailOrders
+                // Lấy transaction liên quan đến đơn hàng
+                var transaction = _context.Transactions
+                    .FirstOrDefault(t => t.idOrder == order.idOrder);
+
+                // Gán totalOrder bằng TotalAmount của transaction (nếu có)
+                order.totalOrder = transaction?.TotalAmount ?? 0; // Nếu không có transaction, gán 0
             }
 
-            // Truyền danh sách đơn hàng sang 
+            // Truyền danh sách đơn hàng sang view
             return View(orders);
         }
+
         public IActionResult Pending()
         {
             // Lấy danh sách các đơn hàng từ cơ sở dữ liệu
@@ -55,7 +61,7 @@ namespace WebThuCung.Controllers
             foreach (var order in orders)
             {
                 // Tính toán tổng giá trị cho mỗi đơn hàng
-                order.CalculateTotalOrder(); // Tính tổng giá trị đơn hàng dựa trên DetailOrders
+               
 
                 // Tìm các Transaction liên quan đến order
                 var transactions = _context.Transactions
@@ -73,7 +79,7 @@ namespace WebThuCung.Controllers
                         Order = order,
                         Transaction = transaction,
                         PaymentExists = paymentExists,
-                        totalOrder = order.totalOrder,
+                        totalOrder = transaction.TotalAmount,
                         Shipper = shipper,
                         ShipperOrder = shipperOrder // Thêm ShipperOrder vào DTO
                     });
@@ -104,7 +110,7 @@ namespace WebThuCung.Controllers
             foreach (var order in orders)
             {
                 // Tính toán tổng giá trị cho mỗi đơn hàng
-                order.CalculateTotalOrder(); // Tính tổng giá trị đơn hàng dựa trên DetailOrders
+               
 
                 // Tìm các Transaction liên quan đến order
                 var transactions = _context.Transactions
@@ -122,7 +128,7 @@ namespace WebThuCung.Controllers
                         Order = order,
                         Transaction = transaction,
                         PaymentExists = paymentExists,
-                        totalOrder = order.totalOrder,
+                        totalOrder = transaction.TotalAmount,
                         Shipper = shipper,
                         ShipperOrder = shipperOrder // Thêm ShipperOrder vào DTO
                     });
@@ -150,7 +156,7 @@ namespace WebThuCung.Controllers
             foreach (var order in orders)
             {
                 // Tính toán tổng giá trị cho mỗi đơn hàng
-                order.CalculateTotalOrder(); // Tính tổng giá trị đơn hàng dựa trên DetailOrders
+               
 
                 // Tìm các Transaction liên quan đến order
                 var transactions = _context.Transactions
@@ -166,7 +172,7 @@ namespace WebThuCung.Controllers
                         Order = order,
                         Transaction = transaction,
                         PaymentExists = paymentExists,
-                        totalOrder = order.totalOrder // Thêm tổng giá trị đơn hàng vào model
+                        totalOrder = transaction.TotalAmount,
                     });
                 }
             }
@@ -193,8 +199,7 @@ namespace WebThuCung.Controllers
             foreach (var order in orders)
             {
                 // Tính toán tổng giá trị cho mỗi đơn hàng
-                order.CalculateTotalOrder(); // Tính tổng giá trị đơn hàng dựa trên DetailOrders
-
+               
                 // Tìm các Transaction liên quan đến order
                 var transactions = _context.Transactions
                     .Where(t => t.idOrder == order.idOrder)
@@ -211,7 +216,7 @@ namespace WebThuCung.Controllers
                         Order = order,
                         Transaction = transaction,
                         PaymentExists = paymentExists,
-                        totalOrder = order.totalOrder,
+                        totalOrder = transaction.TotalAmount,
                         Shipper = shipper,
                         ShipperOrder = shipperOrder // Thêm ShipperOrder vào DTO
                     });
@@ -241,7 +246,7 @@ namespace WebThuCung.Controllers
             foreach (var order in orders)
             {
                 // Tính toán tổng giá trị cho mỗi đơn hàng
-                order.CalculateTotalOrder(); // Tính tổng giá trị đơn hàng dựa trên DetailOrders
+               
 
                 // Tìm các Transaction liên quan đến order
                 var transactions = _context.Transactions
@@ -259,7 +264,7 @@ namespace WebThuCung.Controllers
                         Order = order,
                         Transaction = transaction,
                         PaymentExists = paymentExists,
-                        totalOrder = order.totalOrder,
+                        totalOrder = transaction.TotalAmount,
                         Shipper = shipper,
                         ShipperOrder = shipperOrder // Thêm ShipperOrder vào DTO
                     });
@@ -597,11 +602,7 @@ namespace WebThuCung.Controllers
                 .ToList();
 
             // Tính tổng giá cho mỗi DetailOrder
-            foreach (var detailOrder in detailOrders)
-            {
-                detailOrder.totalPrice = detailOrder.CalculateTotalPrice();
-            }
-
+       
             // Truyền orderId vào view để liên kết trở lại đơn hàng
             ViewBag.OrderId = id;
 

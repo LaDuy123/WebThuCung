@@ -1,4 +1,4 @@
-/**
+﻿/**
 * Template Name: NiceAdmin
 * Template URL: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/
 * Updated: Apr 20 2024 with Bootstrap v5.3.3
@@ -12,44 +12,79 @@
 :root {
   scroll-behavior: smooth;
 }
+.btn.active {
+    border: 2px solid #ffc107; /* Viền màu vàng nhạt */
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.5); /* Hiệu ứng đổ bóng */
+    color: #fff !important; /* Đổi màu chữ thành trắng */
+    background-color: #ffc107 !important; /* Màu nền vàng */
+}
+/* Định nghĩa kiểu cho nút active */
+/* Biểu tượng active: thay đổi cả màu viền và nền */
+.sidebar-nav .nav-item .nav-link i.active-icon {
+    color: white; /* Màu chữ bên trong */
+    background-color: black; /* Màu nền bên trong */
+    border-radius: 50%; /* Tạo hình tròn cho nền */
+    width: 20px; /* Chiều rộng của biểu tượng */
+    height: 20px; /* Chiều cao của biểu tượng */
+    display: flex; /* Căn giữa nội dung */
+    justify-content: center; /* Căn giữa biểu tượng */
+    align-items: center; /* Căn giữa biểu tượng */
+    transition: all 0.3s ease; /* Hiệu ứng chuyển đổi mượt mà */
+    font-size: 12px; /* Đảm bảo biểu tượng có kích thước hợp lý */
+}
+
+/* Màu mặc định cho biểu tượng khi không active */
+.sidebar-nav .nav-item .nav-link i {
+    color: #6c757d; /* Màu xám mặc định cho viền */
+    background-color: transparent; /* Không có nền */
+    border-radius: 50%; /* Tạo hình tròn */
+    width: 20px; /* Chiều rộng của biểu tượng */
+    height: 20px; /* Chiều cao của biểu tượng */
+    display: flex; /* Căn giữa nội dung */
+    justify-content: center; /* Căn giữa biểu tượng */
+    align-items: center; /* Căn giữa biểu tượng */
+    transition: all 0.3s ease; /* Hiệu ứng mượt mà */
+    font-size: 12px; /* Đảm bảo biểu tượng có kích thước hợp lý */
+}
+
 .avatar_imgadmin {
     width: 45px; /* ??t chi?u r?ng c?a avatar (?i?u ch?nh theo mong mu?n) */
     height: 45px; /* ??t chi?u cao c?a avatar */
-    border-radius: 50%; /* T?o h�nh tr�n cho avatar */
-    object-fit: cover; /* ??m b?o ?nh kh�ng b? m�o */
+    border-radius: 50%; /* T?o hình tròn cho avatar */
+    object-fit: cover; /* ??m b?o ?nh không b? méo */
     margin-right: 50px;
 }
 .profileavataradmin {
     display: none;
-    position: absolute; /* ??t th�nh ph?n xu?t hi?n ? v? tr� c? ??nh */
+    position: absolute; /* ??t thành ph?n xu?t hi?n ? v? trí c? ??nh */
     background-color: white;
     border: 1px solid #ccc;
-    z-index: 1000; /* ??m b?o danh s�ch hi?n th? l�n tr�n */
+    z-index: 1000; /* ??m b?o danh sách hi?n th? lên trên */
     list-style: none;
     padding: 0;
     margin: 0;
     color: black;
 }
 
-    /* ??m b?o m?i m?c trong danh s�ch c� kho?ng c�ch ??u */
+    /* ??m b?o m?i m?c trong danh sách có kho?ng cách ??u */
     .profileavataradmin li {
-        padding: 10px 15px; /* Th�m kho?ng c�ch tr�n v� d??i l� 10px, b�n tr�i v� b�n ph?i l� 15px */
-        border-bottom: 1px solid #ddd; /* Th�m ???ng ph�n c�ch gi?a c�c m?c */
+        padding: 10px 15px; /* Thêm kho?ng cách trên và d??i là 10px, bên trái và bên ph?i là 15px */
+        border-bottom: 1px solid #ddd; /* Thêm ???ng phân cách gi?a các m?c */
     }
 
 .profileavataradmin li:last-child {
-    border-bottom: none; /* Lo?i b? ???ng ph�n c�ch ? m?c cu?i c�ng */
+    border-bottom: none; /* Lo?i b? ???ng phân cách ? m?c cu?i cùng */
 }
 
 .profileavataradmin li a {
-    color: black; /* ??t m�u ch? li�n k?t th�nh ?en v� d�ng !important ?? ghi ?� c�c thu?c t�nh kh�c */
-    text-decoration: none; /* X�a g?ch ch�n n?u c� */
-    display: block; /* ??m b?o li�n k?t chi?m to�n b? kho?ng c�ch c?a m?c */
+    color: black; /* ??t màu ch? liên k?t thành ?en và dùng !important ?? ghi ?è các thu?c tính khác */
+    text-decoration: none; /* Xóa g?ch chân n?u có */
+    display: block; /* ??m b?o liên k?t chi?m toàn b? kho?ng cách c?a m?c */
 }
 
 .profileavataradmin li a:hover {
     color: green;
-    text-decoration: underline; /* Th�m g?ch ch�n khi hover */
+    text-decoration: underline; /* Thêm g?ch chân khi hover */
 }
 
 body {

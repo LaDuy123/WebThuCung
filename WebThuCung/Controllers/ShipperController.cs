@@ -243,11 +243,7 @@ namespace WebThuCung.Controllers
                 .ToList();
 
             // Tính tổng giá cho mỗi DetailOrder
-            foreach (var detailOrder in detailOrders)
-            {
-                detailOrder.totalPrice = detailOrder.CalculateTotalPrice();
-            }
-
+          
             // Truyền orderId vào view để liên kết trở lại đơn hàng
             ViewBag.OrderId = id;
 
