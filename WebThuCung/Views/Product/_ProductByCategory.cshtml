@@ -89,7 +89,7 @@
             </div>
         </div>
 
-        <div class="isotope-container row">
+        <div class="isotope-container row" style="text-align:center;">
 
             @foreach (var product in Model.Take(8))
             {
@@ -97,12 +97,12 @@
                 ViewBag.SavedProductIds.Contains(product.idProduct);
 
                 <div class="item col-md-4 col-lg-3 my-4" data-productid="@product.idProduct">
-                    @if (product.DiscountPercent > 0)
+                   @*  @if (product.DiscountPercent > 0)
                     {
                         <div style="color: red;">
                             @product.DiscountPercent% OFF
                         </div>
-                    }
+                    } *@
                     <div class="card position-relative">
                         <a href="@Url.Action("Detail", "Product", new { id = product.idProduct })">
                             <img src="@Url.Content("~/images/" + product.Image)" class="img-fluid rounded-4" alt="@product.nameProduct">
