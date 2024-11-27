@@ -126,24 +126,24 @@
                             <h2 class="text-dark pb-3">Billing Details</h2>
                             <div class="billing-details">
                                 <label for="name">Name</label>
-                                <input type="text" id="name" name="name" class="form-control mt-2 mb-4 ps-3" placeholder="Enter your name" required>
+                                <input style="text-transform: none; type="text" id="name" name="name" class="form-control mt-2 mb-4 ps-3" placeholder="Enter your name" required>
 
                                 <label for="address">Street Address</label>
-                                <input type="text" id="address" name="address"
+                                <input style="text-transform: none; type="text" id="address" name="address"
                                        placeholder="House number and street name"
                                        class="form-control mt-3 ps-3 mb-3"
                                        value="@ViewBag.CustomerAddress"
                                        required>
 
                                 <label for="phone">Phone</label>
-                                <input type="tel" id="phone" name="phone" class="form-control mt-2 mb-4 ps-3" placeholder="Enter your phone number" onkeypress="return isNumberKey(event)" onpaste="return false"
+                                <input style="text-transform: none; type="tel" id="phone" name="phone" class="form-control mt-2 mb-4 ps-3" placeholder="Enter your phone number" onkeypress="return isNumberKey(event)" onpaste="return false"
                                        oninput="validateInput(this)" required>
 
                                 <label for="email">Email address</label>
-                                <input type="email" id="email" name="email" class="form-control mt-2 mb-4 ps-3" placeholder="Enter your email address" required>
+                                <input style="text-transform: none; type="email" id="email" name="email" class="form-control mt-2 mb-4 ps-3" placeholder="Enter your email address" required>
 
                                 <label for="note">Note</label>
-                                <input type="text" id="note" name="note" class="form-control mt-2 mb-4 ps-3" placeholder="Any additional notes">
+                                <input style="text-transform: none; type="text" id="note" name="note" class="form-control mt-2 mb-4 ps-3" placeholder="Any additional notes">
 
                             </div>
 

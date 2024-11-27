@@ -264,22 +264,27 @@ namespace WebThuCung.Controllers
                     break;
             }
 
-            return _context.Orders
-                .Where(o => o.dateFrom.Date >= startDate && o.dateFrom.Date <= endDate)
-                .SelectMany(o => o.DetailOrders)
-                .GroupBy(d => new { d.idProduct, d.Product.nameProduct, d.Product.sellPrice, d.Product.Image })
-                .Select(g => new TopSellingProductDto
-                {
-                    ProductId = g.Key.idProduct,
-                    ProductName = g.Key.nameProduct,
-                    Price = g.Key.sellPrice,
-                    Sold = g.Sum(d => d.Quantity),
-                    Revenue = g.Sum(d => d.Product.sellPrice * d.Quantity),
-                    ImageUrl = g.Key.Image
-                })
-                .OrderByDescending(p => p.Sold)
-                .Take(5) // Lấy 5 sản phẩm bán chạy nhất
-                .ToList();
+            var topSellingProducts = _context.Orders
+     .Where(o => o.dateFrom.Date >= startDate && o.dateFrom.Date <= endDate)
+     .SelectMany(o => o.DetailOrders)
+     .GroupBy(d => new { d.idProduct, d.Product.nameProduct, d.Product.sellPrice, d.Product.Image })
+     .Select(g => new TopSellingProductDto
+     {
+         ProductId = g.Key.idProduct,
+         ProductName = g.Key.nameProduct,
+         Price = g.Key.sellPrice,
+         DiscountedPrice = g.Key.sellPrice - (g.Key.sellPrice * (_context.Discounts
+             .Where(d => d.idProduct == g.Key.idProduct)
+             .Select(d => d.discountPercent)
+             .FirstOrDefault() / 100m)),
+         Sold = g.Sum(d => d.Quantity),
+         ImageUrl = g.Key.Image
+     })
+     .OrderByDescending(p => p.Sold)
+     .Take(5)
+     .ToList();
+
+            return topSellingProducts;
         }
         private CustomerViewDto GetDailyCustomerData(DateTime today)
         {
