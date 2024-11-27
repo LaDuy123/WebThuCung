@@ -51,42 +51,42 @@
                                 <!-- Username -->
                                 <div class="form-input col-lg-12 my-4">
                                     <label asp-for="userCustomer" class="col-form-label">Username</label>
-                                    <input asp-for="userCustomer" class="form-control mb-3 p-4" placeholder="Nhập tên đăng nhập" style="text-transform: none;" />
+                                    <input asp-for="userCustomer" class="form-control mb-3 p-4" placeholder="Enter username" style="text-transform: none;" />
                                     <span asp-validation-for="userCustomer" class="text-danger"></span>
                                 </div>
 
                                 <!-- Email -->
                                 <div class="form-input col-lg-12 my-4">
                                     <label asp-for="Email" class="col-form-label">Email</label>
-                                    <input asp-for="Email" class="form-control mb-3 p-4" placeholder="Nhập địa chỉ email của bạn" style="text-transform: none;" />
+                                    <input asp-for="Email" class="form-control mb-3 p-4" placeholder="Enter email address" style="text-transform: none;" />
                                     <span asp-validation-for="Email" class="text-danger"></span>
                                 </div>
 
                                 <!-- Password -->
                                 <div class="form-input col-lg-12 my-4">
                                     <label asp-for="paswordCusstomer" class="col-form-label">Password</label>
-                                    <input asp-for="paswordCusstomer" type="password" class="form-control mb-3 p-4" placeholder="Tạo mật khẩu" style="text-transform: none;" />
+                                    <input asp-for="paswordCusstomer" type="password" class="form-control mb-3 p-4" placeholder="Enter password" style="text-transform: none;" />
                                     <span asp-validation-for="paswordCusstomer" class="text-danger"></span>
                                 </div>
 
                                 <!-- Confirm Password -->
                                 <div class="form-input col-lg-12 my-4">
                                     <label asp-for="confirmPassword" class="col-form-label">Confirm Password</label>
-                                    <input asp-for="confirmPassword" type="password" class="form-control mb-3 p-4" placeholder="Nhập lại mật khẩu" style="text-transform: none;" />
+                                    <input asp-for="confirmPassword" type="password" class="form-control mb-3 p-4" placeholder="Enter confirm password" style="text-transform: none;" />
                                     <span asp-validation-for="confirmPassword" class="text-danger"></span>
                                 </div>
 
                                 <!-- Full Name -->
                                 <div class="form-input col-lg-12 my-4">
                                     <label asp-for="Name" class="col-form-label">Full Name</label>
-                                    <input asp-for="Name" class="form-control mb-3 p-4" placeholder="Nhập họ tên" style="text-transform: none;" />
+                                    <input asp-for="Name" class="form-control mb-3 p-4" placeholder="Enter your name" style="text-transform: none;" />
                                     <span asp-validation-for="Name" class="text-danger"></span>
                                 </div>
 
                                 <!-- Phone -->
                                 <div class="form-input col-lg-12 my-4">
                                     <label asp-for="Phone" class="col-form-label">Phone</label>
-                                    <input asp-for="Phone" class="form-control mb-3 p-4" placeholder="Nhập số điện thoại" onkeypress="return isNumberKey(event)" />
+                                    <input asp-for="Phone" class="form-control mb-3 p-4" placeholder="Enter Phone" onkeypress="return isNumberKey(event)" />
                                     <span asp-validation-for="Phone" class="text-danger"></span>
                                 </div>
                                 <div class="form-input col-lg-12 my-4">
@@ -129,7 +129,7 @@
                                 </div>
                                 <div class="form-input col-lg-12 my-4">
                                     <label asp-for="Address" class="col-form-label">Address</label>
-                                    <input asp-for="Address" class="form-control mb-3 p-4" placeholder="Nhập địa chỉ" />
+                                    <input asp-for="Address" class="form-control mb-3 p-4" placeholder="Enter address" />
                                     <span asp-validation-for="Address" class="text-danger"></span>
                                 </div>
 
@@ -140,7 +140,7 @@
 
                                 <!-- Back to Login -->
                                 <p class="text-center mt-3">
-                                    <a href="@Url.Action("Login", "User")" class="text-primary fw-bold">Trở về trang đăng nhập</a>
+                                    <a href="@Url.Action("Login", "User")" class="text-primary fw-bold">Back to login</a>
                                 </p>
                             </form><!-- End Register Form -->
                         </div>

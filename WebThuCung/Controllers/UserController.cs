@@ -900,10 +900,7 @@ namespace WebThuCung.Controllers
             }
 
      // Kiểm tra trạng thái đơn hàng
-            if (order.statusOrder != OrderStatus.Complete)
-            {
-                return Json(new { success = false, message = "Orders that have not been delivered to you cannot be refunded." });
-            }
+
             if (order.statusPay != PaymentStatus.Paid)
             {
                 return Json(new { success = false, message = "Your unpaid order is currently non-refundable." });

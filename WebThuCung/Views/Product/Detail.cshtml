@@ -219,78 +219,93 @@
         background-color: #e9ecef; /* Màu n?n nh?t h?n */
     }
 </style>
-<script>
-    $(document).ready(function () {
-        $('#colorList').on('click', '.color-item', function (e) {
-            e.preventDefault();
-            $('.color-item').removeClass('color-selected');
-            $(this).addClass('color-selected');
 
-            $('#btnAddToCart').data('color', $(this).data('color'));
-        });
+<script>
+        $(document).ready(function () {
+            $('#colorList').on('click', '.color-item', function (e) {
+                e.preventDefault();
+                $('.color-item').removeClass('color-selected');
+                $(this).addClass('color-selected');
+
+                $('#btnAddToCart').data('color', $(this).data('color'));
+            });
 
         $('#sizeList').on('click', '.size-item', function (e) {
             e.preventDefault();
-            $('.size-item').removeClass('size-selected');
-            $(this).addClass('size-selected');
+        $('.size-item').removeClass('size-selected');
+        $(this).addClass('size-selected');
 
-            $('#btnAddToCart').data('size', $(this).data('size'));
-        });
+        $('#btnAddToCart').data('size', $(this).data('size'));
+            });
 
         // Add event listener for thumbnail clicks
         $('.product-thumbnail-slider .thumbnail-image').on('click', function () {
-            var newSrc = $(this).attr('src');
-            $('.product-large-slider .main-image').attr('src', newSrc).css({
-                'width': '80%',
-                'height': 'auto'
+                var newSrc = $(this).attr('src');
+        $('.product-large-slider .main-image').attr('src', newSrc).css({
+            'width': '80%',
+        'height': 'auto'
+                });
             });
-        });
 
         $('#btnAddToCart').on('click', function (e) {
             e.preventDefault();
-            let productId = $(this).data('product-id');
-            let color = $(this).data('color') || "Màu sắc không có sẵn"; // Default message if color is not selected
-            let size = $(this).data('size') || "Kích thước không có sẵn"; // Default message if size is not selected
-            let quantity = $('#quantity').val();
+        let productId = $(this).data('product-id');
+        let color = $(this).data('color'); // Không gán giá trị mặc định để kiểm tra chính xác
+        let size = $(this).data('size');  // Không gán giá trị mặc định để kiểm tra chính xác
+        let quantity = $('#quantity').val();
 
-            console.log("ProductId:", productId);
-            console.log("Color:", color);
-            console.log("Size:", size);
-            console.log("Quantity:", quantity);
-
-            $.ajax({
-                url: '/Product/AddToCart',
-                type: 'POST',
-                contentType: 'application/json; charset=utf-8',
-                dataType: 'json',
-                headers: {
-                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
-                },
-                data: JSON.stringify({
-                    ProductId: productId,
-                    Color: color,
-                    Size: size,
-                    Quantity: quantity
-                }),
-                success: function (response) {
-                    if (response.success) {
-                        window.location.href = '/Product/ViewCart';
-                    } else {
-                        if (response.redirectUrl) {
-                            window.location.href = response.redirectUrl;
-                        } else {
-                            alert("Error adding product to cart: " + response.message);
-                        }
-                    }
-                },
-                error: function (xhr, status, error) {
-                    console.error("Status: ", status);
-                    console.error("Error: ", error);
-                    console.error("Response Text: ", xhr.responseText);
-                    alert("Error adding product to cart.");
+        // Kiểm tra nếu chưa chọn color
+        if (!color) {
+            alert("Please select a color before adding the product to the cart.");
+        return; // Dừng lại nếu chưa chọn color
                 }
+
+        // Kiểm tra nếu chưa chọn size
+        if (!size) {
+            alert("Please select a size before adding the product to the cart.");
+        return; // Dừng lại nếu chưa chọn size
+                }
+
+        console.log("ProductId:", productId);
+        console.log("Color:", color);
+        console.log("Size:", size);
+        console.log("Quantity:", quantity);
+
+        $.ajax({
+            url: '/Product/AddToCart',
+        type: 'POST',
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        headers: {
+            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+        data: JSON.stringify({
+            ProductId: productId,
+        Color: color,
+        Size: size,
+        Quantity: quantity
+                    }),
+        success: function (response) {
+                        if (response.success) {
+            window.location.href = '/Product/ViewCart';
+                        } else {
+                            if (response.redirectUrl) {
+            window.location.href = response.redirectUrl;
+                            } else {
+            alert("Error adding product to cart: " + response.message);
+                            }
+                        }
+                    },
+        error: function (xhr, status, error) {
+            console.error("Status: ", status);
+        console.error("Error: ", error);
+        console.error("Response Text: ", xhr.responseText);
+        alert("Error adding product to cart.");
+                    }
+                });
             });
         });
-    });
 </script>
+
+
 

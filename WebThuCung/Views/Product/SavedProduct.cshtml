@@ -42,7 +42,9 @@
                                 <div class="cart-info d-flex flex-wrap align-items-center">
                                     <div class="col-lg-3">
                                         <div class="card-image">
-                                            <img src="@Url.Content("~/images/" + item.Image)" alt="@item.nameProduct" class="img-fluid">
+                                            <a asp-controller ="Product" asp-action="Detail" asp-route-id="@item.idProduct">
+                                            <img  src="~/images/@item.Image" alt="@item.nameProduct" class="img-fluid">
+                                            </a>
                                         </div>
                                     </div>
                                     <div class="col-lg-9">

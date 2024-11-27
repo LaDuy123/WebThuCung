@@ -73,15 +73,27 @@
                     @if (transaction.Order.statusPay == PaymentStatus.Paid) // Kiểm tra trạng thái thanh toán
                     {
                         <div class="info-item">
-                            <p>Trạng thái thanh toán: <strong>Đã thanh toán</strong></p> <!-- Hiển thị thông báo đã thanh toán -->
+                            <p>Trạng thái thanh toán: <strong>@transaction.Order.statusPay</strong></p> <!-- Hiển thị thông báo đã thanh toán -->
+                        </div>
+                        <div class="info-item">
+                            <button type="button" class="btn btn-danger btn-sm" onclick="refundOrder('@transaction.Order.idOrder')">Refund</button>
                         </div>
                     }
-                    else
+                    else if (transaction.Order.statusPay != PaymentStatus.Refunded) // Kiểm tra trạng thái thanh toán
                     {
+                        <div class="info-item">
+                            <p>Trạng thái thanh toán: <strong>@transaction.Order.statusPay</strong></p> <!-- Hiển thị thông báo đã thanh toán -->
+                        </div>
                         <div class="info-item text-end">
                             <button type="button" class="btn btn-primary" onclick="processOnlinePayment(@transaction.idTransaction)">
                                 Thanh toán online
                             </button>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="info-item">
+                            <p>Trạng thái thanh toán: <strong>@transaction.Order.statusPay</strong></p> <!-- Hiển thị thông báo đã thanh toán -->
                         </div>
                     }
 
