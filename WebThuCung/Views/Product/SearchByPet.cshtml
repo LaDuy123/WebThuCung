@@ -80,12 +80,24 @@
 
                                     <div class="card-text">
                                         <div class="price-container">
-                                            <h3 class="secondary-font text-muted text-decoration-line-through">
-                                                Price old: <span>@product.Price.ToString("C")</span>
-                                            </h3>
-                                            <h3 class="secondary-font text-primary">
-                                                Price sales: <span>@product.DiscountedPrice.ToString("C")</span>
-                                            </h3>
+                                            @if (product.Price == product.DiscountedPrice)
+                                            {
+                                                <!-- Hiển thị giá bán nếu không có giảm giá -->
+                                                <h3 class="secondary-font text-primary">
+                                                    Price: <span>@product.Price.ToString("C")</span>
+                                                </h3>
+                                            }
+                                            else
+                                            {
+                                                <!-- Hiển thị cả giá bán gạch chéo và giá đã giảm -->
+                                                <h3 class="secondary-font text-muted text-decoration-line-through">
+                                                    Price old: <span>@product.Price.ToString("C")</span>
+                                                </h3>
+                                                <h3 class="secondary-font text-primary">
+                                                    Price sales: <span>@product.DiscountedPrice.ToString("C")</span>
+                                                </h3>
+                                            }
+
                                         </div>
 
 
@@ -130,12 +142,14 @@
                 ViewBag.SavedProductIds.Contains(product.idProduct);
 
                 <div class="item col-md-4 col-lg-3 my-4" data-productid="@product.idProduct">
-                    @if (product.DiscountPercent > 0)
-                    {
-                        <div style="color: red;">
-                            @product.DiscountPercent% OFF
-                        </div>
-                    }
+                    <div class="z-1 position-absolute rounded-3 m-3 px-3 border border-dark-subtle">
+                        @if (product.DiscountPercent > 0)
+                        {
+                            <div style="color: red;">
+                                @product.DiscountPercent% OFF
+                            </div>
+                        }
+                    </div>
                     <div class="card position-relative">
                         <a href="@Url.Action("Detail", "Product", new { id = product.idProduct })">
                             <img src="@Url.Content("~/images/" + product.Image)" class="img-fluid rounded-4" alt="@product.nameProduct">
@@ -148,14 +162,24 @@
                             <div class="card-text">
 
 
-                                <h3 class="secondary-font text-muted text-decoration-line-through">
-                                    Price old: <span>@product.sellPrice.ToString("C")</span>
-                                </h3>
+                                @if (product.sellPrice == product.DiscountedPrice)
+                                {
+                                    <!-- Hiển thị giá bán nếu không có giảm giá -->
+                                    <h3 class="secondary-font text-primary">
+                                        Price: <span>@product.sellPrice.ToString("C")</span>
+                                    </h3>
+                                }
+                                else
+                                {
+                                    <!-- Hiển thị cả giá bán gạch chéo và giá đã giảm -->
+                                    <h3 class="secondary-font text-muted text-decoration-line-through">
+                                        Price old: <span>@product.sellPrice.ToString("C")</span>
+                                    </h3>
+                                    <h3 class="secondary-font text-primary">
+                                        Price sales: <span>@product.DiscountedPrice.ToString("C")</span>
+                                    </h3>
+                                }
 
-                                <!-- Hiển thị giá đã giảm -->
-                                <h3 class="secondary-font text-primary">
-                                    Price sales: <span>@product.DiscountedPrice.ToString("C")</span>
-                                </h3>
 
                                 <div class="d-flex flex-wrap mt-3">
 
@@ -194,6 +218,9 @@
                         if (response.success) {
                             alert(response.message);
                             toggleIconColor(icon, idproduct);
+                        } else if (response.redirectToLogin) {
+                            // Nếu yêu cầu đăng nhập, chuyển hướng tới trang đăng nhập
+                            window.location.href = '/User/Login'; // Đổi đường dẫn theo đường dẫn của trang đăng nhập
                         }
                     },
                     error: function () {
@@ -221,6 +248,9 @@
                         if (response.success) {
                             alert(response.message);
                             toggleIconColor(icon, idproduct);
+                        } else if (response.redirectToLogin) {
+                            // Nếu yêu cầu đăng nhập, chuyển hướng tới trang đăng nhập
+                            window.location.href = '/User/Login'; // Đổi đường dẫn theo đường dẫn của trang đăng nhập
                         }
                     },
                     error: function () {
@@ -245,7 +275,7 @@
         // Kiểm tra trạng thái của icon, nếu là màu xám thì đổi thành đen, ngược lại thì đổi thành xám
         var currentColor = icon.css('color');
         if (currentColor === 'rgb(162, 162, 162)') {
-            icon.css('color', 'black'); // Đã lưu
+            icon.css('color', 'red'); // Đã lưu
         } else {
             icon.css('color', 'rgb(162, 162, 162)'); // Chưa lưu
         }

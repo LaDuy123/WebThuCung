@@ -152,7 +152,17 @@ namespace WebThuCung.Controllers
                     nameCategory = sp.Category.nameCategory,
                     Quantity = sp.Quantity,
                     Description = sp.Description,
-                    Logo = sp.Branch.Logo
+                    Logo = sp.Branch.Logo,
+                    // Tính giá chiết khấu
+                    DiscountedPrice = sp.sellPrice - (sp.sellPrice * (_context.Discounts
+                        .Where(d => d.idProduct == sp.idProduct)
+                        .Select(d => d.discountPercent)
+                        .FirstOrDefault() / 100m)),
+                    // Lấy phần trăm giảm giá
+                    DiscountPercent = _context.Discounts
+                        .Where(d => d.idProduct == sp.idProduct)
+                        .Select(d => d.discountPercent)
+                        .FirstOrDefault()
                 })
                 .OrderBy(p => p.idProduct)
                 .Skip((page - 1) * pageSize) // Bỏ qua các sản phẩm của các trang trước
@@ -310,20 +320,30 @@ namespace WebThuCung.Controllers
 
             // Lấy sản phẩm cho trang hiện tại
             var products = productsQuery
-                .Select(sp => new ProductViewDto
-                {
-                    idProduct = sp.idProduct,
-                    nameProduct = sp.nameProduct,
-                    sellPrice = sp.sellPrice,
-                    Image = sp.Image,
-                    idBranch = sp.idBranch,
-                    idCategori = sp.idCategory,
-                    nameBranch = sp.Branch.nameBranch,
-                    nameCategory = sp.Category.nameCategory,
-                    Quantity = sp.Quantity,
-                    Description = sp.Description,
-                    Logo = sp.Branch.Logo
-                })
+                 .Select(sp => new ProductViewDto
+                 {
+                     idProduct = sp.idProduct,
+                     nameProduct = sp.nameProduct,
+                     sellPrice = sp.sellPrice,
+                     Image = sp.Image,
+                     idBranch = sp.idBranch,
+                     idCategori = sp.idCategory,
+                     nameBranch = sp.Branch.nameBranch,
+                     nameCategory = sp.Category.nameCategory,
+                     Quantity = sp.Quantity,
+                     Description = sp.Description,
+                     Logo = sp.Branch.Logo,
+                     // Tính giá chiết khấu
+                     DiscountedPrice = sp.sellPrice - (sp.sellPrice * (_context.Discounts
+                        .Where(d => d.idProduct == sp.idProduct)
+                        .Select(d => d.discountPercent)
+                        .FirstOrDefault() / 100m)),
+                     // Lấy phần trăm giảm giá
+                     DiscountPercent = _context.Discounts
+                        .Where(d => d.idProduct == sp.idProduct)
+                        .Select(d => d.discountPercent)
+                        .FirstOrDefault()
+                 })
                 .OrderBy(p => p.idProduct)
                 .Skip((page - 1) * pageSize) // Bỏ qua các sản phẩm của các trang trước
                 .Take(pageSize) // Lấy sản phẩm của trang hiện tại
