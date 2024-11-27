@@ -102,6 +102,9 @@ CSS STRUCTURE:
     object-fit: cover; /* ??m b?o ?nh không b? méo */
 }
 
+.text-danger {
+    color: red !important; /* Đặt màu đỏ */
+}
 
 /* ?n danh sách th? <li> ban ??u */
 /* ?n danh sách th? <li> ban ??u */

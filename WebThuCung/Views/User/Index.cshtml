@@ -85,20 +85,40 @@
                                         <div class="price-container">
                                             @if (product.Price == product.DiscountedPrice)
                                             {
-                                                <!-- Hiển thị giá bán nếu không có giảm giá -->
-                                                <h3 class="secondary-font text-primary">
-                                                    Price: <span>@product.Price.ToString("C")</span>
-                                                </h3>
+                                                <div class="price-container d-flex align-items-center">
+                                                    <h3 class="secondary-font text-primary me-3">
+                                                        <span>
+                                                            @(product.Price % 1 == 0
+                                                                ? string.Format("{0:N0}", product.Price)
+                                                                : string.Format("{0:N2}", product.Price))<small>$</small>
+                                                        </span>
+                                                    </h3>
+                                                </div>
                                             }
                                             else
                                             {
-                                                <!-- Hiển thị cả giá bán gạch chéo và giá đã giảm -->
-                                                <h3 class="secondary-font text-muted text-decoration-line-through">
-                                                    Price old: <span>@product.Price.ToString("C")</span>
-                                                </h3>
-                                                <h3 class="secondary-font text-primary">
-                                                    Price sales: <span>@product.DiscountedPrice.ToString("C")</span>
-                                                </h3>
+                                                <div class="price-container d-flex align-items-center">
+                                                    <!-- Giá giảm -->
+                                                    <h3 class="secondary-font text-primary me-3">
+                                                        <span>
+                                                            @(product.DiscountedPrice % 1 == 0
+                                                                ? string.Format("{0:N0}", product.DiscountedPrice)
+                                                                : string.Format("{0:N2}", product.DiscountedPrice))<small>$</small>
+                                                        </span>
+                                                    </h3>
+
+                                                    <!-- Giá cũ (gạch chéo) -->
+                                                    <h3 class="secondary-font text-muted text-decoration-line-through text-danger">
+                                                        <span>
+                                                            @(product.Price % 1 == 0
+                                                                ? string.Format("{0:N0}", product.Price)
+                                                                : string.Format("{0:N2}", product.Price))<small>$</small>
+                                                        </span>
+                                                    </h3>
+                                                </div>
+
+
+                                                
                                             }
 
                                         </div>
@@ -170,20 +190,37 @@
 
                                     @if (product.sellPrice == product.DiscountedPrice)
                                     {
-                                        <!-- Hiển thị giá bán nếu không có giảm giá -->
-                                        <h3 class="secondary-font text-primary">
-                                            Price: <span>@product.sellPrice.ToString("C")</span>
-                                        </h3>
+                                        <div class="price-container d-flex align-items-center">
+                                            <h3 class="secondary-font text-primary me-3">
+                                                <span>
+                                                    @(product.sellPrice % 1 == 0
+                                                        ? string.Format("{0:N0}", product.sellPrice)
+                                                        : string.Format("{0:N2}", product.sellPrice))<small>$</small>
+                                                </span>
+                                            </h3>
+                                        </div>
                                     }
                                     else
                                     {
-                                        <!-- Hiển thị cả giá bán gạch chéo và giá đã giảm -->
-                                        <h3 class="secondary-font text-muted text-decoration-line-through">
-                                            Price old: <span>@product.sellPrice.ToString("C")</span>
-                                        </h3>
-                                        <h3 class="secondary-font text-primary">
-                                            Price sales: <span>@product.DiscountedPrice.ToString("C")</span>
-                                        </h3>
+                                        <div class="price-container d-flex align-items-center">
+                                            <!-- Giá giảm -->
+                                            <h3 class="secondary-font text-primary me-3">
+                                                <span>
+                                                    @(product.DiscountedPrice % 1 == 0
+                                                        ? string.Format("{0:N0}", product.DiscountedPrice)
+                                                        : string.Format("{0:N2}", product.DiscountedPrice))<small>$</small>
+                                                </span>
+                                            </h3>
+
+                                            <!-- Giá cũ (gạch chéo) -->
+                                            <h3 class="secondary-font text-muted text-decoration-line-through text-danger">
+                                                <span>
+                                                    @(product.sellPrice % 1 == 0
+                                                        ? string.Format("{0:N0}", product.sellPrice)
+                                                        : string.Format("{0:N2}", product.sellPrice))<small>$</small>
+                                                </span>
+                                            </h3>
+                                        </div>
                                     }
 
 
@@ -221,6 +258,7 @@
         display: inline; /* Đảm bảo h3 và nội dung bên trong hiển thị liền mạch */
         margin: 0; /* Loại bỏ khoảng cách mặc định */
         white-space: nowrap; /* Ngăn nội dung xuống dòng */
+        
     }
 
     .price-container span {
